@@ -660,6 +660,144 @@ This method allocates a new SDL surface when necessary."
 	(message "resizing textbox H:~S W:~S" height0 width0)
 	[resize self :height height0 :width width0]))))
 
+(define-method move-end-of-line textbox ()
+  (setf <point> (length <line>)))
+
+(define-method move-beginning-of-line textbox ()
+  (setf <point> 0))
+
+(defun bind-key-to-textbox-insertion (textbox key modifiers &optional (insertion key))
+  "For textbox P ensure that the event (KEY MODIFIERS) causes the
+text INSERTION to be inserted at point."
+ [define-key p (string-upcase key) modifiers
+	      #'(lambda ()
+		  [insert textbox insertion])])
+
+(define-method install-keybindings textbox ()
+  ;; install basic keybindings
+  (bind-key-to-method self "A" '(:control) :move-beginning-of-line)
+  (bind-key-to-method self "E" '(:control) :move-end-of-line)
+  (bind-key-to-method self "HOME" nil :move-beginning-of-line)
+  (bind-key-to-method self "END" nil :move-end-of-line)
+  (bind-key-to-method self "N" '(:control) :next-line)
+  (bind-key-to-method self "P" '(:control) :previous-line)
+  (bind-key-to-method self "F" '(:control) :forward-char)
+  (bind-key-to-method self "B" '(:control) :backward-char)
+  (bind-key-to-method self "DOWN" nil :next-line)
+  (bind-key-to-method self "UP" nil :previous-line)
+  (bind-key-to-method self "RIGHT" nil :forward-char)
+  (bind-key-to-method self "LEFT" nil :backward-char)
+  (bind-key-to-method self "K" '(:control) :clear)
+  (bind-key-to-method self "BACKSPACE" nil :backward-delete-char)
+  (bind-key-to-method self "RETURN" nil :execute)
+  (bind-key-to-method self "ESCAPE" nil :escape)
+  ;; install keybindings for self-inserting characters
+  (map nil #'(lambda (char)
+	       (bind-key-to-textbox-insertion self (string char) nil
+					     (string-downcase char)))
+       *lowercase-alpha-characters*)
+  (map nil #'(lambda (char)
+	       (bind-key-to-textbox-insertion self (string char) '(:shift)))
+       *uppercase-alpha-characters*)
+  (map nil #'(lambda (char)
+	       (bind-key-to-textbox-insertion self (string char) nil))
+       *numeric-characters*)
+  ;; other characters
+  (bind-key-to-textbox-insertion self "MINUS" nil "-")
+  (bind-key-to-textbox-insertion self "SEMICOLON" nil ";")
+  (bind-key-to-textbox-insertion self "SEMICOLON" '(:shift) ":")
+  (bind-key-to-textbox-insertion self "SPACE" nil " ")
+  (bind-key-to-textbox-insertion self "QUOTE" nil "'")
+  (bind-key-to-textbox-insertion self "QUOTE" '(:shift) "\""))
+
+(define-method initialize textbox ()
+  [parent>>initialize self]
+  [install-default-keybindings self])
+
+(define-method forward-char textbox ()
+  (setf <point> (min (1+ <point>)
+		     (length <line>))))
+
+(define-method backward-char textbox ()
+  (setf <point> (max 0 (1- <point>))))
+
+(define-method next-line textbox ()
+  (with-fields (buffer point-row point-column) self
+    (setf point-row (min (1+ point-row)
+			 (1- (length buffer))))
+    (setf point-column (min point-column 
+			    (length (nth point-row buffer))))))
+
+(define-method previous-line textbox ()
+  (with-fields (buffer point-row point-column) self
+    (setf point-row (max 0 (1- point-row)))
+    (setf point-column (min point-column
+			    (length (nth point-row buffer))))))
+
+(define-method newline textbox ()
+  (with-fields (buffer point-row point-column) self
+    ;;  insert line break
+    (let* ((line (nth point-row buffer))
+	   (line-remainder (subseq line point-column))
+	   (buffer-remainder (nthcdr (1+ point-row) buffer)))
+      ;; truncate current line
+      (setf (nth point-row buffer) 
+	    (subseq line 0 point-column))
+      ;; insert new line
+      (if (= 0 point-row)
+	  (setf (cdr buffer)
+		(cons line-remainder (cdr buffer)))
+	  (setf (cdr (nthcdr (- point-row 1) buffer))
+		(cons (nth point-row buffer)
+		      (cons line-remainder buffer-remainder))))
+      ;;
+      (incf point-row)			
+      (setf point-column 0))))
+
+(define-method backward-delete-char textbox ()
+  (with-fields (buffer point-row point-column) self
+    (if (and (= 0 point-column) (/= 0 point-row))
+	(progn 
+	  ;;
+	  ;; we need to remove a line break.
+	  (let ((line (nth (- point-row 1) buffer))
+		(next-line (nth (+ point-row 1) buffer)))
+	    (setf (nth (- point-row 1) buffer)
+		  (concatenate 'string line (nth point-row buffer)))
+	    (setf (cdr (nthcdr (- point-row 1) buffer))
+		  (nth (+ point-row 1) buffer))
+	    ;;
+	    ;; move cursor too
+	    (decf point-row)
+	    (setf point-column (length line))))
+	(progn
+	  ;;
+	  ;; otherwise, delete within current line.
+	  (when (/= 0 point-column)
+	    (let* ((line (nth point-row buffer))
+		   (remainder (subseq line point-column)))
+	      (setf (nth point-row buffer)
+		    (concatenate 'string 
+				 (subseq line 0 (- point-column 1))
+				 remainder))
+	      (decf point-column)))))))
+    
+(define-method insert textbox (key)       
+  (with-fields (buffer point-row point-column) self
+    (if (null buffer)
+	(progn
+	  (push key buffer)
+	  (incf point-column))
+	(progn
+	  (let* ((line (nth point-row buffer))
+		 (remainder (subseq line point-column)))
+	    (setf (nth point-row buffer)
+		  (concatenate 'string
+			       (subseq line 0 point-column)
+			       key
+			       remainder)))
+	  (incf point-column)))))
+
 (define-method render textbox ()
   (when <visible>
     [clear self]
@@ -682,19 +820,19 @@ This method allocates a new SDL surface when necessary."
 	    (dolist (line (nthcdr <point-row> buffer))
 	      (draw-string-solid line x0 y0 :destination image
 				 :font font :color <foreground-color>)
-	      (incf y0 line-height))))))))
-	    ;; ;; draw cursor
-	    ;; ;; TODO fix <point-row> to be drawn relative pos in scrolling
-	    ;; (let* ((current-line (nth <point-row> buffer))
-	    ;; 	   (cursor-width (font-width font))
-	    ;; 	   (x1 (+ 0 *textbox-margin*
-	    ;; 		  (font-text-extents (subseq current-line 0 <point-column>)
-	    ;; 				     font)))
-	    ;; 	   (y1 (+ 2 0 *textbox-margin*
-	    ;; 		  (* line-height <point-row>))))
-	    ;;   (draw-rectangle x1 y1 cursor-width line-height 
-	    ;; 		      :color ".yellow"
-	    ;; 		      :destination image))))))))
+	      (incf y0 line-height)))
+	    ;; draw cursor
+	    ;; TODO fix <point-row> to be drawn relative pos in scrolling
+	    (let* ((current-line (nth <point-row> buffer))
+	    	   (cursor-width (font-width font))
+	    	   (x1 (+ 0 *textbox-margin*
+	    		  (font-text-extents (subseq current-line 0 <point-column>)
+	    				     font)))
+	    	   (y1 (+ 2 0 *textbox-margin*
+	    		  (* line-height <point-row>))))
+	      (draw-rectangle x1 y1 cursor-width line-height 
+	    		      :color ".yellow"
+	    		      :destination image)))))))
 
 ;;; The pager switches between different visible groups of widgets
 

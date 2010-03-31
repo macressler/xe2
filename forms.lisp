@@ -42,6 +42,7 @@
   (border-style :initform t :documentation "When non-nil, draw cell borders.")
   (draw-blanks :initform t :documentation "When non-nil, draw blank cells.")
   (header-style :initform t :documentation "When non-nil, draw row and column headers.")
+  (header-line :initform nil :documentation "Formatted line to be displayed at top of window above spreadsheet.")
   (selected-tool :documentation "Keyword symbol identifying the method to be applied.")
   (tool-data :documentation "Arguments for tool method invocation."))
 

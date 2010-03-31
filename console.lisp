@@ -497,7 +497,9 @@ Allocates a new image."
 				    :surface image
 				    :smooth nil))
 
-;;; Timing
+;;; Timing (OBSOLETE)
+
+;; TODO remove this section, it's deprecated. 
 
 (defvar *frame-rate* 30 
 "The intended frame rate of the game. Recommended value is 30.
@@ -567,7 +569,6 @@ window. Set this in the game startup file.")
   "Initialize the console, open a window, and play.
 We want to process all inputs, update the game state, then update the
 display."
-;;  (setf *physics-function* nil)
   (let ((fps (make-instance 'sdl:fps-unlocked :dt *dt* :ps-fn #'do-physics)))
     (if *fullscreen*
 	(sdl:window *screen-width* *screen-height*

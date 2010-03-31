@@ -219,7 +219,7 @@ initialize the arrays for a world of the size specified there."
 
 (define-method generate world (&rest parameters)
   "Generate a world, reading generation parameters from the plist
-  PARAMETERS."  
+PARAMETERS and interpreting the world's grammar field <GRAMMAR>."
   (declare (ignore parameters))
   (with-fields (grammar stack) self
     (assert grammar)
@@ -244,6 +244,7 @@ initialize the arrays for a world of the size specified there."
   (apply #'send self :generate self parameters))
 
 (define-method origin world ()
+  "Move the turtle to its default location (0,0) and orientation (east)."
   (setf <row> 0 <column> 0 <direction> :east))
 
 (define-method color world ()
@@ -331,8 +332,6 @@ is the integer on the top of the stack."
 
 (define-method noop world ()
   nil)
-
-;;; Narration
 
 (define-method set-narrator world (narrator)
   (setf <narrator> narrator))

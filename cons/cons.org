@@ -1,8 +1,36 @@
+** CELL-MODE
+*** TODO indirect widget rendering... eh
+*** TODO dynamic multiline text control inline editable with point/focus
+*** TODO function to change which world a form is viewing
+*** TODO each module haz a content/resource mgmt cell wiki associated. 
+*** TODO create workbooks composed of spreadsheets
+*** TODO property list editor
+*** TODO splitscreen mode
+*** TODO add serialization so that one can save maps as resources.
+*** TODO bricks and more enemies blocking entrances to reactor
+*** TODO [#A] Don't run dataflow every frame
+*** TODO [#A] cancel button resets to default
+*** TODO [#A] implement proper key repeat in prompt // movedevshot send-held-events to do-physics??
+*** TODO [#B] Function to uniformly pretty-print events
+*** TODO [#B] header-line with help
+*** TODO [#B] link/command button. maps /highlights prefixes to whatever text link typed
+*** TODO [#B] row/column headers
+*** TODO [#C] Data entry area like in excel?
+*** TODO [#C] Formatter shows which buttons you are pressing. hook into event handler?
+*** TODO [#C] calculate via mouse which cell is clicked
+*** TODO [#C] cursor and save-excursion for the logo world gen stuff
+*** TODO [#C] only update strings every physics timestep
+*** TODO [#C] option cells
+*** TODO [#C] scrolling
+*** TODO [#C] simple customizer grammar
+*** TODO [#C] toggle-cells
 ** CONS
 *** DONE FIX no docs for exit
 CLOSED: [2010-03-29 Mon 11:42]
 *** TODO fix bad rook behavior
 *** TODO fix no c-q during help mode
+*** TODO mystery sector ! encounter early, but locked
+*** TODO desctructible bricks for control rods.
 *** TODO help and descriptions everywhere
 *** TODO LOS enemies with [can-see-player self ]
 *** TODO upgrade weapon power with chips and upgrade stations
@@ -40,23 +68,6 @@ CLOSED: [2010-03-29 Mon 11:42]
 *** TODO xiogond command units
 *** TODO help screen
 *** TODO tutorial
-** CELL-MODE
-*** TODO [#A] Don't run dataflow every frame
-*** TODO [#A] cancel button resets to default
-*** TODO [#A] implement proper key repeat in prompt // movedevshot send-held-events to do-physics??
-*** TODO [#B] Function to uniformly pretty-print events
-*** TODO [#B] header-line with help
-*** TODO [#B] link/command button. maps /highlights prefixes to whatever text link typed
-*** TODO [#B] row/column headers
-*** TODO [#C] Data entry area like in excel?
-*** TODO [#C] Formatter shows which buttons you are pressing. hook into event handler?
-*** TODO [#C] calculate via mouse which cell is clicked
-*** TODO [#C] cursor and save-excursion for the logo world gen stuff
-*** TODO [#C] only update strings every physics timestep
-*** TODO [#C] option cells
-*** TODO [#C] scrolling
-*** TODO [#C] simple customizer grammar
-*** TODO [#C] toggle-cells
 ** XE2 CORE IMPROVEMENTS
 *** TODO [#A] hold down shift/l2 to move a single space in xiotank?
 *** TODO [#C] better error message about missing methods
