@@ -358,6 +358,9 @@
     [resize textbox :height 200 :width 500]
     [move textbox :x 0 :y 0]
     ;;
+    [resize form2 :height 500 :width 800]
+    [move form2 :x 0 :y 0]
+    ;;
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     (xe2:install-widgets splash-prompt splash)
