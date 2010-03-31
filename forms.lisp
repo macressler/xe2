@@ -20,19 +20,35 @@
 
 (in-package :xe2)
 
-(defvar *forms* nil "Hash table mapping string form names to form objects.")
+(defvar *notebook* nil "Hash table mapping string page names to world objects.")
 
-(defun initialize-forms-table-maybe (&optional force)
-  (when (or force (null *forms*))
-    (setf *forms* (make-hash-table :test 'equal))))
+(defun initialize-notebook (&optional force)
+  (when (or force (null *notebook*))
+    (setf *notebook* (make-hash-table :test 'equal))))
+
+(defun create-blank-page ()
+  (clone =world=))
+
+(defun add-page (page-name world)
+  (initialize-notebook)
+  (if (gethash page-name *notebook*)
+      (error "Name collision adding page ~S" page-name)
+      (setf (gethash page-name *notebook*) world)))
+
+(defun find-page (page-name)
+  (assert *notebook*)
+  (or (gethash page-name *notebook*)
+      (add-page page-name (create-blank-page))))
+
+;;; The form widget browses notebook pages
 
 (define-prototype form 
     (:parent =widget= :documentation  "An interactive graphical spreadsheet.")
+  (page-name :initform nil)
   (world :documentation "The xe2:=world= of objects to be displayed.")
   rows columns
   (cursor-row :initform 0) 
   (cursor-column :initform 0)
-  (name :documentation "String name of the form.")
   (column-widths :documentation "A vector of integers where v[x] is the pixel width of form column x.")
   (row-heights :documentation "A vector of integers where v[x] is the pixel height of form row x.")
   (column-styles :documentation "A vector of property lists used to customize the appearance of columns.")
@@ -46,18 +62,18 @@
   (selected-tool :documentation "Keyword symbol identifying the method to be applied.")
   (tool-data :documentation "Arguments for tool method invocation."))
 
-(define-method initialize form (&key (name "*untitled form*") world)
-  (initialize-forms-table-maybe)
+(define-method initialize form (&key (page-name "*untitled page*") world)
+  (initialize-notebook)
   [parent>>initialize self]
-  (when world 
-    [configure self world]))
+  [configure self (or world (find-page page-name))])
 
 (define-method configure form (&optional world)
-  (when world (setf <world> world))
+  (assert world)
+  (setf <world> world)
   [install-keybindings self]
   (setf <cursor-row> 0 <cursor-column> 0)
-  (setf <rows> (field-value :height world)
-	<columns> (field-value :width world))
+  (setf <rows> (field-value :height world))
+  (setf <columns> (field-value :width world))
   (setf <column-widths> (make-array (+ 1 <columns>) :initial-element 0)
 	<row-heights> (make-array (+ 1 <rows>) :initial-element 0)
 	<column-styles> (make-array (+ 1 <columns>))

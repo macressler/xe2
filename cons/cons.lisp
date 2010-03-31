@@ -261,6 +261,7 @@
 	 (help (clone =cons-formatter=))
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
+	 (form2 (clone =form=))
 	 (viewport (clone =view=))
 	 (textbox (clone =textbox=))
 	 (status (clone =status=))
@@ -361,6 +362,7 @@
     [auto-position *pager*]
     (xe2:install-widgets splash-prompt splash)
     ;;
+    [add-page *pager* :notebook (list form2)]
     [add-page *pager* :dev (list textbox)]
     [add-page *pager* :config (list form)]
     [add-page *pager* :game (list prompt stack viewport terminal quickhelp *status*)]

@@ -871,11 +871,13 @@ text INSERTION to be inserted at point."
   (labels ((s1 () [select self 1])
 	   (s2 () [select self 2])
 	   (s3 () [select self 3])
-	   (s4 () [select self 4]))
+	   (s4 () [select self 4])
+	   (s5 () [select self 5]))
     [define-key self "F1" nil #'s1]
     [define-key self "F2" nil #'s2]
     [define-key self "F3" nil #'s3]
-    [define-key self "F4" nil #'s4]))
+    [define-key self "F4" nil #'s4]
+    [define-key self "F5" nil #'s5]))
 
 (define-method page-property pager (page-name property-keyword)
   (getf (gethash page-name <properties>) property-keyword))
