@@ -259,7 +259,6 @@ else.")
 
 (defun dispatch-event (event)
   "Send EVENT to the handler function."
-  (setf *event* event)
   (if *event-handler-function*
       (progn (message "TRANSLATED EVENT: ~A" event)
 	     (funcall *event-handler-function* event))
