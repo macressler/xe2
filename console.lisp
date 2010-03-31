@@ -960,9 +960,9 @@ control the size of the individual frames or subimages."
   (let* ((image (load-image-resource resource))
 	 (props (resource-properties resource))
 	 (w (or (getf props :width)
-                (image-width image))
+                (image-width image)))
 	 (h (or (getf props :height)
-                (image-height image))
+                (image-height image)))
 	 (sw (getf props :sprite-width))
 	 (sh (getf props :sprite-height))
 	 (sprite-cells (loop for y from 0 to (- h sh) by sh
