@@ -595,6 +595,7 @@ normally."
   (max-displayed-columns :initform nil)
   (background-color :initform ".blue")
   (foreground-color :initform ".white")
+  (cursor-color :initform ".yellow")
   (point-row :initform 0)
   (point-column :initform 0)
   (visible :initform t))
@@ -661,15 +662,15 @@ This method allocates a new SDL surface when necessary."
 	[resize self :height height0 :width width0]))))
 
 (define-method move-end-of-line textbox ()
-  (setf <point> (length <line>)))
+  (setf <point-column> (length (nth <point-row> <buffer>))))
 
 (define-method move-beginning-of-line textbox ()
-  (setf <point> 0))
+  (setf <point-column> 0))
 
 (defun bind-key-to-textbox-insertion (textbox key modifiers &optional (insertion key))
   "For textbox P ensure that the event (KEY MODIFIERS) causes the
 text INSERTION to be inserted at point."
- [define-key p (string-upcase key) modifiers
+ [define-key textbox (string-upcase key) modifiers
 	      #'(lambda ()
 		  [insert textbox insertion])])
 
@@ -689,8 +690,7 @@ text INSERTION to be inserted at point."
   (bind-key-to-method self "LEFT" nil :backward-char)
   (bind-key-to-method self "K" '(:control) :clear)
   (bind-key-to-method self "BACKSPACE" nil :backward-delete-char)
-  (bind-key-to-method self "RETURN" nil :execute)
-  (bind-key-to-method self "ESCAPE" nil :escape)
+  (bind-key-to-method self "RETURN" nil :newline)
   ;; install keybindings for self-inserting characters
   (map nil #'(lambda (char)
 	       (bind-key-to-textbox-insertion self (string char) nil
@@ -712,14 +712,16 @@ text INSERTION to be inserted at point."
 
 (define-method initialize textbox ()
   [parent>>initialize self]
-  [install-default-keybindings self])
+  [install-keybindings self])
 
 (define-method forward-char textbox ()
-  (setf <point> (min (1+ <point>)
-		     (length <line>))))
+  (with-fields (buffer point-row point-column) self
+    (setf point-column (min (1+ point-column)
+			    (length (nth point-row buffer))))))
 
 (define-method backward-char textbox ()
-  (setf <point> (max 0 (1- <point>))))
+  (with-fields (buffer point-row point-column) self
+    (setf point-column (max 0 (1- point-column)))))
 
 (define-method next-line textbox ()
   (with-fields (buffer point-row point-column) self
@@ -736,23 +738,31 @@ text INSERTION to be inserted at point."
 
 (define-method newline textbox ()
   (with-fields (buffer point-row point-column) self
-    ;;  insert line break
-    (let* ((line (nth point-row buffer))
-	   (line-remainder (subseq line point-column))
-	   (buffer-remainder (nthcdr (1+ point-row) buffer)))
-      ;; truncate current line
-      (setf (nth point-row buffer) 
-	    (subseq line 0 point-column))
-      ;; insert new line
-      (if (= 0 point-row)
-	  (setf (cdr buffer)
-		(cons line-remainder (cdr buffer)))
-	  (setf (cdr (nthcdr (- point-row 1) buffer))
-		(cons (nth point-row buffer)
-		      (cons line-remainder buffer-remainder))))
-      ;;
-      (incf point-row)			
-      (setf point-column 0))))
+    (if (null buffer)
+	(progn (push "" buffer)
+	       (setf point-row 1))
+	(if (and (= point-row (length buffer))
+		 (= point-column (length (nth point-row buffer))))
+	    (progn (setf buffer (append buffer (list "")))
+		   (incf point-row)
+		   (setf point-column 0))
+	    ;;  insert line break
+	    (let* ((line (nth point-row buffer))
+		   (line-remainder (subseq line point-column))
+		   (buffer-remainder (nthcdr (1+ point-row) buffer)))
+	      ;; truncate current line
+	      (setf (nth point-row buffer) 
+		    (subseq line 0 point-column))
+	      ;; insert new line
+	      (if (= 0 point-row)
+		  (setf (cdr buffer)
+			(cons line-remainder (cdr buffer)))
+		  (setf (cdr (nthcdr (- point-row 1) buffer))
+			(cons (nth point-row buffer)
+			      (cons line-remainder buffer-remainder))))
+	      ;;
+	      (incf point-row)			
+	      (setf point-column 0))))))
 
 (define-method backward-delete-char textbox ()
   (with-fields (buffer point-row point-column) self
@@ -761,11 +771,13 @@ text INSERTION to be inserted at point."
 	  ;;
 	  ;; we need to remove a line break.
 	  (let ((line (nth (- point-row 1) buffer))
-		(next-line (nth (+ point-row 1) buffer)))
-	    (setf (nth (- point-row 1) buffer)
-		  (concatenate 'string line (nth point-row buffer)))
-	    (setf (cdr (nthcdr (- point-row 1) buffer))
-		  (nth (+ point-row 1) buffer))
+		(next-line (nth (+ point-row 1) buffer))
+		(len (length buffer)))
+	    (setf buffer (append (subseq buffer 0 (- point-row 1))
+				 (list (concatenate 'string line (nth point-row buffer)))
+				 (subseq buffer (min len (+ point-row 1)))))
+	    ;; (setf (cdr (nthcdr (- point-row 1) buffer))
+	    ;; 	  (nth (+ point-row 1) buffer))
 	    ;;
 	    ;; move cursor too
 	    (decf point-row)
@@ -817,7 +829,7 @@ text INSERTION to be inserted at point."
 	  ;; draw text
 	  (let ((x0 (+ 0 *textbox-margin*))
 		(y0 (+ 0 *textbox-margin*)))
-	    (dolist (line (nthcdr <point-row> buffer))
+	    (dolist (line buffer)
 	      (draw-string-solid line x0 y0 :destination image
 				 :font font :color <foreground-color>)
 	      (incf y0 line-height)))
@@ -828,10 +840,10 @@ text INSERTION to be inserted at point."
 	    	   (x1 (+ 0 *textbox-margin*
 	    		  (font-text-extents (subseq current-line 0 <point-column>)
 	    				     font)))
-	    	   (y1 (+ 2 0 *textbox-margin*
+	    	   (y1 (+ 0 *textbox-margin*
 	    		  (* line-height <point-row>))))
 	      (draw-rectangle x1 y1 cursor-width line-height 
-	    		      :color ".yellow"
+	    		      :color <cursor-color>
 	    		      :destination image)))))))
 
 ;;; The pager switches between different visible groups of widgets
@@ -858,10 +870,12 @@ text INSERTION to be inserted at point."
   [auto-position self]
   (labels ((s1 () [select self 1])
 	   (s2 () [select self 2])
-	   (s3 () [select self 3]))
+	   (s3 () [select self 3])
+	   (s4 () [select self 4]))
     [define-key self "F1" nil #'s1]
     [define-key self "F2" nil #'s2]
-    [define-key self "F3" nil #'s3]))
+    [define-key self "F3" nil #'s3]
+    [define-key self "F4" nil #'s4]))
 
 (define-method page-property pager (page-name property-keyword)
   (getf (gethash page-name <properties>) property-keyword))

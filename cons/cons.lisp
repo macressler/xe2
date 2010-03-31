@@ -92,13 +92,13 @@
   (dolist (k *qwerty-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
 
-(define-method install-keybindings cons-prompt ()
-  (let ((keys (ecase xe2:*user-keyboard-layout* 
-		(:qwerty *qwerty-keybindings*)
-		(:alternate-qwerty *alternate-qwerty-keybindings*)
-		(:dvorak *dvorak-keybindings*))))
-    (dolist (k keys)
-      (apply #'bind-key-to-prompt-insertion self k))))
+;; (define-method install-keybindings cons-prompt ()
+;;   (let ((keys (ecase xe2:*user-keyboard-layout* 
+;; 		(:qwerty *qwerty-keybindings*)
+;; 		(:alternate-qwerty *alternate-qwerty-keybindings*)
+;; 		(:dvorak *dvorak-keybindings*))))
+;;     (dolist (k keys)
+;;       (apply #'bind-key-to-prompt-insertion self k))))
 
 ;;; Custom formatter pauses when shown; it's the help screen
 
@@ -262,6 +262,7 @@
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
 	 (viewport (clone =view=))
+	 (textbox (clone =textbox=))
 	 (status (clone =status=))
 	 (form-prompt (clone =prompt=))
 	 (splash-prompt (clone =splash-prompt=))
@@ -353,9 +354,14 @@
     [move terminal :x 0 :y (- *cons-window-height* 80)]
     [set-verbosity terminal 0]
     ;;
+    [resize textbox :height 200 :width 500]
+    [move textbox :x 0 :y 0]
+    ;;
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     (xe2:install-widgets splash-prompt splash)
+    ;;
+    [add-page *pager* :dev (list textbox)]
     [add-page *pager* :config (list form)]
     [add-page *pager* :game (list prompt stack viewport terminal quickhelp *status*)]
     (xe2:enable-classic-key-repeat 100 100)

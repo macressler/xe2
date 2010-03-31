@@ -529,7 +529,7 @@ is in the way. Returns non-nil if a move occurred."
 		 (ecase (field-value :edge-condition world)
 		   (:block [say self "You cannot move in that direction."])
 		   (:wrap nil) ;; TODO implement this for planet maps
-		   (:exit [exit *active-universe*])))))
+		   (:exit [exit *universe*])))))
 	    (t
 	     (when (or ignore-obstacles 
 		       (not [obstacle-at-p *world* r c]))
