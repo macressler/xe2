@@ -290,11 +290,6 @@ key event symbols."
 	(:SDL-KEY-MOD-RALT :alt)
 	(:SDL-KEY-MOD-LMETA :meta)
 	(:SDL-KEY-MOD-RMETA :meta)
-	;; fix for windows
-	(:SDL-KEY-MOD-NUM nil)
-	(:SDL-KEY-MOD-CAPS :caps-lock)
-	(:SDL-KEY-MOD-MODE nil)
-	(:SDL-KEY-MOD-RESERVED nil)
 	;; for compatibility:
 	(:SDL-KEY-NONE nil)
 	(:SDL-KEY-LSHIFT :shift)
