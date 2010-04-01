@@ -20,27 +20,27 @@
 
 (in-package :xe2)
 
-(defvar *notebook* nil "Hash table mapping string page names to world objects.")
+(defvar *workbook* nil "Hash table mapping string page names to world objects.")
 
-(defun initialize-notebook (&optional force)
-  (when (or force (null *notebook*))
-    (setf *notebook* (make-hash-table :test 'equal))))
+(defun initialize-workbook (&optional force)
+  (when (or force (null *workbook*))
+    (setf *workbook* (make-hash-table :test 'equal))))
 
 (defun create-blank-page ()
   (clone =world=))
 
 (defun add-page (page-name world)
-  (initialize-notebook)
-  (if (gethash page-name *notebook*)
+  (initialize-workbook)
+  (if (gethash page-name *workbook*)
       (error "Name collision adding page ~S" page-name)
-      (setf (gethash page-name *notebook*) world)))
+      (setf (gethash page-name *workbook*) world)))
 
 (defun find-page (page-name)
-  (assert *notebook*)
-  (or (gethash page-name *notebook*)
+  (assert *workbook*)
+  (or (gethash page-name *workbook*)
       (add-page page-name (create-blank-page))))
 
-;;; The form widget browses notebook pages
+;;; The form widget browses workbook pages
 
 (define-prototype form 
     (:parent =widget= :documentation  "An interactive graphical spreadsheet.")
@@ -67,7 +67,7 @@
   (tool-data :documentation "Arguments for tool method invocation."))
 
 (define-method initialize form (&key (page-name "*untitled page*") world)
-  (initialize-notebook)
+  (initialize-workbook)
   [parent>>initialize self]
   [configure self (or world (find-page page-name))])
 

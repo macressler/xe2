@@ -94,12 +94,13 @@
   object-address-string object step-in-direction direction-to =cell=
   plasma-rect subdivide-rect render-plasma add-hook run-hook
   queue-tail make-queue queue unqueue queue-message queued-messages-p
-  unqueue-message send-queue field-value random-direction
-  load-font-resource draw-string-solid read-pak *resource-table*
+  unqueue-message send-queue field-value random-direction *resource-table*
+  load-font-resource save-object-resource draw-string-solid read-pak 
   initialize-resource-table percent-of-time render-formatted-paragraph
   make-formatted-string draw-string-shaded render-formatted-string
   render-formatted-line resource font-text-extents write-sexp-to-file
   with-message-sender *message-sender* =textbox= read-sexp-from-file
+  with-fields with-field-values
   write-pak *grammar* one-of left-hand-side right-hand-side expansions
   generate send-event-to-widgets play-music halt-music seek-music
   *joystick-mapping* *generic-joystick-mapping* *ps3-joystick-mapping*
@@ -119,7 +120,7 @@
   *pak-file-extension* *window-title* *window-position* set-timer-interval
   *message-logging* overlay poll-joystick-axis reset-joystick
   set-screen-width =universe= *universe* set-screen-height genseq
-  *zoom-factor* zoom-image is-zoomed-resource *timer-interval*
+  *zoom-factor* zoom-image is-zoomed-resource *timer-interval* 
   enable-timer disable-timer while enable-held-keys disable-held-keys
   do-cells draw-box draw-rectangle *quitting* quit reset))
 

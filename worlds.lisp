@@ -103,6 +103,7 @@ At the moment, only 0=off and 1=on are supported.")
 
 (define-method serialize world ()
   (with-fields (grid serialized-grid height width) self
+  (setf serialized-grid nil)
     (let (objects)
       (dotimes (row height)
 	(dotimes (column width)

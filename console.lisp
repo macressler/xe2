@@ -696,11 +696,6 @@ client.
 A PAK resource can be either self-contained, or point to an
 external file for its data.
 
-The syntax of PAK files is a subset of the Common Lisp reader
-syntax that is also acceptable to the GNU Emacs reader (reasonably
-small decimal integers and floating-point numbers, strings, lists,
-and symbols).
-
 A 'resource record' defines a resource. A resource record is a
 structure with the following elements:
 
@@ -717,20 +712,22 @@ structure with the following elements:
 
           The special type :alias is used to provide multiple names
           for a resource. The :DATA field contains the name of the
-          target resource.
+          target resource. This name can specify resource
+          transformations, see below. 
 
  :PROPERTIES  Property list with extra data; for example :copyright,
               :license, :author. 
               The special property :AUTOLOAD, when non-nil causes
-              the resource to be loaded automatically.
+              the resource to be loaded automatically upon startup 
+              (the default is to load resources on demand.)
 
  :FILE    Name of file to load data from, if any. 
           Relative to directory of PAK file.
  :DATA    Lisp data encoding the resource itself, if any.
 
-In memory, these will be represented by resource structs (see
-below).  On disk, it's a property list printed as text. Unknown
-keys will trigger an error. 
+In memory, these will be represented by resource structs (see below).
+On disk, it's Lisp data printed as text. This text will compress very
+well.
 
 The string '()' is a valid .PAK file; it contains no resources.")
 
@@ -756,14 +753,18 @@ This prepares it for printing as part of a PAK file."
 ;; from text files.
 
 (defun write-sexp-to-file (filename sexp)
+  (message "Writing data [~10S... to ~A...]" sexp filename)
   (with-open-file (file filename :direction :output 
 			:if-exists :overwrite
 			:if-does-not-exist :create)
-    (format file "~S" sexp)))
+    (format file "~S" sexp))
+  (message "Writing data [~10S... to ~A... Done." sexp filename))
 
 (defun read-sexp-from-file (filename)
+  (message "Reading data from ~A..." filename)
   (with-open-file (file filename :direction :input)
-    (read file)))
+    (prog1 (read file)
+      (message "Reading data from ~A... Done." filename))))
 
 ;; Now tie it all together with routines that read and write
 ;; collections of records into PAK files.
@@ -915,6 +916,7 @@ table. File names are relative to the module MODULE-NAME."
 	    (when (getf (resource-properties res) :autoload)
 	      (push res *pending-autoload-resources*)))))))
 
+(defvar *module* nil)
 
 (defun index-module (module-name)
   "Add all the resources from the module MODULE-NAME to the resource
@@ -929,7 +931,28 @@ table."
 
 (defvar *default-font* ".default-font")
 
+;;; Saving CLON objects to disk as PAK files
+
+(defun save-object-resource (resource &optional (module *module*))
+  (assert (clon:object-p (resource-object resource)))
+  (setf (resource-data resource) (clon:serialize (resource-object resource)))
+  (write-pak (find-module-file module 
+			       (concatenate 'string (resource-name resource)
+					    *pak-file-extension*))
+	     (list resource))
+  (setf (resource-data resource) nil))
+
 ;;; Driver-dependent resource object loading handlers
+
+(defun load-object-resource (resource)
+  "Loads a serialized :OBJECT resource from the Lisp data in the :DATA field.
+Returns the rebuilt object."
+  (let ((object (clon:deserialize (resource-data resource))))
+    (assert (clon:object-p object))
+    (setf (resource-data resource) nil) ;; no longer needed
+    (prog1 object
+      (when (has-method :deserialize object)
+	[deserialize object]))))
 
 (defun load-image-resource (resource)
   "Loads an :IMAGE-type pak resource from a :FILE on disk."
@@ -1038,6 +1061,7 @@ control the size of the individual frames or subimages."
 
 (defvar *resource-handlers* (list :image #'load-image-resource
 				  :lisp #'load-lisp-resource
+				  :object #'load-object-resource
 				  :sprite-sheet #'load-sprite-sheet-resource
 				  :color #'load-color-resource
 				  :music #'load-music-resource
@@ -1110,7 +1134,7 @@ so that it can be fed to the console."
 	  (funcall handler resource))
     (if (null (resource-object resource))
 	(error "Failed to load resource ~S." (resource-name resource))
-	(message "Loaded resource ~S with result ~S." (resource-name resource)
+	(message "Loaded resource ~S with result ~30S." (resource-name resource)
 		 (resource-object resource)))))
 
 (defun find-resource (name &optional noerror)

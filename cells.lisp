@@ -499,21 +499,6 @@ unproxying. By default, it does nothing."
     (when (and occupant [in-category self :proxy])
 	  [unproxy self])))
 
-;;; Narrator
-
-(define-method say cell (format-string &rest args)
-  "Print a string to the message narration window. Arguments
-are as with `format'."
-  (unless [in-category self :dead]
-    (let ((range (if (clon:has-field :hearing-range self)
-		     <hearing-range>
-		     *default-sample-hearing-range*))
-	  (dist (distance (or <column> 0) (or <row> 0)
-			  [player-column *world*]
-			  [player-row *world*])))
-      (when (> range dist)
-	(apply #'send-queue self :say :narrator format-string args)))))
-
 ;;; Cell movement
 
 (define-method move cell (direction &optional ignore-obstacles)
@@ -934,6 +919,19 @@ May be affected by the player's :hearing-range stat, if any."
 			     [player-row *world*]))))
       (when (> range dist)
 	(play-sample sample-name)))))
+
+(define-method say cell (format-string &rest args)
+  "Print a string to the message narration window. Arguments
+are as with `format'."
+  (unless [in-category self :dead]
+    (let ((range (if (clon:has-field :hearing-range self)
+		     <hearing-range>
+		     *default-sample-hearing-range*))
+	  (dist (distance (or <column> 0) (or <row> 0)
+			  [player-column *world*]
+			  [player-row *world*])))
+      (when (> range dist)
+	(apply #'send-queue self :say :narrator format-string args)))))
 
 (define-method viewport-coordinates cell ()
   "Return as values X,Y the world coordinates of CELL."

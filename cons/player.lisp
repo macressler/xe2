@@ -58,7 +58,8 @@
   (movement-cost :initform (make-stat :base 10))
   (stepping :initform t)
   (light-radius :initform 7)
-  (categories :initform '(:actor :obstacle :player :target :container :light-source)))
+  (categories :initform '(:actor :obstacle :player :target :container :light-source))
+  (excluded-fields :initform '(:segments)))
 
 (define-method loadout agent ()
   (push (clone =buster-defun=) <items>))

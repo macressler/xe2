@@ -1,13 +1,16 @@
 ** CELL-MODE
-*** TODO tooltip handler
+*** TODO auto-save pages as one object per file
+*** TODO generate workbook.pak
+*** TODO mark as modified-p each world
+*** TODO resource links to new pages
+*** TODO the other page-name.pak files
+*** TODO typical index.pak is composed of just :includes
+**** TODO include workbook.pak
+**** TODO include <gamename>.pak <--- whichever hand-edited entries are needed
 *** TODO each module haz a content/resource mgmt cell wiki associated. 
-*** TODO indirect widget rendering... eh
-*** TODO function to change which world a form is viewing
-*** TODO create workbooks composed of spreadsheets
+*** TODO indirect widget rendering
 *** TODO property list editor
 *** TODO splitscreen mode
-*** TODO add serialization so that one can save maps as resources.
-*** TODO bricks and more enemies blocking entrances to reactor
 *** TODO [#A] Don't run dataflow every frame
 *** TODO [#A] cancel button resets to default
 *** TODO [#A] implement proper key repeat in prompt // movedevshot send-held-events to do-physics??
@@ -24,6 +27,7 @@
 *** TODO [#C] scrolling
 *** TODO [#C] simple customizer grammar
 *** TODO [#C] toggle-cells
+*** TODO bricks and more enemies blocking entrances to reactor
 ** CONS
 *** DONE FIX no docs for exit
 CLOSED: [2010-03-29 Mon 11:42]
