@@ -1,8 +1,8 @@
 ;;; console.lisp --- core operations for XE2
 
-;; Copyright (C) 2006, 2007, 2008, 2009  David O'Toole
+;; Copyright (C) 2006, 2007, 2008, 2009, 2010  David O'Toole
 
-;; Author: David O'Toole <dto@gnu.org>
+;; Author: David O'Toole <dto@gnu.org> <dto1138@gmail.com>
 ;; Keywords: multimedia, games
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -56,10 +56,6 @@ disabled."
 (defun genseq (&optional (x 0))
   "Generate an all-purpose sequence number."
   (+ x (incf *sequence-number*)))
-
-;;; Mixer channels
-
-(defvar *channels* 128 "Number of audio mixer channels to use.")
    
 ;;; Hooks
 
@@ -1181,6 +1177,8 @@ found."
   (setf *pending-autoload-resources* nil))
 
 ;;; Playing music and sound effects
+
+(defvar *channels* 128 "Number of audio mixer channels to use.")
 
 (defun set-music-volume (number)
   "Set the mixer music volume between 0 (silent) and 255 (full volume)."
