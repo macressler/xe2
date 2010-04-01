@@ -49,6 +49,7 @@
   rows columns
   (cursor-row :initform 0) 
   (cursor-column :initform 0)
+  (cursor-color :initform ".yellow")
   (column-widths :documentation "A vector of integers where v[x] is the pixel width of form column x.")
   (row-heights :documentation "A vector of integers where v[x] is the pixel height of form row x.")
   (column-styles :documentation "A vector of property lists used to customize the appearance of columns.")
@@ -138,45 +139,57 @@
 
 ;; TODO (define-method hit form (x y) 
 
+(define-method compute form ()
+  (with-fields (rows columns) self
+    (let (data cell)
+      (dotimes (row rows)
+	(setf data nil)
+	(dotimes (column columns)
+	  (setf cell [cell-at self row column])
+	  (if (null cell)
+	      (setf data nil)
+	      (progn 
+		(when data [set cell data])
+		[compute cell]
+		(setf data [get cell]))))))))
+
 (define-method render form ()
   [clear self]
   (when <world>
     (with-field-values (cursor-row cursor-column row-heights world
 				   row-spacing rows columns draw-blanks column-widths) self
+      [compute self]
       [compute-geometry self]
       (let ((image <image>)
-	    (x 0) (y 0) (data nil)
+	    (x 0) (y 0) 
 	    (cursor-dimensions nil))
+	;; TODO draw header line, if any
+	;; TODO column header, if any
 	(dotimes (row rows)
 	  (setf x 0)
-	  (setf data nil)
 	  (dotimes (column columns)
 	    (let ((column-width (aref column-widths column))
 		  (row-height (aref row-heights row))
 		  (cell [cell-at self row column]))
+	      ;; render the cell
 	      (if (null cell)
-		  (progn (setf data nil)
-			 (when draw-blanks
-			   (draw-box x y 
-				     column-width 
-				     row-height  
-				     :stroke-color ".gray30"
-				     :color (if (evenp column) ".gray50" ".gray45")
-				     :destination image)))
-		  (let ((*world* world))
-		    (when data 
-		      [set cell data])
-		    [compute cell]
-		    (setf data [get cell])
-		    [form-render cell image x y column-width]))
-	      ;; possibly draw cursor
+		  (when draw-blanks
+		    (draw-box x y 
+			      column-width 
+			      row-height  
+			      :stroke-color ".gray30"
+			      :color (if (evenp column) ".gray50" ".gray45")
+			      :destination image))
+		  ;; see also cells.lisp
+		  [form-render cell image x y column-width]) 
+	      ;; possibly save cursor drawing info for this cell
 	      (when (and (= row cursor-row) (= column cursor-column))
 		(setf cursor-dimensions (list x y column-width row-height)))
 	      ;; move to next column right
 	      (incf x (aref column-widths column))))
 	  ;; move to next row down
 	  (incf y (+ row-spacing (aref row-heights row))))
-	;; render cursor if any
+	;; render cursor, if any 
 	(when cursor-dimensions
 	  (destructuring-bind (x y w h) cursor-dimensions
 	    [draw-cursor self x y w h]))))))
@@ -184,7 +197,7 @@
 ;;; Cursor
 
 (define-method draw-cursor form (x y width height)
-  (draw-rectangle x y width height :color ".red" :destination <image>))
+  (draw-rectangle x y width height :color <cursor-color> :destination <image>))
 
 (define-method move-cursor form (direction)
   (with-field-values (cursor-row cursor-column rows columns) self
