@@ -99,6 +99,7 @@ When nil, the method DRAW is invoked instead of using a tile.")
   (stepping :initform nil :documentation "Whether to generate step events where you walk.")
   (movement-cost :initform '(:base 10 :min nil :max nil :delta nil)
 		 :documentation "Base cost of moving one square.")
+  (tooltip :initform nil :documentation "A formatted line giving dev help or information about the cell.")
   ;; <: knowledge :>
   (name :documentation "The name of this cell.")
   (description :documentation "A description of the cell.") 
@@ -125,7 +126,9 @@ When nil, the method DRAW is invoked instead of using a tile.")
   (proxy :documentation "Link to the proxying cell for this occupant cell.")
   ;; other
   (combination-amount :initform 0 :documentation "Amount of item this cell represents.")
-  (combination-key :initform nil :documentation "Only items matching this key will be combined."))
+  (combination-key :initform nil :documentation "Only items matching this key will be combined.")
+  ;; serialization
+  (excluded-fields :initform '(:render-cell :equipper :parent-container :occupant :proxy)))
 
 (define-method compute cell () nil)
 

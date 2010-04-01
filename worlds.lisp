@@ -40,7 +40,7 @@ interacting cells. The world object performs the following tasks:
   (required-modes :initform nil :documentation 
 "A list of keywords specifying which modes of transportation are
 required for travel here." )
-  (categories :initform "The set of categories this world is in.")
+  (categories :initform nil :documentation "The set of categories this world is in.")
   ;; turtle graphics
   (grammar :initform '() :documentation "Context-free grammar for level generation.")
   (stack :initform '() :documentation "Stack for logo system.")
@@ -59,7 +59,6 @@ required for travel here." )
   (serialized-grid :documentation "A serialized sexp version.")
   ;; sprite cells
   (sprites :initform nil :documentation "A list of sprites.")
-  (serialized-sprites :initform nil)
   (sprite-grid :initform nil :documentation "Grid for collecting sprite collision information.")
   (sprite-table :initform nil :documentation "Hash table to prevent redundant collisions.")
   ;; forms processing
@@ -91,7 +90,9 @@ At the moment, only 0=off and 1=on are supported.")
   (exited :initform nil
 	  :documentation "Non-nil when the player has exited. See also `forward'.")
   (player-exit-row :initform 0)
-  (player-exit-column :initform 0))
+  (player-exit-column :initform 0)
+  ;; serialization
+  (excluded-fields :initform '(:stack :paint :sprite-grid :sprite-table :narrator :browser :viewport :grid)))
 
 (defparameter *default-world-axis-size* 10)
 (defparameter *default-world-z-size* 4)
@@ -99,6 +100,17 @@ At the moment, only 0=off and 1=on are supported.")
 (define-method initialize world ()
   (setf <variables> (make-hash-table :test 'equal))
   [create-default-grid self])
+
+(define-method serialize world ()
+  (with-fields (grid serialized-grid height width) self
+    (let (objects)
+      (dotimes (row height)
+	(dotimes (column width)
+	  (do-cells (cell (aref grid row column))
+	    (push (list :row row :column column :cell cell)
+		  objects))))
+      (setf serialized-grid objects)))
+  (clon:serialize self))
 
 (define-method set-variable world (var value)
   (setf (gethash var <variables>) value))
@@ -147,12 +159,12 @@ At the moment, only 0=off and 1=on are supported.")
       (setf <light-grid> (make-array dims
 				     :element-type 'integer
 				     :initial-element 0))
-      ;;and a grid of special objects for the environment map.
-      (let ((environment (make-array dims)))
-	(setf <environment-grid> environment)
-	(dotimes (i height)
-	  (dotimes (j width)
-	    (setf (aref environment i j) (clone =environment=)))))
+      ;; and a grid of special objects for the environment map.
+      ;; (let ((environment (make-array dims)))
+      ;; 	(setf <environment-grid> environment)
+      ;; 	(dotimes (i height)
+      ;; 	  (dotimes (j width)
+      ;; 	    (setf (aref environment i j) (clone =environment=)))))
       ;; sprite intersection data grid
       (let ((sprite-grid (make-array dims :element-type 'vector :adjustable t)))
 	;; now put a vector in each square to collect intersecting sprites

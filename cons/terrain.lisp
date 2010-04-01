@@ -32,7 +32,7 @@
 
 (define-prototype sector (:parent xe2:=world=)
   ;; theme variables
-  floor barrier accent
+  floor (barrier :initform nil) accent
   ;; other
   (ambient-light :initform :total)
   (required-modes :initform nil)

@@ -1,8 +1,8 @@
 ** CELL-MODE
-*** TODO indirect widget rendering... eh
-*** TODO dynamic multiline text control inline editable with point/focus
-*** TODO function to change which world a form is viewing
+*** TODO tooltip handler
 *** TODO each module haz a content/resource mgmt cell wiki associated. 
+*** TODO indirect widget rendering... eh
+*** TODO function to change which world a form is viewing
 *** TODO create workbooks composed of spreadsheets
 *** TODO property list editor
 *** TODO splitscreen mode

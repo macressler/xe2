@@ -50,6 +50,8 @@
   (cursor-row :initform 0) 
   (cursor-column :initform 0)
   (cursor-color :initform ".yellow")
+  (origin-row :initform 0 :documentation "Row number of top-left displayed cell.") 
+  (origin-column :initform 0 :documentation "Column number of top-left displayed cell.")
   (column-widths :documentation "A vector of integers where v[x] is the pixel width of form column x.")
   (row-heights :documentation "A vector of integers where v[x] is the pixel height of form row x.")
   (column-styles :documentation "A vector of property lists used to customize the appearance of columns.")
@@ -60,6 +62,7 @@
   (draw-blanks :initform t :documentation "When non-nil, draw blank cells.")
   (header-style :initform t :documentation "When non-nil, draw row and column headers.")
   (header-line :initform nil :documentation "Formatted line to be displayed at top of window above spreadsheet.")
+  (status-line :initform nil :documentation "Formatted line to be displayed at top of window above spreadsheet.")
   (selected-tool :documentation "Keyword symbol identifying the method to be applied.")
   (tool-data :documentation "Arguments for tool method invocation."))
 
@@ -157,17 +160,59 @@
   [clear self]
   (when <world>
     (with-field-values (cursor-row cursor-column row-heights world
+				   origin-row origin-column header-line status-line
 				   row-spacing rows columns draw-blanks column-widths) self
       [compute self]
       [compute-geometry self]
-      (let ((image <image>)
-	    (x 0) (y 0) 
-	    (cursor-dimensions nil))
-	;; TODO draw header line, if any
+      (let* ((image <image>)
+	     (widget-width <width>)
+	     (widget-height <height>)
+	     (rightmost-visible-column
+	      (block searching
+		(let ((width 0))
+		  (loop for column from origin-column to columns 
+			do (incf width (aref column-widths column))
+			   (when (> width widget-width)
+			     (return-from searching (- column 1))))
+		  (return-from searching (- columns 1)))))
+	     (bottom-visible-row
+	      (block searching
+		(let ((height (if header-line
+				  (formatted-line-height header-line)
+				  0)))
+		  (loop for row from origin-row to rows 
+			do (incf height (aref row-heights row))
+			   (when (> height widget-height)
+			     (return-from searching (- row 1))))
+		  (return-from searching (- rows 1)))))
+	     (x 0) 
+	     (y 0)
+	     (cursor-dimensions nil))
+	;; see if current cell has a tooltip
+	(let ((selected-cell [cell-at self cursor-row cursor-column]))
+	  (when (object-p selected-cell)
+	    (setf header-line (field-value :tooltip selected-cell))))
+	;; draw header line with tooltip, if any
+	(when header-line
+	  (render-formatted-line header-line 0 y :destination image)
+	  (incf y (formatted-line-height header-line)))
+	;; create status line
+	(setf status-line
+	      (list (list (format nil "Current position: (ROW ~S, COLUMN ~S) " 
+				  cursor-row cursor-column)
+			  :foreground ".white")))
+	;; draw status line
+	(when status-line 
+	  (render-formatted-line status-line 0 y :destination image)
+	  (incf y (formatted-line-height status-line)))
 	;; TODO column header, if any
-	(dotimes (row rows)
+	;; (message "GEOMETRY: ~S" (list :origin-row origin-row
+	;; 			      :origin-column origin-column
+	;; 			      :right rightmost-visible-column
+	;; 			      :bottom bottom-visible-row))
+	(loop for row from origin-row to bottom-visible-row do
 	  (setf x 0)
-	  (dotimes (column columns)
+	  (loop for column from origin-column to rightmost-visible-column do
 	    (let ((column-width (aref column-widths column))
 		  (row-height (aref row-heights row))
 		  (cell [cell-at self row column]))
@@ -181,7 +226,8 @@
 			      :color (if (evenp column) ".gray50" ".gray45")
 			      :destination image))
 		  ;; see also cells.lisp
-		  [form-render cell image x y column-width]) 
+		  [form-render cell image x y column-width])
+	      ;; TODO possibly indicate more cells to right/left/up/down of screen portion
 	      ;; possibly save cursor drawing info for this cell
 	      (when (and (= row cursor-row) (= column cursor-column))
 		(setf cursor-dimensions (list x y column-width row-height)))
