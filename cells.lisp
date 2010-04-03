@@ -78,6 +78,7 @@ Sprites are also based on cells. See `defsprite'.")
   (auto-loadout :initform nil :documentation "When non-nil, the :loadout method is invoked upon entry into a world.")
   (team :initform nil :documentation "Keyword symbol of team, if any.")
   (weight :documentation "Weight of the cell, in kilograms.")
+  (widget :initform nil :documentation "XE2 widget object, if any.")
   (tile :initform nil :documentation "Resource name of image. 
 When nil, the method DRAW is invoked instead of using a tile.")
   (render-cell :initform nil :documentation "Subcell to render. See load-sprite-sheet-resource.")
@@ -146,10 +147,14 @@ When nil, the method DRAW is invoked instead of using a tile.")
 	*default-cell-label*)))
   
 (define-method form-width cell () 
-  (formatted-line-width [form-label self]))
+  (if <widget>
+      (image-width (field-value :image <widget>))
+      (formatted-line-width [form-label self])))
 
 (define-method form-height cell ()
-  (formatted-line-height [form-label self]))
+  (if <widget>
+      (image-height (field-value :image <widget>))
+      (formatted-line-height [form-label self])))
     
 (define-method set cell (data)
   nil)
@@ -158,18 +163,23 @@ When nil, the method DRAW is invoked instead of using a tile.")
   nil)
 
 (define-method form-render cell (image x y width)
-  (let* ((label [form-label self])
-	 (shortfall (- width (formatted-line-width label)))
-	 (color
-	  (or (when (and (listp label)
-			 (listp (last label)))
-		(getf (cdr (car (last label))) :background))
-	      ".cyan"))
-	 (spacer (when (plusp shortfall) 
-		   (list nil :width shortfall :background color))))
-    (let ((line (if spacer (append label (list spacer))
-		    label)))
-      (render-formatted-line line x y :destination image))))
+  (let ((widget <widget>))
+    (if widget 
+	(progn [render widget]
+	       (draw-image (field-value :image widget)
+			   x y :destination image))
+	(let* ((label [form-label self])
+	       (shortfall (- width (formatted-line-width label)))
+	       (color
+		(or (when (and (listp label)
+			       (listp (last label)))
+		      (getf (cdr (car (last label))) :background))
+		    ".cyan"))
+	       (spacer (when (plusp shortfall) 
+			 (list nil :width shortfall :background color))))
+	  (let ((line (if spacer (append label (list spacer))
+			  label)))
+	    (render-formatted-line line x y :destination image))))))
 
 (define-method is-located cell ()
   "Returns non-nil if this cell is located somewhere on the grid."

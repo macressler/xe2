@@ -57,7 +57,9 @@ including an output formatter and a configurable command prompt.
   "Allocate an image buffer of HEIGHT by WIDTH pixels."
   (setf <width> width 
 	<height> height)
-  (setf <image> (create-image width height)))
+  (let ((oldimage <image>))
+    (setf <image> (create-image width height))
+    (when oldimage (sdl:free oldimage))))
 
 (define-method move widget (&key x y)
   "Move the widget to the location X, Y."
@@ -593,7 +595,7 @@ normally."
   (bordered :initform nil)
   (max-displayed-rows :initform nil :documentation "An integer when scrolling is enabled.")
   (max-displayed-columns :initform nil)
-  (background-color :initform ".blue")
+  (background-color :initform ".gray30")
   (foreground-color :initform ".white")
   (cursor-color :initform ".yellow")
   (point-row :initform 0)
@@ -602,6 +604,9 @@ normally."
 
 (define-method set-buffer textbox (buffer)
   (setf <buffer> buffer))
+
+(define-method get-buffer-as-string textbox ()
+  (apply #'concatenate 'string <buffer>))
 
 (defparameter *next-screen-context-lines* 3)
 

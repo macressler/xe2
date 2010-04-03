@@ -1,5 +1,4 @@
 * CELL-MODE
-** TODO resource links to new pages
 ** DONE integrate new docs into clon and console.el
 CLOSED: [2010-04-02 Fri 20:29]
 ** DONE revise forms.lisp with docs/workbook capabilities.
@@ -8,6 +7,7 @@ CLOSED: [2010-04-02 Fri 21:47]
 CLOSED: [2010-04-02 Fri 21:47]
 *** TODO include .pak <--- whichever hand-edited entries are needed
 *** TODO include workbook.pak
+** TODO resource links to new pages
 ** TODO text entry for comments
 ** TODO select paint color from text
 ** TODO select paint color from object

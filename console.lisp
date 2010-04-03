@@ -1378,11 +1378,17 @@ The default destination is the main window."
 
 (defun image-height (image)
   "Return the height in pixels of IMAGE."
-  (sdl:height (find-resource-object image)))
+  (let ((img (if (stringp image)
+		 (find-resource-object image)
+		 image)))
+    (sdl:height img)))
 
 (defun image-width (image)
   "Return the width in pixels of IMAGE."
-  (sdl:width (find-resource-object image)))
+  (let ((img (if (stringp image)
+		 (find-resource-object image)
+		 image)))
+    (sdl:width img)))
 
 ;;; Drawing shapes
 

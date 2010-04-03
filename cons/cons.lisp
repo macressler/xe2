@@ -273,6 +273,7 @@
     (setf *form* form)
     (setf *viewport* viewport)
     (setf *status* status)
+    (setf xe2:*workbook* nil)
     ;;
     [resize splash :height (- *cons-window-height* 20) :width *cons-window-width*]
     [move splash :x 0 :y 0]

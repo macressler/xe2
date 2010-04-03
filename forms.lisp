@@ -44,6 +44,22 @@
     (string (or (gethash page *workbook*)
 		(add-page page (create-blank-page))))))
 
+;;; A generic data cell just prints out the stored value.
+
+(defparameter *data-cell-style* '(:foreground ".gray40" :background ".white"))
+
+(defcell data-cell data)
+
+(define-method set data-cell (data)
+  (setf <data> data))
+
+(define-method get data-cell ()
+  <data>)
+
+(define-method compute data-cell ()
+  ;; update the label
+  (setf <label> (list (cons (format nil " ~S  " <data>) *data-cell-style*))))
+
 ;;; The form widget browses workbook pages
 
 (define-prototype form 
@@ -51,6 +67,7 @@
   (page-name :initform nil)
   (world :documentation "The xe2:=world= of objects to be displayed.")
   rows columns
+  (entered :initform nil :documentation "When non-nil, forward key events to the entry and/or any attached widget.")
   (cursor-row :initform 0) 
   (cursor-column :initform 0)
   (cursor-color :initform ".yellow")
@@ -73,10 +90,11 @@
 (defparameter *default-page-name* "scratch-page")
 
 (define-method initialize form (&optional (page *default-page-name*))
-  (let ((world (find-page page)))
-    (initialize-workbook)
-    [parent>>initialize self]
-    [visit self page]))
+  (with-fields (entry) self
+    (let ((world (find-page page)))
+      (initialize-workbook)
+      [parent>>initialize self]
+      [visit self page])))
 
 (define-method visit form (&optional (page *default-page-name*))
   "Visit the page PAGE with the current form."
@@ -104,7 +122,8 @@
   [top-cell-at <world> row column])
 
 (define-method install-keybindings form ()
-  (bind-key-to-method self "RETURN" nil :select)
+  (bind-key-to-method self "RETURN" nil :enter)
+  (bind-key-to-method self "ESCAPE" nil :exit)
   (bind-key-to-method self "UP" nil :move-cursor-up)
   (bind-key-to-method self "DOWN" nil :move-cursor-down)
   (bind-key-to-method self "LEFT" nil :move-cursor-left)
@@ -117,6 +136,35 @@
   (let ((cell [current-cell self]))
     (when cell
       [select cell])))
+
+(define-method enter form ()
+  ;; TODO put up header-line message about how to exit
+  (unless <entered>
+    (let ((entry (clone =textbox=))
+	  (cell [current-cell self]))
+      (when (null cell)
+	(setf cell (clone =data-cell=))
+	[drop-cell <world> cell <cursor-row> <cursor-column>])
+      [install-keybindings entry]
+      [resize entry :width 120
+	      :height 40]
+      [move entry :x 0 :y 0]
+      (setf <entered> t)
+      (setf (field-value :widget cell)
+	    entry))))
+    
+(define-method exit form ()
+  (when <entered>
+    (with-fields (widget) [current-cell self]
+      (let* ((str [get-buffer-as-string widget])
+	     (data (handler-case
+		       (read-from-string str)
+		     ;; print any errors to standard output for now
+		     (condition (c) (format t "~S" c)))))
+	(when data
+	  [set [current-cell self] data])
+	(setf widget nil)
+	(setf <entered> nil)))))
 
 (defparameter *blank-cell-string* '(" ........ "))
 
@@ -151,11 +199,16 @@
 
 (define-method handle-key form (event)
   ;; possibly forward event to current cell. used for the event cell, see below.
-  (let ((cell [current-cell self]))
-    (if (and cell (has-method :handle-key cell))
-	(or [handle-key cell event]
-	    [parent>>handle-key self event])
-	[parent>>handle-key self event])))
+  (if (equal "ESCAPE" (car event))
+      [parent>>handle-key self event]
+      (let* ((cell [current-cell self])
+	     (widget (when cell (field-value :widget cell))))
+	(cond ((and cell (has-method :handle-key cell))
+	       (or [handle-key cell event]
+		   [parent>>handle-key self event]))
+	      ((and widget <entered>)
+	       [handle-key widget event])
+	      (t [parent>>handle-key self event])))))
 
 ;; TODO (define-method hit form (x y) 
 
@@ -247,7 +300,14 @@
 			      :color (if (evenp column) ".gray50" ".gray45")
 			      :destination image))
 		  ;; see also cells.lisp
-		  [form-render cell image x y column-width])
+		  (progn 
+		    [form-render cell image x y column-width]
+		    (when <entered>
+		      (draw-rectangle x y 
+				column-width 
+				row-height
+				:color ".red"
+				:destination image))))
 	      ;; TODO possibly indicate more cells to right/left/up/down of screen portion
 	      ;; possibly save cursor drawing info for this cell
 	      (when (and (= row cursor-row) (= column cursor-column))
@@ -296,22 +356,6 @@
 
 (define-method move-cursor-right form ()
   [move-cursor self :right])
-
-;;; A data cell just prints out the stored value.
-
-(defparameter *data-cell-style* '(:foreground ".gray40" :background ".white"))
-
-(defcell data-cell data)
-
-(define-method set data-cell (data)
-  (setf <data> data))
-
-(define-method get data-cell ()
-  <data>)
-
-(define-method compute data-cell ()
-  ;; update the label
-  (setf <label> (list (cons (format nil " ~S  " <data>) *data-cell-style*))))
 
 ;;; A var cell stores a value into a variable, and reads it.
 
