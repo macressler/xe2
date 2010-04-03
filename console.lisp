@@ -1097,7 +1097,7 @@ object (possibly driver-dependent). When a resource is loaded (with
 the resource record.  The return value is stored in the OBJECT field
 of the record.")
 
-;;; Functions to load, find, and transform resources
+;;; Transforming resources
 
 (defvar *resource-transformation-delimiter* #\:)
 
@@ -1141,6 +1141,8 @@ of the record.")
   (list :rotate #'rotate-image
 	:subimage #'subsect-image
 	:scale #'scale-image))
+
+;;; Main user-level functions for finding and loading resources.
 
 (defun load-resource (resource)
   "Load the driver-dependent object of RESOURCE into the OBJECT field
@@ -1580,9 +1582,5 @@ and its .startup resource is loaded."
   ;; 	       (when (eq :music (resource-type resource))
   ;; 		 (sdl-mixer:free (resource-object resource))))
   ;; 	   *resource-table*))
-
-
-;;; Saving and loading data 
-;;; Taking screenshots
 
 ;;; console.lisp ends here
