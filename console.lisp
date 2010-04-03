@@ -916,8 +916,6 @@ table. File names are relative to the module MODULE-NAME."
 	    (when (getf (resource-properties res) :autoload)
 	      (push res *pending-autoload-resources*)))))))
 
-(defvar *module* nil)
-
 (defun index-module (module-name)
   "Add all the resources from the module MODULE-NAME to the resource
 table."
@@ -931,9 +929,31 @@ table."
 
 (defvar *default-font* ".default-font")
 
-;;; Saving CLON objects to disk as PAK files
+;;; Creating, saving, and loading object resources in PAK files
+
+;; See also the documentation string for `*pak-file-extension*'.
+
+;; Object resources are PAK resources with type :object. These are
+;; used to save serialized objects to disk and read them back
+;; again. Each page is stored in one PAK file, containing a single
+;; resource with the serialized data stored in the :DATA field of the
+;; resource record. Page-names are resource-names, and therefore must
+;; be unique within a given XE2 module. A page's PAK file is stored in
+;; {MODULENAME}/{PAGENAME}.pak, and for a given module these PAKs will
+;; all be included by {MODULENAME}/WORKBOOK.PAK, which is an
+;; automatically generated PAK index linking to all the serialized
+;; page PAK files.
+
+(defun make-object-resource (name object)
+  "Make an object resource named NAME (a string) with the CLON object
+OBJECT as the data."
+  (message "Creating new object resource ~S." name)
+  (index-resource (make-resource :name name 
+				 :type :object
+				 :object object)))
 
 (defun save-object-resource (resource &optional (module *module*))
+  "Save an object resource to disk as {RESOURCE-NAME}.PAK."
   (assert (clon:object-p (resource-object resource)))
   (setf (resource-data resource) (clon:serialize (resource-object resource)))
   (write-pak (find-module-file module 
@@ -942,17 +962,16 @@ table."
 	     (list resource))
   (setf (resource-data resource) nil))
 
-;;; Driver-dependent resource object loading handlers
-
 (defun load-object-resource (resource)
-  "Loads a serialized :OBJECT resource from the Lisp data in the :DATA field.
-Returns the rebuilt object."
+  "Loads a serialized :OBJECT resource from the Lisp data in the 
+:DATA field of the RESOURCE argument. Returns the rebuilt object. See
+also the documentation for CLON:DESERIALIZE."
   (let ((object (clon:deserialize (resource-data resource))))
     (assert (clon:object-p object))
     (setf (resource-data resource) nil) ;; no longer needed
-    (prog1 object
-      (when (has-method :deserialize object)
-	[deserialize object]))))
+    object))
+
+;;; Driver-dependent resource object loading handlers
 
 (defun load-image-resource (resource)
   "Loads an :IMAGE-type pak resource from a :FILE on disk."
@@ -1190,13 +1209,19 @@ found."
 
 ;;; Loading modules as a whole and autoloading resources
 
+(defvar *module* nil "The name of the current module.")
+
 (defvar *loaded-modules* nil 
 "List of loaded modules.")
 
 (defun load-module (module)
-  "Load the module named MODULE."
+  "Load the module named MODULE. Load any resources marked with a
+non-nil :autoload property. This operation also sets the default
+object save directory (by setting the current `*module*'. See also
+`save-object-resource')."
   (setf *pending-autoload-resources* nil)
   (index-module module)
+  (setf *module* module)
   (mapc #'load-resource (nreverse *pending-autoload-resources*))
   (setf *pending-autoload-resources* nil))
 
@@ -1226,8 +1251,6 @@ of the music."
   "Stop all music playing."
   (when *use-sound*
     (sdl-mixer:halt-music fade-milliseconds)))
-
-;; TODO (defun seek-music 
 
 (defun play-sample (sample-name &rest args)
   "When sound is enabled, play the sample resource SAMPLE-NAME."
