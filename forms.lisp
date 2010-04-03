@@ -137,9 +137,15 @@
     (when cell
       [select cell])))
 
+(define-method say form (text)
+  (setf <header-line>
+	(etypecase text
+	  (list text)
+	  (string (list (list text))))))
+
 (define-method enter form ()
-  ;; TODO put up header-line message about how to exit
   (unless <entered>
+    [say self "Now entering data. Press ESCAPE to stop editing."]
     (let ((entry (clone =textbox=))
 	  (cell [current-cell self]))
       (when (null cell)
@@ -159,12 +165,13 @@
       (let* ((str [get-buffer-as-string widget])
 	     (data (handler-case
 		       (read-from-string str)
-		     ;; print any errors to standard output for now
-		     (condition (c) (format t "~S" c)))))
+		     (condition (c) 
+		       [say self (format nil "Error reading data: ~S" c)]))))
 	(when data
 	  [set [current-cell self] data])
 	(setf widget nil)
-	(setf <entered> nil)))))
+	(setf <entered> nil)
+	[say self "Finished entering data."]))))
 
 (defparameter *blank-cell-string* '(" ........ "))
 
@@ -261,9 +268,9 @@
 	     (y 0)
 	     (cursor-dimensions nil))
 	;; see if current cell has a tooltip
-	(let ((selected-cell [cell-at self cursor-row cursor-column]))
-	  (when (object-p selected-cell)
-	    (setf header-line (field-value :tooltip selected-cell))))
+	;; (let ((selected-cell [cell-at self cursor-row cursor-column]))
+	;;   (when (object-p selected-cell)
+	;;     (setf header-line (field-value :tooltip selected-cell))))
 	;; draw header line with tooltip, if any
 	(when header-line
 	  (render-formatted-line header-line 0 y :destination image)
