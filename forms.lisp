@@ -27,7 +27,9 @@
     (setf *workbook* (make-hash-table :test 'equal))))
 
 (defun create-blank-page ()
-  (clone =world=))
+  (let ((world (clone =world=)))
+    (prog1 world
+      [generate world])))
 
 (defun add-page (page-name world)
   (initialize-workbook)
@@ -35,10 +37,12 @@
       (error "Name collision adding page ~S" page-name)
       (setf (gethash page-name *workbook*) world)))
 
-(defun find-page (page-name)
-  (assert *workbook*)
-  (or (gethash page-name *workbook*)
-      (add-page page-name (create-blank-page))))
+(defun find-page (page)
+  (initialize-workbook)
+  (etypecase page
+    (clon:object page)
+    (string (or (gethash page *workbook*)
+		(add-page page (create-blank-page))))))
 
 ;;; The form widget browses workbook pages
 
@@ -66,24 +70,37 @@
   (selected-tool :documentation "Keyword symbol identifying the method to be applied.")
   (tool-data :documentation "Arguments for tool method invocation."))
 
-(define-method initialize form (&key (page-name "*untitled page*") world)
-  (initialize-workbook)
-  [parent>>initialize self]
-  [configure self (or world (find-page page-name))])
+(defparameter *default-page-name* "scratch-page")
 
-(define-method configure form (&optional world)
-  (assert world)
-  (setf <world> world)
-  [install-keybindings self]
-  (setf <cursor-row> 0 <cursor-column> 0)
-  (setf <rows> (field-value :height world))
-  (setf <columns> (field-value :width world))
-  (setf <column-widths> (make-array (+ 1 <columns>) :initial-element 0)
-	<row-heights> (make-array (+ 1 <rows>) :initial-element 0)
-	<column-styles> (make-array (+ 1 <columns>))
-	<row-styles> (make-array (+ 1 <rows>))))
+(define-method initialize form (&optional (page *default-page-name*))
+  (let ((world (find-page page)))
+    (initialize-workbook)
+    [parent>>initialize self]
+    [visit self page]))
+
+(define-method visit form (&optional (page *default-page-name*))
+  "Visit the page PAGE with the current form."
+  (let ((world (find-page page)))
+    (assert world)
+    (setf <page-name> page)
+    (setf <world> world)
+    [install-keybindings self]
+    (setf <rows> (field-value :height world))
+    (setf <columns> (field-value :width world))
+    (assert (integerp <rows>))
+    (assert (integerp <columns>))
+    (setf <cursor-row> 0)
+    (setf <cursor-column> 0)
+    (setf <cursor-column> (min <columns> <cursor-column>))
+    (setf <cursor-row> (min <rows> <cursor-row>))
+    (setf <cursor-column> (min <columns> <cursor-column>))
+    (setf <column-widths> (make-array (+ 1 <columns>) :initial-element 0)
+	  <row-heights> (make-array (+ 1 <rows>) :initial-element 0)
+	  <column-styles> (make-array (+ 1 <columns>))
+	  <row-styles> (make-array (+ 1 <rows>)))))
 
 (define-method cell-at form (row column)
+  (assert (and (integerp row) (integerp column)))
   [top-cell-at <world> row column])
 
 (define-method install-keybindings form ()
@@ -156,10 +173,12 @@
 		[compute cell]
 		(setf data [get cell]))))))))
 
+;; TODO break up this method.
+
 (define-method render form ()
   [clear self]
   (when <world>
-    (with-field-values (cursor-row cursor-column row-heights world
+    (with-field-values (cursor-row cursor-column row-heights world page-name 
 				   origin-row origin-column header-line status-line
 				   row-spacing rows columns draw-blanks column-widths) self
       [compute self]
@@ -198,8 +217,10 @@
 	  (incf y (formatted-line-height header-line)))
 	;; create status line
 	(setf status-line
-	      (list (list (format nil "Current position: (ROW ~S, COLUMN ~S) " 
-				  cursor-row cursor-column)
+	      (list (list (format nil " Location: (Row ~S, Column ~S)  |  Visiting page: ~S | Color: ~A "
+				  cursor-row cursor-column page-name 
+				  (when (field-value :paint <world>)
+				    (get-some-object-name (field-value :paint <world>))))
 			  :foreground ".white")))
 	;; draw status line
 	(when status-line 

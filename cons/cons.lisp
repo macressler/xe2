@@ -317,7 +317,7 @@
 	       (let ((config-screen (clone =joystick-world=)))
 		 [generate config-screen]
 		 [set-prompt config-screen prompt]
-		 [configure form config-screen])
+		 [visit form config-screen])
 	       ;;
 	       [set-character *status* player]
 	       [resize viewport :height 470 :width *cons-window-width*]

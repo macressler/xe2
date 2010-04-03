@@ -84,7 +84,7 @@
   load-lisp-resource *executable* *resource-handlers* load-resource
   find-resource find-resource-object *colors* *world*
   load-user-init-file *module-directories* resource-to-plist
-  make-resource
+  make-resource make-object-resource
   make-event =widget= *active-widgets* bind-key-to-prompt-insertion
   make-field-initializer clone make-field-initializer-body
   make-key-modifier-symbol make-key-string normalize-event

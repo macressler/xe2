@@ -92,7 +92,8 @@ At the moment, only 0=off and 1=on are supported.")
   (player-exit-row :initform 0)
   (player-exit-column :initform 0)
   ;; serialization
-  (excluded-fields :initform '(:stack :paint :sprite-grid :sprite-table :narrator :browser :viewport :grid)))
+  (excluded-fields :initform '(:stack :paint :sprite-grid :sprite-table :narrator :browser :viewport :grid
+			       :player :sprites)))
 
 (defparameter *default-world-axis-size* 10)
 (defparameter *default-world-z-size* 4)
@@ -194,10 +195,7 @@ At the moment, only 0=off and 1=on are supported.")
       (dolist (s <sprites>)
 	(push (serialize s) sprites))
       (setf <serialized-sprites> sprites)
-      (prog1 (clon:serialize self :excluding 
-			     '(:grid :sprite-grid 
-			       :sprites :light-grid
-			       :narrator :browser :viewport :player))
+      (prog1 (clon:serialize self)
 	(setf <serialized-grid> nil)
 	(setf <serialized-sprites> nil)))))
     
@@ -236,10 +234,9 @@ initialize the arrays for a world of the size specified there."
 PARAMETERS and interpreting the world's grammar field <GRAMMAR>."
   (declare (ignore parameters))
   (with-fields (grammar stack) self
-    (assert grammar)
     (setf xe2:*grammar* grammar)
     (let ((program (generate 'world)))
-      (or program (error "ERROR: Nothing was generated from this grammar."))
+      (or program (message "WARNING: Nothing was generated from this grammar."))
       (message (prin1-to-string program))
       (unless <grid>
 	[create-default-grid self])
@@ -655,13 +652,13 @@ so on, until no more messages are generated."
     "If this is the player's last turn, run the cpu phase. otherwise,
 stay in player phase and exit. Always runs cpu when the engine is in
 realtime mode."
-    (when (or *timer-p* (not [can-act player <phase-number>]))
-      [end-phase player]
+    (when (or *timer-p* (not [can-act <player> <phase-number>]))
+      [end-phase <player>]
       (unless <exited>
 	(incf <phase-number>)
 	(when (not [in-category <player> :dead])
 	  [run-cpu-phase self])
-	[begin-phase player])))
+	[begin-phase <player>])))
 
 (define-method run-cpu-phase world (&optional timer-p)
   "Run all non-player actor cells."
