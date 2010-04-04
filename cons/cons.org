@@ -1,38 +1,3 @@
-* CELL-MODE
-
-** TODO try saving pages
-** TODO auto-save of objects.pak
-** TODO separate dev module with widescreen view, spreadsheet at top, toolbar pane right 1/4 of screen, terminal at bottom
-** TODO loading in dev view does not autoload any resources
-** TODO M-x commands in forms
-** TODO [#C] http://blackthorn-engine.googlecode.com/hg/Makefile
-** TODO [#C] http://mapeditor.org/
-** TODO http://nsis.sourceforge.net/Main_Page
-** TODO [#B] resource links to new pages
-** TODO [#A] select paint color from text
-** TODO [#A] select paint color from object
-** TODO palette sheet / dual view
-** TODO enable user to specify a prototype name directly for creating a cell
-** TODO enable user to create cells by picking up/dropping colors
-** TODO property list editor
-** TODO splitscreen mode
-** TODO [#A] Don't run dataflow every frame
-** TODO [#A] cancel button resets to default
-** TODO [#A] implement proper key repeat in prompt // movedevshot send-held-events to do-physics??
-** TODO [#B] Function to uniformly pretty-print events
-** TODO [#B] header-line with help
-** TODO [#B] link/command button. maps /highlights prefixes to whatever text link typed
-** TODO [#B] row/column headers
-** TODO [#C] Data entry area like in excel?
-** TODO [#C] Formatter shows which buttons you are pressing. hook into event handler?
-** TODO [#C] calculate via mouse which cell is clicked
-** TODO [#C] cursor and save-excursion for the logo world gen stuff
-** TODO [#C] only update strings every physics timestep
-** TODO [#C] option cells
-** TODO [#C] scrolling
-** TODO [#C] simple customizer grammar
-** TODO [#C] toggle-cells
-** TODO bricks and more enemies blocking entrances to reactor
 * DONE XE2 IDE notes
 CLOSED: [2010-04-02 Fri 20:29]
 

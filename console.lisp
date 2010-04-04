@@ -753,13 +753,16 @@ This prepares it for printing as part of a PAK file."
 ;; First we need routines to read and write raw s-expressions to and
 ;; from text files.
 
+(defconstant *keyword-package* (find-package :keyword))
+
 (defun write-sexp-to-file (filename sexp)
-  (message "Writing data to file ~A...]" sexp filename)
+  (message "Writing data to file ~S" sexp filename)
   (with-open-file (file filename :direction :output 
 			:if-exists :overwrite
 			:if-does-not-exist :create)
-    (format file "~S" sexp))
-  (message "Writing data to file ~A... Done." sexp filename))
+    (let ((*package* *keyword-package*))
+      (format file "~S" sexp)))
+  (message "Writing data to file ~S... Done." filename))
 
 (defun read-sexp-from-file (filename)
   (message "Reading data from ~A..." filename)
@@ -917,12 +920,19 @@ table. File names are relative to the module MODULE-NAME."
 	    (when (getf (resource-properties res) :autoload)
 	      (push res *pending-autoload-resources*)))))))
 
+(defparameter *object-index-filename* "objects.pak")
+
 (defun index-module (module-name)
   "Add all the resources from the module MODULE-NAME to the resource
 table."
   (let ((index-file (find-module-file module-name
-				      (concatenate 'string module-name ".pak"))))
-    (index-pak module-name index-file)))
+				      (concatenate 'string module-name ".pak")))
+	(object-index-file (find-module-file module-name *object-index-filename*)))
+    (index-pak module-name index-file)
+    ;; index any saved objects
+    (when (probe-file object-index-file)
+      (message "Loading saved objects from ~S" object-index-file)
+      (index-pak module-name object-index-file))))
 
 ;;; Standard resource names
 
@@ -969,8 +979,6 @@ OBJECT as the data."
     (message "Saving resource ~S... Done." name)
     (setf (resource-data resource) nil)))
 
-(defparameter *object-index-filename* "objects.pak")
-
 (defun save-modified-objects (&optional force)
   (let (index)
     (labels ((save (name resource)
@@ -978,12 +986,17 @@ OBJECT as the data."
 		 (when (eq :object (resource-type resource))
 		   (when (or force (resource-modified-p resource))
 		     (save-object-resource resource)
-		     (push resource index))))))
+		     ;; make a link resource (i.e. of type :pak) to pull this in later
+		     (let ((link-resource (make-resource :type :pak 
+							 :file (concatenate 'string
+									    (resource-name resource)
+									    *pak-file-extension*))))
+		       (push link-resource index)))))))
       (maphash #'save *resource-table*))
     ;; write auto-generated index
     (write-pak (find-module-file *module* *object-index-filename*) index)))
 
-;; (save-modified-objectsq t)
+;; (save-modified-objects t)
 ;; (clon:serialize (clone xe2:=world=))
 ;; (clon:serialize (clone xe2:=world=)))
 

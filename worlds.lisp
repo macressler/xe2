@@ -94,7 +94,7 @@ At the moment, only 0=off and 1=on are supported.")
   ;; serialization
   (excluded-fields :initform
   '(:stack :paint :sprite-grid :sprite-table :narrator :browser :viewport :grid
-    :player :sprites)))
+    :message-queue :player)))
 
 (defparameter *default-world-axis-size* 10)
 (defparameter *default-world-z-size* 4)
@@ -102,17 +102,6 @@ At the moment, only 0=off and 1=on are supported.")
 (define-method initialize world ()
   (setf <variables> (make-hash-table :test 'equal))
   [create-default-grid self])
-
-;; (define-method serialize world ()
-;;   (with-fields (grid serialized-grid height width) self
-;;     (setf serialized-grid nil)
-;;     (let (objects)
-;;       (dotimes (row height)
-;; 	(dotimes (column width)
-;; 	  (do-cells (cell (aref grid row column))
-;; 	    (push (list :row row :column column :cell cell)
-;; 		  objects))))
-;;       (setf serialized-grid objects))))
 
 (define-method set-variable world (var value)
   (setf (gethash var <variables>) value))
@@ -182,7 +171,6 @@ At the moment, only 0=off and 1=on are supported.")
 (define-method serialize world ()
   (clon:with-field-values (width height) self
     (let ((grid <grid>)
-	  (sprites nil)
 	  (sgrid (make-array (list height width) :initial-element nil :adjustable nil)))
       (dotimes (i height)
 	(dotimes (j width)
@@ -191,11 +179,20 @@ At the moment, only 0=off and 1=on are supported.")
 			 (push (clon:serialize cell) 
 			       (aref sgrid i j))))
 	       (aref grid i j))))
-      (setf <serialized-grid> sgrid)
-      (dolist (s <sprites>)
-	(push (serialize s) sprites))
-      (setf <serialized-sprites> sprites))))
+      (setf <serialized-grid> sgrid))))
     
+(define-method deserialize world ()
+    [create-default-grid self]
+    (clon:with-field-values (width height grid sprites serialized-grid) self
+      (dotimes (i height)
+	(dotimes (j width)
+	  (map nil #'(lambda (cell)
+		       (when cell
+			 (vector-push-extend (clon:deserialize cell)
+					     (aref grid i j))))
+	       (aref serialized-grid i j))))
+      (setf <serialized-grid> nil)))
+
 (define-method create-default-grid world ()
   "If height and width have been set in a world's definition,
 initialize the arrays for a world of the size specified there."
@@ -795,11 +792,6 @@ sources and ray casting."
       (dotimes (i <height>)
 	(dotimes (j <width>)	
 	  (setf (aref light-grid i j) 0))))))
-
-(define-method deserialize world (sexp)
-  "Load a saved world from Lisp data."
-  (declare (ignore sexp))
-  nil)
 
 (define-method begin-ambient-loop world ()
   "Begin looping your music for this world here."
