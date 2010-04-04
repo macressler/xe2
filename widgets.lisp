@@ -343,8 +343,8 @@ auto-updated displays."
 	   
 ;;; Command prompt widget
 
-(defparameter *direct-prompt-string* "COMMAND> ")
-(defparameter *forward-prompt-string* "> ")
+(defparameter *direct-prompt-string* "ENTER COMMAND >>")
+(defparameter *forward-prompt-string* "Press CONTROL-X to enter the prompt.")
 
 (defparameter *default-prompt-margin* 4)
 
@@ -405,7 +405,7 @@ the next widget in the frame (the customized prompt.) To 'escape'
 this and enter commands, hit ESCAPE (and again to return to forward
 mode.)
 
-The modes can be toggled with the ESCAPE key.
+The modes can be toggled with CONTROL-X.
 ")
   (mode :documentation "Either :direct or :forward." :initform :direct)
   (default-keybindings :documentation "Default keybindings bound during initialization.
@@ -438,11 +438,15 @@ normally."
     (:direct (prog1 t (let ((func (gethash keylist <keymap>)))
 			(when func
 			  (funcall func)))))
-    (:forward (when (string= "ESCAPE" (first keylist))
-		(setf <mode> :direct)))))
+    (:forward (when (equal (normalize-event '("X" :control))
+			   keylist)
+		(prog1 t (setf <mode> :direct))))))
 
-(define-method escape prompt ()
+(define-method exit prompt ()
   (setf <mode> :forward))
+
+(define-method goto prompt ()
+  (setf <mode> :direct))
 
 (define-method set-mode prompt (mode)
   (setf <mode> mode))
@@ -460,7 +464,7 @@ normally."
   (bind-key-to-method self "K" '(:control) :clear)
   (bind-key-to-method self "BACKSPACE" nil :backward-delete-char)
   (bind-key-to-method self "RETURN" nil :execute)
-  (bind-key-to-method self "ESCAPE" nil :escape)
+  (bind-key-to-method self "X" '(:control) :exit)
   (bind-key-to-method self "P" '(:alt) :backward-history)
   (bind-key-to-method self "N" '(:alt) :forward-history)  
   ;; install keybindings for self-inserting characters
@@ -478,9 +482,14 @@ normally."
   (bind-key-to-prompt-insertion self "MINUS" nil "-")
   (bind-key-to-prompt-insertion self "SEMICOLON" nil ";")
   (bind-key-to-prompt-insertion self "SEMICOLON" '(:shift) ":")
+  (bind-key-to-prompt-insertion self "0" '(:shift) ")")
+  (bind-key-to-prompt-insertion self "9" '(:shift) "(")
   (bind-key-to-prompt-insertion self "SPACE" nil " ")
   (bind-key-to-prompt-insertion self "QUOTE" nil "'")
   (bind-key-to-prompt-insertion self "QUOTE" '(:shift) "\""))
+
+(define-method say prompt (&rest args)
+  (apply #'error args))
 
 (define-method initialize prompt ()
   [parent>>initialize self]
@@ -516,9 +525,13 @@ normally."
   (let* ((*read-eval* nil)
 	 (sexp (handler-case 
 		   (read-from-string (concatenate 'string "(" <line> ")"))
-		 ((or end-of-file reader-error) () nil))))
+		 (condition (c)
+		   [say self c]))))
     (when sexp 
-      (apply #'send nil (make-keyword (car sexp)) <receiver> (cdr sexp)))
+      (handler-case 
+	  (apply #'send nil (make-keyword (car sexp)) <receiver> (cdr sexp))
+	(condition (c)
+	  [say self c])))
     (queue <line> <history>)
     [clear self]))
 

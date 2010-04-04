@@ -754,12 +754,12 @@ This prepares it for printing as part of a PAK file."
 ;; from text files.
 
 (defun write-sexp-to-file (filename sexp)
-  (message "Writing data [~10S... to ~A...]" sexp filename)
+  (message "Writing data to file ~A...]" sexp filename)
   (with-open-file (file filename :direction :output 
 			:if-exists :overwrite
 			:if-does-not-exist :create)
     (format file "~S" sexp))
-  (message "Writing data [~10S... to ~A... Done." sexp filename))
+  (message "Writing data to file ~A... Done." sexp filename))
 
 (defun read-sexp-from-file (filename)
   (message "Reading data from ~A..." filename)
@@ -969,15 +969,21 @@ OBJECT as the data."
     (message "Saving resource ~S... Done." name)
     (setf (resource-data resource) nil)))
 
-(defun save-modified-resources (&optional force)
-  (labels ((save (name resource)
-	     (when (not (stringp resource))
-	       (when (eq :object (resource-type resource))
-		 (when (or force (resource-modified-p resource))
-		   (save-object-resource resource))))))
-    (maphash #'save *resource-table*)))
+(defparameter *object-index-filename* "objects.pak")
 
-;; (save-modified-resources t)
+(defun save-modified-objects (&optional force)
+  (let (index)
+    (labels ((save (name resource)
+	       (when (not (stringp resource))
+		 (when (eq :object (resource-type resource))
+		   (when (or force (resource-modified-p resource))
+		     (save-object-resource resource)
+		     (push resource index))))))
+      (maphash #'save *resource-table*))
+    ;; write auto-generated index
+    (write-pak (find-module-file *module* *object-index-filename*) index)))
+
+;; (save-modified-objectsq t)
 ;; (clon:serialize (clone xe2:=world=))
 ;; (clon:serialize (clone xe2:=world=)))
 

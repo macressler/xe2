@@ -52,6 +52,7 @@
 
 (define-prototype form 
     (:parent =widget= :documentation  "An interactive graphical spreadsheet.")
+  prompt narrator
   (page-name :initform nil)
   (world :documentation "The xe2:=world= of objects to be displayed.")
   rows columns
@@ -108,13 +109,24 @@
   (assert (and (integerp row) (integerp column)))
   [top-cell-at <world> row column])
 
+(define-method set-prompt form (prompt)
+  (setf <prompt> prompt))
+
+(define-method set-narrator form (narrator)
+  (setf <narrator> narrator))
+
 (define-method install-keybindings form ()
   (bind-key-to-method self "RETURN" nil :enter)
   (bind-key-to-method self "ESCAPE" nil :exit)
+  (bind-key-to-method self "X" '(:control) :goto-prompt)
   (bind-key-to-method self "UP" nil :move-cursor-up)
   (bind-key-to-method self "DOWN" nil :move-cursor-down)
   (bind-key-to-method self "LEFT" nil :move-cursor-left)
   (bind-key-to-method self "RIGHT" nil :move-cursor-right))
+
+(define-method goto-prompt form ()
+  (when <prompt>
+    [goto <prompt>]))
 
 (define-method current-cell form ()
   [cell-at self <cursor-row> <cursor-column>])

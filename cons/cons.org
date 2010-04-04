@@ -1,26 +1,19 @@
 * CELL-MODE
-** DONE integrate new docs into clon and console.el
-CLOSED: [2010-04-02 Fri 20:29]
-** DONE revise forms.lisp with docs/workbook capabilities.
-CLOSED: [2010-04-02 Fri 21:47]
-** DONE typical index.pak is composed of just :includes
-CLOSED: [2010-04-02 Fri 21:47]
-*** TODO include .pak <--- whichever hand-edited entries are needed
-*** TODO include workbook.pak
-** TODO http://blackthorn-engine.googlecode.com/hg/Makefile
-** TODO http://mapeditor.org/
-** TODO resource links to new pages
-** TODO text entry for comments
-** TODO select paint color from text
-** TODO select paint color from object
+
 ** TODO try saving pages
+** TODO auto-save of objects.pak
+** TODO separate dev module with widescreen view, spreadsheet at top, toolbar pane right 1/4 of screen, terminal at bottom
+** TODO loading in dev view does not autoload any resources
+** TODO M-x commands in forms
+** TODO [#C] http://blackthorn-engine.googlecode.com/hg/Makefile
+** TODO [#C] http://mapeditor.org/
+** TODO http://nsis.sourceforge.net/Main_Page
+** TODO [#B] resource links to new pages
+** TODO [#A] select paint color from text
+** TODO [#A] select paint color from object
 ** TODO palette sheet / dual view
 ** TODO enable user to specify a prototype name directly for creating a cell
 ** TODO enable user to create cells by picking up/dropping colors
-** TODO generate workbook.pak
-** TODO mark as modified-p each world
-** TODO the other page-name.pak files
-** TODO indirect widget rendering
 ** TODO property list editor
 ** TODO splitscreen mode
 ** TODO [#A] Don't run dataflow every frame
