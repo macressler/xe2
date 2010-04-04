@@ -7,6 +7,8 @@ CLOSED: [2010-04-02 Fri 21:47]
 CLOSED: [2010-04-02 Fri 21:47]
 *** TODO include .pak <--- whichever hand-edited entries are needed
 *** TODO include workbook.pak
+** TODO http://blackthorn-engine.googlecode.com/hg/Makefile
+** TODO http://mapeditor.org/
 ** TODO resource links to new pages
 ** TODO text entry for comments
 ** TODO select paint color from text

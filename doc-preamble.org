@@ -70,7 +70,7 @@ serialization. Messages (i.e. method invocations) can be queued and
 pre-processed before sending to their recipients. Message forwarding
 (i.e. doesNotUnderstand) is also supported.
 
-See also [[file:../clon/clon.html][clon.lisp]].
+See also [[http://github.com/dto/clon/blob/master/clon.lisp][clon.lisp]].
 
 ** The console
 
@@ -82,7 +82,7 @@ joystick input) are provided here with a platform-neutral Common Lisp
 interface. Currently the console uses LISPBUILDER-SDL as a
 backend, but other backends are possible.
 
-See also [[file:../xe2/console.html][console.lisp]].
+See also [[http://github.com/dto/xe2/blob/master/console.lisp][console.lisp]].
 
 ** Interactive graphical widgets
 
@@ -93,7 +93,7 @@ widgets. Events are things like keystrokes, joystick buttons, timers,
 or mouse clicks. The keybinding system (where events are mapped to
 responses) draws inspiration from Emacs.
 
-Also included in [[file:../xe2/widgets.html][widgets.lisp]]:
+Also included in [[http://github.com/dto/xe2/blob/master/widgets.lisp][widgets.lisp]]:
 
   - basic layout widgets 
   - an interactive command prompt 
@@ -113,8 +113,8 @@ cells. Cells interact by sending messages to one another and to other
 objects in the environment; these messages are queued and processed by
 the world for delivery to their recipients.
 
-In [[file:../xe2/cells.html][cells.lisp]] you will find some basic roguelike logic built into
-cells.
+In [[http://github.com/dto/xe2/blob/master/cells.lisp][cells.lisp]]
+you will find some basic roguelike logic built into cells.
 
   - Basic features like name, description, and discovery.
   - Unified container, inventory, and equipment system.
@@ -131,7 +131,6 @@ cells.
     and keeping track of units (meters, kilograms.)
   - "Categories" allow arbitrary tagging of objects, with some
     categories having special interpretation by the engine.
-
 
 These are in effect a basic set of roleplaying rules or "physics". By
 defining new prototypes based on cells, you can change the rules and
@@ -151,7 +150,7 @@ performs the following tasks:
 
 There are also Universe objects composed of interlinked worlds.
 
-See also [[file:../xe2/worlds.html][worlds.lisp]].
+See also [[http://github.com/dto/xe2/blob/master/worlds.lisp][worlds.lisp]].
 
 ** Math routines
 
@@ -161,11 +160,11 @@ See also [[file:../xe2/worlds.html][worlds.lisp]].
  - Bresenham's line algorithm
  - Random midpoint displacement "plasma"
 
- See also [[file:../xe2/math.html][math.lisp.]]
+ See also [[http://github.com/dto/xe2/blob/master/math.lisp][math.lisp.]]
 
 ** Pathfinding
 
-Not yet fully ported. See [[file:../xe2/path.html][path.lisp.]]
+Not yet fully ported. See [[http://github.com/dto/xe2/blob/master/path.lisp][path.lisp.]]
 
 * Introducing CLON 
 

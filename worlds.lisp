@@ -92,8 +92,9 @@ At the moment, only 0=off and 1=on are supported.")
   (player-exit-row :initform 0)
   (player-exit-column :initform 0)
   ;; serialization
-  (excluded-fields :initform '(:stack :paint :sprite-grid :sprite-table :narrator :browser :viewport :grid
-			       :player :sprites)))
+  (excluded-fields :initform
+  '(:stack :paint :sprite-grid :sprite-table :narrator :browser :viewport :grid
+    :player :sprites)))
 
 (defparameter *default-world-axis-size* 10)
 (defparameter *default-world-z-size* 4)
@@ -102,17 +103,16 @@ At the moment, only 0=off and 1=on are supported.")
   (setf <variables> (make-hash-table :test 'equal))
   [create-default-grid self])
 
-(define-method serialize world ()
-  (with-fields (grid serialized-grid height width) self
-  (setf serialized-grid nil)
-    (let (objects)
-      (dotimes (row height)
-	(dotimes (column width)
-	  (do-cells (cell (aref grid row column))
-	    (push (list :row row :column column :cell cell)
-		  objects))))
-      (setf serialized-grid objects)))
-  (clon:serialize self))
+;; (define-method serialize world ()
+;;   (with-fields (grid serialized-grid height width) self
+;;     (setf serialized-grid nil)
+;;     (let (objects)
+;;       (dotimes (row height)
+;; 	(dotimes (column width)
+;; 	  (do-cells (cell (aref grid row column))
+;; 	    (push (list :row row :column column :cell cell)
+;; 		  objects))))
+;;       (setf serialized-grid objects))))
 
 (define-method set-variable world (var value)
   (setf (gethash var <variables>) value))
@@ -194,10 +194,7 @@ At the moment, only 0=off and 1=on are supported.")
       (setf <serialized-grid> sgrid)
       (dolist (s <sprites>)
 	(push (serialize s) sprites))
-      (setf <serialized-sprites> sprites)
-      (prog1 (clon:serialize self)
-	(setf <serialized-grid> nil)
-	(setf <serialized-sprites> nil)))))
+      (setf <serialized-sprites> sprites))))
     
 (define-method create-default-grid world ()
   "If height and width have been set in a world's definition,

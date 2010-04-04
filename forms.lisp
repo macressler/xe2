@@ -20,29 +20,17 @@
 
 (in-package :xe2)
 
-(defvar *workbook* nil "Hash table mapping string page names to world objects.")
-
-(defun initialize-workbook (&optional force)
-  (when (or force (null *workbook*))
-    (setf *workbook* (make-hash-table :test 'equal))))
-
 (defun create-blank-page ()
   (let ((world (clone =world=)))
     (prog1 world
       [generate world])))
 
-(defun add-page (page-name world)
-  (initialize-workbook)
-  (if (gethash page-name *workbook*)
-      (error "Name collision adding page ~S" page-name)
-      (setf (gethash page-name *workbook*) world)))
-
 (defun find-page (page)
-  (initialize-workbook)
   (etypecase page
-    (clon:object page)
-    (string (or (gethash page *workbook*)
-		(add-page page (create-blank-page))))))
+    (object page)
+    (string (or (find-resource-object page :noerror)
+		(progn (make-object-resource page (create-blank-page))
+		       (find-resource-object page))))))
 
 ;;; A generic data cell just prints out the stored value.
 
@@ -92,14 +80,13 @@
 (define-method initialize form (&optional (page *default-page-name*))
   (with-fields (entry) self
     (let ((world (find-page page)))
-      (initialize-workbook)
       [parent>>initialize self]
       [visit self page])))
 
 (define-method visit form (&optional (page *default-page-name*))
   "Visit the page PAGE with the current form."
   (let ((world (find-page page)))
-    (assert world)
+    (assert (object-p world))
     (setf <page-name> page)
     (setf <world> world)
     [install-keybindings self]

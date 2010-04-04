@@ -732,11 +732,12 @@ well.
 The string '()' is a valid .PAK file; it contains no resources.")
 
 (defstruct resource 
-  name type properties file data object)
+  name type properties file data object modified-p)
 
 ;; The extra `object' field is not saved in .PAK files; it is used to
 ;; store driver-dependent loaded resources (i.e. SDL image surface
 ;; objects and so on). This is used in the resource table.
+;; The modified-p field is likewise not stored. 
 
 (defun resource-to-plist (res)
   "Convert the resource record RES into a property list.
@@ -771,7 +772,7 @@ This prepares it for printing as part of a PAK file."
 
 (defun write-pak (filename resources)
   "Write the RESOURCES to the PAK file FILENAME."
-  (write-sexp-to-file (mapcar #'resource-to-plist resources) filename))
+  (write-sexp-to-file filename (mapcar #'resource-to-plist resources)))
 
 (defun read-pak (filename)
   "Return a list of resources from the PAK file FILENAME."
@@ -948,19 +949,37 @@ table."
   "Make an object resource named NAME (a string) with the CLON object
 OBJECT as the data."
   (message "Creating new object resource ~S." name)
-  (index-resource (make-resource :name name 
+  (let ((resource (make-resource :name name 
 				 :type :object
 				 :object object)))
+    (prog1 resource
+      (index-resource resource))))
 
 (defun save-object-resource (resource &optional (module *module*))
   "Save an object resource to disk as {RESOURCE-NAME}.PAK."
   (assert (clon:object-p (resource-object resource)))
-  (setf (resource-data resource) (clon:serialize (resource-object resource)))
-  (write-pak (find-module-file module 
-			       (concatenate 'string (resource-name resource)
-					    *pak-file-extension*))
-	     (list resource))
-  (setf (resource-data resource) nil))
+  (let ((name (resource-name resource)))
+    (message "Serializing resource ~S..." name)
+    (setf (resource-data resource) (clon:serialize (resource-object resource)))
+    (message "Saving resource ~S..." name)
+    (write-pak (find-module-file module 
+				 (concatenate 'string (resource-name resource)
+					      *pak-file-extension*))
+	       (list resource))
+    (message "Saving resource ~S... Done." name)
+    (setf (resource-data resource) nil)))
+
+(defun save-modified-resources (&optional force)
+  (labels ((save (name resource)
+	     (when (not (stringp resource))
+	       (when (eq :object (resource-type resource))
+		 (when (or force (resource-modified-p resource))
+		   (save-object-resource resource))))))
+    (maphash #'save *resource-table*)))
+
+;; (save-modified-resources t)
+;; (clon:serialize (clone xe2:=world=))
+;; (clon:serialize (clone xe2:=world=)))
 
 (defun load-object-resource (resource)
   "Loads a serialized :OBJECT resource from the Lisp data in the 
@@ -1199,22 +1218,26 @@ when NAME cannot be found."
 		   nil
 		   (error "Cannot find resource.")))))))
 
-(defun find-resource-object (name)
+(defun find-resource-object (name &optional noerror)
   "Obtain the resource object named NAME, or signal an error if not
 found."
-  (resource-object (find-resource name)))
+  (let ((val (find-resource name noerror)))
+    (if (resource-p val)
+	(resource-object val)
+	(if noerror nil (error "Resource ~S not found." name)))))
 
 (defun find-resource-property (resource-name property)
   "Read the value of PROPERTY from the resource RESOURCE-NAME."
   (getf (resource-properties (find-resource resource-name))
 	property))
 
+(defun set-resource-modified-p (resource &optional (value t))
+  (let ((res (find-resource resource)))
+    (setf (resource-modified-p res) value)))
+
 ;;; Loading modules as a whole and autoloading resources
 
 (defvar *module* nil "The name of the current module.")
-
-(defvar *loaded-modules* nil 
-"List of loaded modules.")
 
 (defun load-module (module)
   "Load the module named MODULE. Load any resources marked with a
@@ -1228,6 +1251,49 @@ object save directory (by setting the current `*module*'. See also
   (setf *pending-autoload-resources* nil))
 
 ;;; Playing music and sound effects
+
+(defvar *frequency* 44100)
+
+(defvar *output-chunksize* 1024)
+
+(defvar *output-channels* 2)
+
+(defvar *sample-format* SDL-CFFI::AUDIO-S16LSB)
+
+(defun cffi-sample-type (sdl-sample-type)
+  (ecase sdl-sample-type
+    (SDL-CFFI::AUDIO-U8 :uint8) ; Unsigned 8-bit samples
+    (SDL-CFFI::AUDIO-S8 :int8) ; Signed 8-bit samples
+    (SDL-CFFI::AUDIO-U16LSB :uint16) ; Unsigned 16-bit samples, in little-endian byte order
+    (SDL-CFFI::AUDIO-S16LSB :int16) ; Signed 16-bit samples, in little-endian byte order
+    ;; (SDL-CFFI::AUDIO-U16MSB nil) ; Unsigned 16-bit samples, in big-endian byte order
+    ;; (SDL-CFFI::AUDIO-S16MSB nil) ; Signed 16-bit samples, in big-endian byte order
+    (SDL-CFFI::AUDIO-U16 :uint16)  ; same as SDL(SDL-CFFI::AUDIO-U16LSB (for backwards compatability probably)
+    (SDL-CFFI::AUDIO-S16 :int16) ; same as SDL(SDL-CFFI::AUDIO-S16LSB (for backwards compatability probably)
+    (SDL-CFFI::AUDIO-U16SYS :uint16) ; Unsigned 16-bit samples, in system byte order
+    (SDL-CFFI::AUDIO-S16SYS :int16) ; Signed 16-bit samples, in system byte order
+    ))
+
+(defun cffi-chunk-buffer (chunk)
+  (sdl:fp chunk))
+
+(defun convert-cffi-sample (chunk)
+  (let* ((input-buffer (cffi-chunk-buffer chunk))
+	 (type (cffi-sample-type *sample-format*))
+	 (size (length (cffi:mem-ref input-buffer type))))
+    (assert (eq *sample-format* SDL-CFFI::AUDIO-S16LSB)) ;; for now
+    (let ((output-buffer (make-array size)))
+	(prog1 output-buffer
+	  (dotimes (n size)
+	    (setf (aref output-buffer n)
+		  (/ (float (cffi:mem-aref input-buffer type n))
+		     32768.0)))))))
+
+;(defun convert-internal-audio (input-buffer output-stream)
+
+;; (REGISTER-MUSIC-MIXER 
+;;     (lambda (user stream len)
+;;       &#039;FILL-THE-AUDIO-OUTPUT-BUFFER))
 
 (defvar *channels* 128 "Number of audio mixer channels to use.")
 
@@ -1299,24 +1365,6 @@ of the music."
   (sdl:draw-string-shaded-* string x y (find-resource-object foreground)
 			    (find-resource-object background)
 			    :surface destination :font (find-resource-object font)))
-
-;;; Other primitives
-
-(defun draw-line (x0 y0 x1 y1 
-		     &key 
-		     (color ".white")
-		     destination)
-  (sdl:draw-line-* x0 y0 x1 y1 :surface destination :color (find-resource-object color)))
-
-(defun draw-pixel (x y &key 
-		   (color ".white")
-		   destination)
-  (sdl:draw-pixel-* x y :surface destination :color (find-resource-object color)))
-
-(defun draw-circle (x y radius &key 
-		   (color ".white")
-		    destination)
-  (sdl:draw-circle-* x y radius :surface destination :color (find-resource-object color)))
 
 ;;; Standard colors
 
@@ -1390,7 +1438,7 @@ The default destination is the main window."
 		 image)))
     (sdl:width img)))
 
-;;; Drawing shapes
+;;; Drawing shapes and other primitives
 
 (defun draw-box (x y width height		
 		 &key (stroke-color ".white")
@@ -1407,51 +1455,21 @@ The default destination is the main window."
   (sdl:draw-rectangle-* x y width height :color (find-resource-object color)
 			:surface destination))
 
-;;; Audio
+(defun draw-line (x0 y0 x1 y1 
+		     &key 
+		     (color ".white")
+		     destination)
+  (sdl:draw-line-* x0 y0 x1 y1 :surface destination :color (find-resource-object color)))
 
-(defvar *frequency* 44100)
+(defun draw-pixel (x y &key 
+		   (color ".white")
+		   destination)
+  (sdl:draw-pixel-* x y :surface destination :color (find-resource-object color)))
 
-(defvar *output-chunksize* 1024)
-
-(defvar *output-channels* 2)
-
-(defvar *sample-format* SDL-CFFI::AUDIO-S16LSB)
-
-(defun cffi-sample-type (sdl-sample-type)
-  (ecase sdl-sample-type
-    (SDL-CFFI::AUDIO-U8 :uint8) ; Unsigned 8-bit samples
-    (SDL-CFFI::AUDIO-S8 :int8) ; Signed 8-bit samples
-    (SDL-CFFI::AUDIO-U16LSB :uint16) ; Unsigned 16-bit samples, in little-endian byte order
-    (SDL-CFFI::AUDIO-S16LSB :int16) ; Signed 16-bit samples, in little-endian byte order
-    ;; (SDL-CFFI::AUDIO-U16MSB nil) ; Unsigned 16-bit samples, in big-endian byte order
-    ;; (SDL-CFFI::AUDIO-S16MSB nil) ; Signed 16-bit samples, in big-endian byte order
-    (SDL-CFFI::AUDIO-U16 :uint16)  ; same as SDL(SDL-CFFI::AUDIO-U16LSB (for backwards compatability probably)
-    (SDL-CFFI::AUDIO-S16 :int16) ; same as SDL(SDL-CFFI::AUDIO-S16LSB (for backwards compatability probably)
-    (SDL-CFFI::AUDIO-U16SYS :uint16) ; Unsigned 16-bit samples, in system byte order
-    (SDL-CFFI::AUDIO-S16SYS :int16) ; Signed 16-bit samples, in system byte order
-    ))
-
-(defun cffi-chunk-buffer (chunk)
-  (sdl:fp chunk))
-
-(defun convert-cffi-sample (chunk)
-  (let* ((input-buffer (cffi-chunk-buffer chunk))
-	 (type (cffi-sample-type *sample-format*))
-	 (size (length (cffi:mem-ref input-buffer type))))
-    (assert (eq *sample-format* SDL-CFFI::AUDIO-S16LSB)) ;; for now
-    (let ((output-buffer (make-array size)))
-	(prog1 output-buffer
-	  (dotimes (n size)
-	    (setf (aref output-buffer n)
-		  (/ (float (cffi:mem-aref input-buffer type n))
-		     32768.0)))))))
-
-;(defun convert-internal-audio (input-buffer output-stream)
-
-;; (REGISTER-MUSIC-MIXER 
-;;     (lambda (user stream len)
-;;       &#039;FILL-THE-AUDIO-OUTPUT-BUFFER))
-
+(defun draw-circle (x y radius &key 
+		   (color ".white")
+		    destination)
+  (sdl:draw-circle-* x y radius :surface destination :color (find-resource-object color)))
 
 ;;; Engine status
 
