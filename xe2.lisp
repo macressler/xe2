@@ -120,7 +120,7 @@ set-field-option-value =pager= =pager-prompt= load-module
 field-options world set-frame-rate *frame-rate* =stack= *workbook*
 *pak-file-extension* *window-title* *window-position*
 set-timer-interval *message-logging* overlay poll-joystick-axis
-reset-joystick set-screen-width =universe= *universe*
+reset-joystick set-screen-width =universe= *universe* *play-args*
 set-screen-height genseq *zoom-factor* zoom-image is-zoomed-resource
 *timer-interval* save-modified-objects enable-timer disable-timer
 while enable-held-keys disable-held-keys do-cells draw-box *resizable*

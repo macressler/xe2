@@ -943,13 +943,8 @@ table. File names are relative to the module MODULE-NAME."
   "Add all the resources from the module MODULE-NAME to the resource
 table."
   (let ((index-file (find-module-file module-name
-				      (concatenate 'string module-name ".pak")))
-	(object-index-file (find-module-file module-name *object-index-filename*)))
-    (index-pak module-name index-file)
-    ;; index any saved objects
-    (when (probe-file object-index-file)
-      (message "Loading saved objects from ~S" object-index-file)
-      (index-pak module-name object-index-file))))
+				      (concatenate 'string module-name ".pak"))))
+    (index-pak module-name index-file)))
 
 ;;; Standard resource names
 
@@ -984,9 +979,9 @@ OBJECT as the data."
 
 (defun save-object-resource (resource &optional (module *module*))
   "Save an object resource to disk as {RESOURCE-NAME}.PAK."
-  (assert (clon:object-p (resource-object resource)))
   (let ((name (resource-name resource)))
     (message "Serializing resource ~S..." name)
+;    (assert (clon:object-p (resource-object resource)))
     (setf (resource-data resource) (clon:serialize (resource-object resource)))
     (message "Saving resource ~S..." name)
     (write-pak (find-module-file module 
@@ -1203,9 +1198,10 @@ so that it can be fed to the console."
   (message "Attempting to load resource ~S." (resource-name resource))
   (let ((handler (getf *resource-handlers* (resource-type resource))))
     (assert (functionp handler))
-    ;; fill in the object field by invoking the handler
-    (setf (resource-object resource)
-	  (funcall handler resource))
+    ;; fill in the object field by invoking the handler, if needed
+    (when (null (resource-object resource))
+      (setf (resource-object resource)
+	    (funcall handler resource)))
     (if (null (resource-object resource))
 	(error "Failed to load resource ~S." (resource-name resource))
 	(message "Loaded resource ~S with result ~30S." (resource-name resource)
@@ -1278,12 +1274,17 @@ found."
 non-nil :autoload property. This operation also sets the default
 object save directory (by setting the current `*module*'. See also
 `save-object-resource')."
+  (setf *module* module)
   (setf *pending-autoload-resources* nil)
   (index-module module)
-  (setf *module* module)
   (when autoload 
     (mapc #'load-resource (nreverse *pending-autoload-resources*)))
-  (setf *pending-autoload-resources* nil))
+  (setf *pending-autoload-resources* nil)
+  ;; now load any objects
+  (let ((object-index-file (find-module-file module *object-index-filename*)))
+    (when (probe-file object-index-file)
+      (message "Loading saved objects from ~S" object-index-file)
+      (index-pak module object-index-file))))
 
 ;;; Playing music and sound effects
 
@@ -1551,11 +1552,15 @@ also the file LIBSDL-LICENSE for details.
 		      '(#P"/opt/local/lib" #P"/sw/lib/")
 		      :test #'equal)))
 
-(defun play (&optional (module-name "standard"))
+(defvar *play-args* nil)
+
+(defun play (&optional (module-name "standard") &rest args)
   "This is the main entry point to XE2. MODULE-NAME is loaded 
 and its .startup resource is loaded."
   (format t "~A" *copyright-text*)
+  (initialize-resource-table)
   (setf *initialization-hook* nil)
+  (setf *play-args* args)
   (setf *random-state* (make-random-state t))
   ;; override module to play?
   (setf *next-module* module-name)

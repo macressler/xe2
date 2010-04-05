@@ -25,12 +25,22 @@
     (prog1 world
       [generate world])))
 
+(defun generate-page-name (world)
+  (concatenate 'string (get-some-object-name world) "::" (format nil "~S" (genseq))))
+
 (defun find-page (page)
   (etypecase page
-    (object page)
+    (clon:object (prog1 page (make-object-resource (generate-page-name page) page)))
     (string (or (find-resource-object page :noerror)
 		(progn (make-object-resource page (create-blank-page))
+		       ;; ;; TODO BUG IS HERE???
+		       ;; (message "OBJEKKT: ~S" (find-resource page))
 		       (find-resource-object page))))))
+
+;; (maphash #'(lambda (k v) (when (resource-p v)
+;; 			   (when (eq :object (resource-type v))
+;; 			     (message "XXobject ~S" (resource-object v)))))
+;; 	 *resource-table*)
 
 ;;; A generic data cell just prints out the stored value.
 
@@ -95,7 +105,7 @@
     (assert (object-p world))
     (setf <page-name> (if (stringp page) 
 			  page 
-			  (concatenate 'string (get-some-object-name world) "::" (format nil "~S" (genseq)))))
+			  (generate-page-name world)))
     (setf <world> world)
     (setf *world* world)
     [install-keybindings self]
@@ -166,7 +176,6 @@
   (xe2:save-modified-objects t)
   [say self "Saving objects... Done."])
     
-
 (define-method enter form ()
   (unless <entered>
     [say self "Now entering data. Press ESCAPE to stop editing."]
@@ -186,6 +195,9 @@
 (define-method load-module form (name)
   [say self (format nil"Loading module ~S" name)]
   (xe2:load-module name))
+
+(define-method quit form ()
+  (xe2:quit t))
 
 (define-method exit form ()
   (when <entered>
@@ -308,8 +320,8 @@
 	  (incf y (formatted-line-height header-line)))
 	;; create status line
 	(setf status-line
-	      (list (list (format nil " Location: (Row ~S, Column ~S)  |  Visiting page: ~S | Color: ~A "
-				  cursor-row cursor-column page-name 
+	      (list (list (format nil " Module: ~A  |  Location: (Row ~S, Column ~S)  |  Visiting page: ~S | Color: ~A "
+				  *module* cursor-row cursor-column page-name 
 				  (when (field-value :paint <world>)
 				    (get-some-object-name (field-value :paint <world>))))
 			  :foreground ".white")))

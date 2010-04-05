@@ -553,8 +553,8 @@ normally."
       [clear self])))
 
 (define-method history-item prompt (n)
-  (nth (- (queue-count <history>) n)
-       (queue-head <history>)))
+  (nth (- (clon:queue-count <history>) n)
+       (clon:queue-head <history>)))
 
 (define-method forward-history prompt ()
   (when (> <history-position> 0)
