@@ -25,6 +25,7 @@
 (in-package :xiodev)
 
 (setf xe2:*dt* 20)
+(setf xe2:*resizable* t)
 
 ;;; Main program. 
 
@@ -45,6 +46,8 @@
   (apply #'send nil :say *terminal* args))
 
 (defun xiodev ()
+  (setf xe2:*screen-width* *window-width*)
+  (setf xe2:*screen-height* *window-height*)
   (xe2:message "Initializing XIODEV...")
   (setf xe2:*window-title* "XIODEV")
   (clon:initialize)
@@ -60,8 +63,17 @@
     (setf *form* form)
     (setf *prompt* prompt)
     (setf *terminal* terminal)
+    (labels ((resize-widgets ()
+	       [say terminal "Resizing to ~S" (list :width *screen-width* :height *screen-height*)]
+	       [resize prompt :height *prompt-height* :width *screen-width*]
+	       [resize form :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *screen-width*]
+	       [resize help :height 540 :width 800] 
+	       [resize stack :width *screen-width* :height (- *screen-height* *pager-height*)]
+	       [resize terminal :height *terminal-height* :width *screen-width*]
+	       [auto-position *pager*]))
+      (add-hook 'xe2:*resize-hook* #'resize-widgets))
     ;;
-    [resize prompt :height *prompt-height* :width *window-width*]
+    [resize prompt :height *prompt-height* :width *screen-width*]
     [move prompt :x 0 :y 0]
     [show prompt]
     [install-keybindings prompt]
@@ -69,14 +81,13 @@
     [set-mode prompt :forward] ;; don't start with prompt on
     [set-receiver prompt form]
     ;; 
-    [resize form :height (- *window-height* *terminal-height* *prompt-height* *pager-height*) :width *window-width*]
+    [resize form :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *screen-width*]
     [move form :x 0 :y 0]
     [set-prompt form prompt]
     [set-narrator form terminal]
     ;;
     (xe2:halt-music 1000)
-    ;; (setf xe2:*physics-function* #'(lambda (&rest ignore)
-    ;; 				     (when *world* [run-cpu-phase *world* :timer])))
+
     [resize help :height 540 :width 800] 
     [move help :x 0 :y 0]
     (let ((text	(find-resource-object "help-message")))
@@ -86,19 +97,19 @@
     	[newline help]))
     ;; ;;
     ;; [resize quickhelp :height 72 :width 250] 
-    ;; [move quickhelp :y (- *window-height* 130) :x (- *window-width* 250)]
+    ;; [move quickhelp :y (- *screen-height* 130) :x (- *screen-width* 250)]
     ;; (let ((text	(find-resource-object "quickhelp-message")))
     ;;   (dolist (line text)
     ;; 	(dolist (string line)
     ;; 	  (funcall #'send nil :print-formatted-string quickhelp string))
     ;; 	[newline quickhelp]))
     ;;
-    [resize stack :width *window-width* :height (- *window-height* *pager-height*)]
+    [resize stack :width *screen-width* :height (- *screen-height* *pager-height*)]
     [move stack :x 0 :y 0]
     [set-children stack (list form terminal prompt)]
     ;;
-    [resize terminal :height *terminal-height* :width *window-width*]
-    [move terminal :x 0 :y (- *window-height* *terminal-height*)]
+    [resize terminal :height *terminal-height* :width *screen-width*]
+    [move terminal :x 0 :y (- *screen-height* *terminal-height*)]
     [set-verbosity terminal 0]
     ;;
     ;;

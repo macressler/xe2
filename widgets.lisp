@@ -448,6 +448,7 @@ normally."
 		(prog1 t [goto self])))))
 
 (define-method exit prompt ()
+  [clear self]
   (setf <mode> :forward))
 
 (define-method goto prompt ()
@@ -539,12 +540,14 @@ normally."
 	 (sexp (handler-case 
 		   (read-from-string (concatenate 'string "(" <line> ")"))
 		 (condition (c)
-		   [say self c]))))
+		   [say self "SYNTAX ERROR: ~S" <line>]
+		   [say self "~S" c]))))
     (when sexp 
+      [say self "EXECUTE: ~A" <line>]
       (handler-case 
 	  (apply #'send nil (make-keyword (car sexp)) <receiver> (cdr sexp))
 	(condition (c)
-	  [say self "~S" c])))
+	  [say self "ERROR: during command execution. ~S" c])))
     (queue <line> <history>)
     [clear self]))
 

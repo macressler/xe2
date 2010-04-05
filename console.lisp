@@ -537,6 +537,10 @@ Set it to 0 to get a timer event every frame."
 
 ;;; Screen dimensions
 
+(defvar *resizable* nil)
+
+(defvar *resize-hook* nil)
+
 (defvar *screen-width* 640 "The width (in pixels) of the game
 window. Set this in the game startup file.")
 
@@ -566,105 +570,118 @@ window. Set this in the game startup file.")
 We want to process all inputs, update the game state, then update the
 display."
   (let ((fps (make-instance 'sdl:fps-unlocked :dt *dt* :ps-fn #'do-physics)))
-    (if *fullscreen*
-	(sdl:window *screen-width* *screen-height*
-		    :fps fps 
-		    :title-caption *window-title*
-		    :flags sdl:SDL-FULLSCREEN
-                    :position *window-position*)
-	(sdl:window *screen-width* *screen-height*
-		    :fps fps
-		    :title-caption *window-title*
-                    :position *window-position*)))
-  (reset-joystick)
-  (sdl:clear-display sdl:*black*)
-  (show-widgets)
-  (sdl:update-display)
-  (run-hook '*initialization-hook*)
-  (let ((events-this-frame 0))
-    (sdl:with-events ()
-      (:quit-event () (prog1 t))
-      (:mouse-motion-event (:state state :x x :y y :x-rel x-rel :y-rel y-rel)
-			   nil)
-      (:mouse-button-down-event (:button button :state state :x x :y y)
-				(let ((object (hit-widgets x y *active-widgets*)))
-				  (if (null object)
-				      (message "")
-				      (progn 
-					;; deliver messages in a queued environment
-					(sdl:clear-display sdl:*black*)
-					(when *world*
-					  (when (field-value :message-queue *world*)
-					    (with-message-queue (field-value :message-queue *world*)
-					      (case button
-						(1 (when (has-method :select object) 
-						     [select object]))
-						(3 (when (has-method :activate object) 
-						     [activate object]))))
-					    [process-messages *world*]))))))
-      (:mouse-button-up-event (:button button :state state :x x :y y)
-			      nil)
-      (:joy-button-down-event (:which which :button button :state state)
+    (cond (*fullscreen*
+	   (sdl:window *screen-width* *screen-height*
+		       :fps fps 
+		       :title-caption *window-title*
+		       :flags sdl:SDL-FULLSCREEN
+		       :position *window-position*))
+	  (*resizable*
+	   	   (sdl:window *screen-width* *screen-height*
+		       :fps fps 
+		       :title-caption *window-title*
+		       :flags sdl:SDL-RESIZABLE
+		       :position *window-position*))
+	  (t (sdl:window *screen-width* *screen-height*
+			 :fps fps
+			 :title-caption *window-title*
+			 :position *window-position*)))
+    (reset-joystick)
+    (sdl:clear-display sdl:*black*)
+    (show-widgets)
+    (sdl:update-display)
+    (run-hook '*initialization-hook*)
+    (let ((events-this-frame 0))
+      (sdl:with-events ()
+	(:quit-event () (prog1 t))
+	(:video-resize-event (:w w :h h)  
+			     (setf *screen-width* w
+				   *screen-height* h)
+			     (run-hook '*resize-hook*)
+			     (sdl:window w h :fps fps :title-caption *window-title*
+					 :flags sdl:SDL-RESIZABLE
+					 :position *window-position*))
+	(:mouse-motion-event (:state state :x x :y y :x-rel x-rel :y-rel y-rel)
+			     nil)
+	(:mouse-button-down-event (:button button :state state :x x :y y)
+				  (let ((object (hit-widgets x y *active-widgets*)))
+				    (if (null object)
+					(message "")
+					(progn 
+					  ;; deliver messages in a queued environment
+					  (sdl:clear-display sdl:*black*)
+					  (when *world*
+					    (when (field-value :message-queue *world*)
+					      (with-message-queue (field-value :message-queue *world*)
+						(case button
+						  (1 (when (has-method :select object) 
+						       [select object]))
+						  (3 (when (has-method :activate object) 
+						       [activate object]))))
+					      [process-messages *world*]))))))
+	(:mouse-button-up-event (:button button :state state :x x :y y)
+				nil)
+	(:joy-button-down-event (:which which :button button :state state)
+				(when (assoc button *joystick-mapping*)
+				  (update-joystick button state)
+				  (dispatch-event (make-event :joystick
+							      (list (translate-joystick-button button) 
+								    :button-down)))))
+	(:joy-button-up-event (:which which :button button :state state)  
 			      (when (assoc button *joystick-mapping*)
 				(update-joystick button state)
 				(dispatch-event (make-event :joystick
 							    (list (translate-joystick-button button) 
-								  :button-down)))))
-      (:joy-button-up-event (:which which :button button :state state)  
-			    (when (assoc button *joystick-mapping*)
-			      (update-joystick button state)
-			      (dispatch-event (make-event :joystick
-							(list (translate-joystick-button button) 
-							      :button-up)))))
-      (:joy-axis-motion-event (:which which :axis axis :value value)
-			      (update-joystick-axis axis value))
-      (:video-expose-event () (sdl:update-display))
-      (:key-down-event (:key key :mod-key mod)
-		       (let ((event (make-event key mod)))
-			 (if *held-keys*
-			     (hold-event event)
-			     (dispatch-event event))))
-      (:key-up-event (:key key :mod-key mod)
-		     (when *held-keys*
-		       (let* ((event (make-event key mod))
-			      (entry (gethash event *key-table*)))
-			 (if (numberp entry)
-			     (if (plusp entry)
-				 (progn (message "Removing entry ~A:~A" event entry)
-					(remhash event *key-table*))
-				 (when (zerop entry)
-				   ;; This event hasn't yet been sent,
-				   ;; but the key release happened
-				   ;; now. Mark this entry as pending
-				   ;; deletion.
-				   (release-held-event event)))
-			     (break-events event)))))
-      (:idle ()
-	     (if *timer-p*
-	       (if (zerop *clock*)
+								  :button-up)))))
+	(:joy-axis-motion-event (:which which :axis axis :value value)
+				(update-joystick-axis axis value))
+	(:video-expose-event () (sdl:update-display))
+	(:key-down-event (:key key :mod-key mod)
+			 (let ((event (make-event key mod)))
+			   (if *held-keys*
+			       (hold-event event)
+			       (dispatch-event event))))
+	(:key-up-event (:key key :mod-key mod)
+		       (when *held-keys*
+			 (let* ((event (make-event key mod))
+				(entry (gethash event *key-table*)))
+			   (if (numberp entry)
+			       (if (plusp entry)
+				   (progn (message "Removing entry ~A:~A" event entry)
+					  (remhash event *key-table*))
+				   (when (zerop entry)
+				     ;; This event hasn't yet been sent,
+				     ;; but the key release happened
+				     ;; now. Mark this entry as pending
+				     ;; deletion.
+				     (release-held-event event)))
+			       (break-events event)))))
+	(:idle ()
+	       (if *timer-p*
+		   (if (zerop *clock*)
+		       (progn 
+			 (sdl:clear-display sdl:*black*)
+			 ;; send held events
+			 (when *held-keys*
+			   (send-held-events))
+			 ;; send timer event
+			 (dispatch-event *timer-event*)
+			 ;; send any joystick button events
+			 ;; (poll-all-buttons)
+			 ;;  (generate-button-events)
+			 ;; update display
+			 (show-widgets)
+			 (sdl:update-display)
+			 (setf *clock* *timer-interval*))
+		       (decf *clock*))
+		   ;; clean this up. these two cases aren't that different.
 		   (progn 
 		     (sdl:clear-display sdl:*black*)
-		     ;; send held events
- 		     (when *held-keys*
-		       (send-held-events))
-		     ;; send timer event
-		     (dispatch-event *timer-event*)
-		     ;; send any joystick button events
-		     ;; (poll-all-buttons)
-		     ;;  (generate-button-events)
-		     ;; update display
-		     (show-widgets)
-		     (sdl:update-display)
-		     (setf *clock* *timer-interval*))
-		   (decf *clock*))
-		 ;; clean this up. these two cases aren't that different.
-		 (progn 
-		   (sdl:clear-display sdl:*black*)
-		   (when *held-keys* (send-held-events)) ;; TODO move this to do-physics?
-		   (show-widgets) 
-		   (sdl:update-display)))))))
-		 
-
+		     (when *held-keys* (send-held-events)) ;; TODO move this to do-physics?
+		     (show-widgets) 
+		     (sdl:update-display))))))))
+  
+  
 ;;; The .xe2rc user init file
 
 (defparameter *user-init-file-name* ".xe2rc")

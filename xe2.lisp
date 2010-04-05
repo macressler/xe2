@@ -123,7 +123,8 @@ set-timer-interval *message-logging* overlay poll-joystick-axis
 reset-joystick set-screen-width =universe= *universe*
 set-screen-height genseq *zoom-factor* zoom-image is-zoomed-resource
 *timer-interval* save-modified-objects enable-timer disable-timer
-while enable-held-keys disable-held-keys do-cells draw-box
+while enable-held-keys disable-held-keys do-cells draw-box *resizable*
+*resize-hook*
 draw-rectangle *quitting* quit reset))
 
 (in-package :xe2)

@@ -137,10 +137,13 @@
       [select cell])))
 
 (define-method say form (text)
-  (setf <header-line>
-	(etypecase text
-	  (list text)
-	  (string (list (list text))))))
+  [say <prompt> text])
+
+(define-method save-all form ()
+  [say self "Saving objects..."]
+  (xe2:save-modified-objects t)
+  [say self "Saving objects... Done."])
+    
 
 (define-method enter form ()
   (unless <entered>
