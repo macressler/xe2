@@ -773,7 +773,7 @@ This prepares it for printing as part of a PAK file."
 (defconstant *keyword-package* (find-package :keyword))
 
 (defun write-sexp-to-file (filename sexp)
-  (message "Writing data to file ~S" sexp filename)
+  (message "Writing data to file ~S" filename)
   (with-open-file (file filename :direction :output 
 			:if-exists :overwrite
 			:if-does-not-exist :create)
@@ -1204,8 +1204,9 @@ so that it can be fed to the console."
 	    (funcall handler resource)))
     (if (null (resource-object resource))
 	(error "Failed to load resource ~S." (resource-name resource))
-	(message "Loaded resource ~S with result ~30S." (resource-name resource)
-		 (resource-object resource)))))
+	(message "Loaded resource ~S with result type ~S." 
+		 (resource-name resource)
+		 (type-of (resource-object resource))))))
 
 (defun find-resource (name &optional noerror)
   "Obtain the resource named NAME, performing any necessary loading

@@ -190,7 +190,7 @@ At the moment, only 0=off and 1=on are supported.")
 		       (when cell
 			 (vector-push-extend (clon:deserialize cell)
 					     (aref grid i j))))
-	       (aref serialized-grid i j))))
+	       (reverse (aref serialized-grid i j)))))
       (setf <serialized-grid> nil)))
 
 (define-method create-default-grid world ()
