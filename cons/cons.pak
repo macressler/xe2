@@ -838,5 +838,5 @@
  (:name "security-lisp" :type :lisp :file "security.lisp" :properties (:autoload t))
  (:name "player-lisp" :type :lisp :file "player.lisp" :properties (:autoload t))
  (:name "enemies-lisp" :type :lisp :file "enemies.lisp" :properties (:autoload t))
- (:name ".startup" :type :lisp :file "cons.lisp" :properties (:autoload t))
+ (:name ".startup" :type :lisp :file "cons.lisp")
 ) 

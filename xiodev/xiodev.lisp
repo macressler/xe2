@@ -116,8 +116,8 @@
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     ;;
-    [add-page *pager* :help (list help)]
     [add-page *pager* :edit (list stack prompt form terminal )]
+    [add-page *pager* :help (list help)]
     [select *pager* :edit]
 ;;    [add-page *pager* :configure nil]
     (xe2:enable-classic-key-repeat 100 100)

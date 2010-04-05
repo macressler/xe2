@@ -245,6 +245,9 @@ PARAMETERS and interpreting the world's grammar field <GRAMMAR>."
 	  (string (push op stack))
 	  (number (push op stack)))))))
 
+(define-method is-generated world ()
+  (if <grid> t nil))
+
 (define-method generate-with world (parameters)
   (apply #'send self :generate self parameters))
 

@@ -59,6 +59,8 @@
   (entered :initform nil :documentation "When non-nil, forward key events to the entry and/or any attached widget.")
   (cursor-row :initform 0) 
   (cursor-column :initform 0)
+  (view-style :initform :label)
+  (tile-size :initform 16)
   (cursor-color :initform ".yellow")
   (origin-row :initform 0 :documentation "Row number of top-left displayed cell.") 
   (origin-column :initform 0 :documentation "Column number of top-left displayed cell.")
@@ -84,12 +86,18 @@
       [parent>>initialize self]
       [visit self page])))
 
+(define-method generate form ()
+  [generate <world>])
+
 (define-method visit form (&optional (page *default-page-name*))
   "Visit the page PAGE with the current form."
   (let ((world (find-page page)))
     (assert (object-p world))
-    (setf <page-name> page)
+    (setf <page-name> (if (stringp page) 
+			  page 
+			  (concatenate 'string (get-some-object-name world) "::" (format nil "~S" (genseq)))))
     (setf <world> world)
+    (setf *world* world)
     [install-keybindings self]
     (setf <rows> (field-value :height world))
     (setf <columns> (field-value :width world))
@@ -118,11 +126,22 @@
 (define-method install-keybindings form ()
   (bind-key-to-method self "RETURN" nil :enter)
   (bind-key-to-method self "ESCAPE" nil :exit)
+  (bind-key-to-method self "F9" nil :tile-view)
+  (bind-key-to-method self "F10" nil :label-view)
   (bind-key-to-method self "X" '(:control) :goto-prompt)
   (bind-key-to-method self "UP" nil :move-cursor-up)
   (bind-key-to-method self "DOWN" nil :move-cursor-down)
   (bind-key-to-method self "LEFT" nil :move-cursor-left)
   (bind-key-to-method self "RIGHT" nil :move-cursor-right))
+
+(define-method set-view-style form (style)
+  (setf <view-style> style))
+
+(define-method tile-view form ()
+  [set-view-style self :tile])
+
+(define-method label-view form ()
+  [set-view-style self :label])
 
 (define-method goto-prompt form ()
   (when <prompt>
@@ -135,6 +154,9 @@
   (let ((cell [current-cell self]))
     (when cell
       [select cell])))
+
+(define-method eval form (&rest args)
+  [say self (format nil "RESULT: ~A" args)])
 
 (define-method say form (text)
   [say <prompt> text])
@@ -161,6 +183,10 @@
       (setf (field-value :widget cell)
 	    entry))))
     
+(define-method load-module form (name)
+  [say self (format nil"Loading module ~S" name)]
+  (xe2:load-module name))
+
 (define-method exit form ()
   (when <entered>
     (with-fields (widget) [current-cell self]
@@ -178,22 +204,24 @@
 (defparameter *blank-cell-string* '(" ........ "))
 
 (define-method row-height form (row)
-  (max (formatted-string-height *blank-cell-string*)
-       (let ((height 0) cell)
-	 (dotimes (column <columns>)
-	   (setf cell [cell-at self row column])
-	   (when cell
-	     (setf height (max height [form-height cell]))))
-	 height)))
-
+  (let ((height 0) cell)
+    (dotimes (column <columns>)
+      (setf cell [cell-at self row column])
+      (when cell
+	(setf height (max height [form-height cell]))))
+    (ecase <view-style>
+      (:label (max (formatted-string-height *blank-cell-string*) height))
+      (:tile <tile-size>))))
+       
 (define-method column-width form (column)
-  (max (formatted-string-width *blank-cell-string*)
-       (let ((width 0) cell)
-	 (dotimes (row <rows>)
-	   (setf cell [cell-at self row column])
-	   (when cell
-	     (setf width (max width [form-width cell]))))
-	 width)))
+  (let ((width 0) cell)
+    (dotimes (row <rows>)
+      (setf cell [cell-at self row column])
+      (when cell
+	(setf width (max width [form-width cell]))))
+    (ecase <view-style> 
+      (:label (max width (formatted-string-width *blank-cell-string*)))
+      (:tile <tile-size>))))
 
 (define-method compute-geometry form ()
   (dotimes (column <columns>)
@@ -242,6 +270,7 @@
   (when <world>
     (with-field-values (cursor-row cursor-column row-heights world page-name 
 				   origin-row origin-column header-line status-line
+				   view-style
 				   row-spacing rows columns draw-blanks column-widths) self
       [compute self]
       [compute-geometry self]
@@ -310,7 +339,11 @@
 			      :destination image))
 		  ;; see also cells.lisp
 		  (progn 
-		    [form-render cell image x y column-width]
+		    (ecase view-style
+		      (:label [form-render cell image x y column-width])
+		      (:tile (when (field-value :tile cell)
+			       (draw-image (find-resource-object 
+					    (field-value :tile cell)) x y :destination image))))
 		    (when <entered>
 		      (draw-rectangle x y 
 				column-width 

@@ -494,6 +494,7 @@ normally."
        *numeric-characters*)
   ;; other characters
   (bind-key-to-prompt-insertion self "MINUS" nil "-")
+  (bind-key-to-prompt-insertion self "EQUALS" nil "=")
   (bind-key-to-prompt-insertion self "SEMICOLON" nil ";")
   (bind-key-to-prompt-insertion self "SEMICOLON" '(:shift) ":")
   (bind-key-to-prompt-insertion self "0" '(:shift) ")")
@@ -544,12 +545,12 @@ normally."
 		   [say self "~S" c]))))
     (when sexp 
       [say self "EXECUTE: ~A" <line>]
-      (handler-case 
-	  (apply #'send nil (make-keyword (car sexp)) <receiver> (cdr sexp))
-	(condition (c)
-	  [say self "ERROR: during command execution. ~S" c])))
-    (queue <line> <history>)
-    [clear self]))
+      ;; (handler-case 
+	  (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp)))
+	  ;; (condition (c)
+	  ;; 	     [say self "ERROR: during command execution. ~S" c]))
+      (queue <line> <history>)
+      [clear self])))
 
 (define-method history-item prompt (n)
   (nth (- (queue-count <history>) n)

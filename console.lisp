@@ -1273,7 +1273,7 @@ found."
 
 (defvar *module* nil "The name of the current module.")
 
-(defun load-module (module)
+(defun load-module (module &key (autoload t))
   "Load the module named MODULE. Load any resources marked with a
 non-nil :autoload property. This operation also sets the default
 object save directory (by setting the current `*module*'. See also
@@ -1281,7 +1281,8 @@ object save directory (by setting the current `*module*'. See also
   (setf *pending-autoload-resources* nil)
   (index-module module)
   (setf *module* module)
-  (mapc #'load-resource (nreverse *pending-autoload-resources*))
+  (when autoload 
+    (mapc #'load-resource (nreverse *pending-autoload-resources*)))
   (setf *pending-autoload-resources* nil))
 
 ;;; Playing music and sound effects
@@ -1626,6 +1627,7 @@ and its .startup resource is loaded."
 			(sdl-mixer:allocate-channels *channels*))
 		      (index-module "standard") 
 		      (load-module *next-module*)
+		      (find-resource *startup*)
 		      (run-main-loop)))
 	  ;; close audio if crash
 	  (when *use-sound* 
