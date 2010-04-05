@@ -343,13 +343,17 @@ auto-updated displays."
 	   
 ;;; Command prompt widget
 
-(defparameter *direct-prompt-string* "ENTER COMMAND >>")
+(defparameter *prompt-blink-time* 7)
+(defparameter *prompt-cursor-color* ".yellow")
+(defparameter *prompt-cursor-blink-color* ".red")
+
+(defparameter *direct-prompt-string* ">> ")
 (defparameter *forward-prompt-string* "Press CONTROL-X to enter the prompt.")
 
 (defparameter *default-prompt-margin* 4)
 
 (defparameter *default-prompt-history-size* 100)
-(defparameter *default-cursor-width* 2)
+(defparameter *default-cursor-width* 5)
 
 (defvar *lowercase-alpha-characters* "abcdefghijklmnopqrstuvwxyz")
 (defvar *uppercase-alpha-characters* "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -408,6 +412,7 @@ mode.)
 The modes can be toggled with CONTROL-X.
 ")
   (mode :documentation "Either :direct or :forward." :initform :direct)
+  (clock :initform *prompt-blink-time*)
   (default-keybindings :documentation "Default keybindings bound during initialization.
 These are the arguments to `bind-key-to-prompt-insertion', which see.")
   (visible :documentation "When non-nil, the prompt is drawn." :initform t)
@@ -440,12 +445,13 @@ normally."
 			  (funcall func)))))
     (:forward (when (equal (normalize-event '("X" :control))
 			   keylist)
-		(prog1 t (setf <mode> :direct))))))
+		(prog1 t [goto self])))))
 
 (define-method exit prompt ()
   (setf <mode> :forward))
 
 (define-method goto prompt ()
+  [say self "Enter command below at the >> prompt. Press ENTER when finished, or CONTROL-X to cancel."]
   (setf <mode> :direct))
 
 (define-method set-mode prompt (mode)
@@ -461,12 +467,19 @@ normally."
   (bind-key-to-method self "E" '(:control) :move-end-of-line)
   (bind-key-to-method self "F" '(:control) :forward-char)
   (bind-key-to-method self "B" '(:control) :backward-char)
+  (bind-key-to-method self "HOME" nil :move-beginning-of-line)
+  (bind-key-to-method self "END" nil :move-end-of-line)
+  (bind-key-to-method self "RIGHT" nil :forward-char)
+  (bind-key-to-method self "LEFT" nil :backward-char)
   (bind-key-to-method self "K" '(:control) :clear)
   (bind-key-to-method self "BACKSPACE" nil :backward-delete-char)
   (bind-key-to-method self "RETURN" nil :execute)
   (bind-key-to-method self "X" '(:control) :exit)
+  (bind-key-to-method self "ESCAPE" nil :exit)
   (bind-key-to-method self "P" '(:alt) :backward-history)
   (bind-key-to-method self "N" '(:alt) :forward-history)  
+  (bind-key-to-method self "UP" nil :backward-history)
+  (bind-key-to-method self "DOWN" nil :forward-history)  
   ;; install keybindings for self-inserting characters
   (map nil #'(lambda (char)
 	       (bind-key-to-prompt-insertion self (string char) nil
@@ -489,7 +502,7 @@ normally."
   (bind-key-to-prompt-insertion self "QUOTE" '(:shift) "\""))
 
 (define-method say prompt (&rest args)
-  (apply #'error args))
+  (apply #'message args))
 
 (define-method initialize prompt ()
   [parent>>initialize self]
@@ -531,7 +544,7 @@ normally."
       (handler-case 
 	  (apply #'send nil (make-keyword (car sexp)) <receiver> (cdr sexp))
 	(condition (c)
-	  [say self c])))
+	  [say self "~S" c])))
     (queue <line> <history>)
     [clear self]))
 
@@ -562,6 +575,9 @@ normally."
 
 (define-method render prompt ()
   (when <visible>
+    (decf <clock>)
+    (when (> (- 0 *prompt-blink-time*) <clock>)
+      (setf <clock> *prompt-blink-time*))
     (let* ((image <image>)
 	   (font-height (font-height *default-font*))
 	   (font-width (font-width *default-font*))
@@ -573,26 +589,30 @@ normally."
 			    (:forward *forward-prompt-string*))))
       (draw-box 0 0 <width> prompt-height :color ".black" :stroke-color ".black"
 		:destination image)
-      ;; draw prompt 
-      (draw-string-solid prompt-string
-			 *default-prompt-margin*
-			 strings-y
-			 :destination image)
+      ;; draw cursor
+      (when (eq :direct <mode>)
+	(let ((color (if (minusp <clock>)
+			 *prompt-cursor-color*
+			 *prompt-cursor-blink-color*)))
+	  (draw-box (* (+ (length prompt-string) 1 <point>)
+		       font-width)
+		    strings-y
+		    *default-cursor-width*
+		    font-height
+		    :color color
+		    :stroke-color color
+		    :destination image))
+	;; draw prompt 
+	(draw-string-solid prompt-string
+			   *default-prompt-margin*
+			   strings-y
+			   :destination image))
       ;; draw current command line text
       (draw-string-solid <line>
 			 (+ *default-prompt-margin* 
 			    (* font-width (length prompt-string)))
 			 strings-y
-			 :destination image)
-      ;; draw cursor
-      (draw-box (* (+ (length prompt-string) 1 <point>)
-		   font-width)
-		strings-y
-		*default-cursor-width*
-		font-height
-		:color ".yellow"
-		:stroke-color ".yellow"
-		:destination image))))
+			 :destination image))))
 
 ;;; Text display and edit control
 

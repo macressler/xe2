@@ -42,8 +42,8 @@
 (define-prototype xiodev-prompt (:parent xe2:=prompt=))
 
 (define-method say xiodev-prompt (&rest args)
-  [say *terminal* "~S" args])
-  
+  (apply #'send nil :say *terminal* args))
+
 (defun xiodev ()
   (xe2:message "Initializing XIODEV...")
   (setf xe2:*window-title* "XIODEV")
@@ -65,6 +65,8 @@
     [move prompt :x 0 :y 0]
     [show prompt]
     [install-keybindings prompt]
+    [say prompt "Welcome to XIODEV. Press CONTROL-X to enter command mode, or F1 for help."]
+    [set-mode prompt :forward] ;; don't start with prompt on
     [set-receiver prompt form]
     ;; 
     [resize form :height (- *window-height* *terminal-height* *prompt-height* *pager-height*) :width *window-width*]

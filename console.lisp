@@ -951,7 +951,7 @@ table."
 ;; resource record. Page-names are resource-names, and therefore must
 ;; be unique within a given XE2 module. A page's PAK file is stored in
 ;; {MODULENAME}/{PAGENAME}.pak, and for a given module these PAKs will
-;; all be included by {MODULENAME}/WORKBOOK.PAK, which is an
+;; all be included by {MODULENAME}/OBJECTS.PAK, which is an
 ;; automatically generated PAK index linking to all the serialized
 ;; page PAK files.
 
@@ -997,8 +997,6 @@ OBJECT as the data."
     (write-pak (find-module-file *module* *object-index-filename*) index)))
 
 ;; (save-modified-objects t)
-;; (clon:serialize (clone xe2:=world=))
-;; (clon:serialize (clone xe2:=world=)))
 
 (defun load-object-resource (resource)
   "Loads a serialized :OBJECT resource from the Lisp data in the 
