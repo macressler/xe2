@@ -75,10 +75,10 @@
 	       [resize form :height (- *screen-height* *terminal-height* 
 				       *prompt-height* *pager-height*) 
 		       :width (- *screen-width* *sidebar-width* 2)]
-	       [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *sidebar-width*]
+	       [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width (- *sidebar-width* 2)]
 	       [resize help :height 540 :width 800] 
 	       [resize stack :width *screen-width* :height (- *screen-height* *pager-height*)]
-	       [resize split :width *screen-width* :height (- *screen-height* *pager-height* *terminal-height*)]
+	       [resize split :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *terminal-height*)]
 	       [resize terminal :height *terminal-height* :width *screen-width*]
 	       [auto-position *pager*]))
       (add-hook 'xe2:*resize-hook* #'resize-widgets))
@@ -142,6 +142,7 @@
     [add-page *pager* :help (list help)]
     [select *pager* :edit]
     (xe2:enable-classic-key-repeat 100 100)
+    (run-hook 'xe2:*resize-hook*)
 ))
 
 (xiodev)
