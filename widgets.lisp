@@ -191,8 +191,10 @@ possibly return one of them."
     (setf <focus> newpos)))
 
 (define-method handle-key split (event)
-  (if (equal "TAB" (car event))
-      (prog1 t [tab self])
+  (or (let ((func (gethash event <keymap>)))
+	(when func
+	  (prog1 t
+	    (funcall func))))
       [handle-key (nth <focus> <children>) event]))
 
 (define-method forward split (method &rest args)
@@ -541,10 +543,12 @@ normally."
   ;; other characters
   (bind-key-to-prompt-insertion self "MINUS" nil "-")
   (bind-key-to-prompt-insertion self "EQUALS" nil "=")
+  (bind-key-to-prompt-insertion self "EQUALS" '(:control) "+")
   (bind-key-to-prompt-insertion self "SEMICOLON" nil ";")
   (bind-key-to-prompt-insertion self "SEMICOLON" '(:shift) ":")
   (bind-key-to-prompt-insertion self "0" '(:shift) ")")
   (bind-key-to-prompt-insertion self "9" '(:shift) "(")
+  (bind-key-to-prompt-insertion self "8" '(:shift) "*")
   (bind-key-to-prompt-insertion self "SPACE" nil " ")
   (bind-key-to-prompt-insertion self "QUOTE" nil "'")
   (bind-key-to-prompt-insertion self "QUOTE" '(:shift) "\""))
@@ -799,9 +803,14 @@ text INSERTION to be inserted at point."
 	       (bind-key-to-textbox-insertion self (string char) nil))
        *numeric-characters*)
   ;; other characters
+  (bind-key-to-textbox-insertion self "EQUALS" nil "=")
   (bind-key-to-textbox-insertion self "MINUS" nil "-")
+  (bind-key-to-textbox-insertion self "EQUALS" '(:control) "+")
   (bind-key-to-textbox-insertion self "SEMICOLON" nil ";")
   (bind-key-to-textbox-insertion self "SEMICOLON" '(:shift) ":")
+  (bind-key-to-textbox-insertion self "0" '(:shift) ")")
+  (bind-key-to-textbox-insertion self "9" '(:shift) "(")
+  (bind-key-to-textbox-insertion self "8" '(:shift) "*")
   (bind-key-to-textbox-insertion self "SPACE" nil " ")
   (bind-key-to-textbox-insertion self "QUOTE" nil "'")
   (bind-key-to-textbox-insertion self "QUOTE" '(:shift) "\""))
