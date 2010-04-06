@@ -34,11 +34,15 @@
 (defparameter *prompt-height* 20)
 (defparameter *terminal-height* 100)
 (defparameter *pager-height* 20)
+(defparameter *sidebar-width* 400)
 
 (defvar *form*)
 (defvar *terminal*)
 (defvar *prompt*)
 (defvar *pager*)
+
+(add-hook '*after-load-module-hook* (lambda ()
+				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]))
 
 (define-prototype xiodev-prompt (:parent xe2:=prompt=))
 
@@ -57,7 +61,9 @@
 	 (help (clone =formatter=))
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
+	 (form2 (clone =form= "*index*"))
 	 (terminal (clone =narrator=))
+	 (split (clone =split=))
 	 (stack (clone =stack=)))
     ;;
     (setf *form* form)
@@ -66,9 +72,13 @@
     (labels ((resize-widgets ()
 	       [say terminal "Resizing to ~S" (list :width *screen-width* :height *screen-height*)]
 	       [resize prompt :height *prompt-height* :width *screen-width*]
-	       [resize form :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *screen-width*]
+	       [resize form :height (- *screen-height* *terminal-height* 
+				       *prompt-height* *pager-height*) 
+		       :width (- *screen-width* *sidebar-width* 2)]
+	       [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *sidebar-width*]
 	       [resize help :height 540 :width 800] 
 	       [resize stack :width *screen-width* :height (- *screen-height* *pager-height*)]
+	       [resize split :width *screen-width* :height (- *screen-height* *pager-height* *terminal-height*)]
 	       [resize terminal :height *terminal-height* :width *screen-width*]
 	       [auto-position *pager*]))
       (add-hook 'xe2:*resize-hook* #'resize-widgets))
@@ -79,15 +89,23 @@
     [install-keybindings prompt]
     [say prompt "Welcome to XIODEV. Press CONTROL-X to enter command mode, or F1 for help."]
     [set-mode prompt :forward] ;; don't start with prompt on
-    [set-receiver prompt form]
+    [set-receiver prompt split]
     ;; 
-    [resize form :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *screen-width*]
+    [resize form :height (- *screen-height* *terminal-height* 
+			    *prompt-height* *pager-height*) 
+	    :width (- *screen-width* *sidebar-width*)]
     [move form :x 0 :y 0]
     [set-prompt form prompt]
     [set-narrator form terminal]
     ;;
+    [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *sidebar-width*]
+    [move form2 :x 0 :y 0]
+    (setf (field-value :header-style form2) nil)
+    ;; [set-prompt form2 prompt]
+    [set-narrator form2 terminal]
+    ;;
     (xe2:halt-music 1000)
-
+    ;;
     [resize help :height 540 :width 800] 
     [move help :x 0 :y 0]
     (let ((text	(find-resource-object "help-message")))
@@ -104,9 +122,13 @@
     ;; 	  (funcall #'send nil :print-formatted-string quickhelp string))
     ;; 	[newline quickhelp]))
     ;;
-    [resize stack :width *screen-width* :height (- *screen-height* *pager-height*)]
+    [resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*)]
     [move stack :x 0 :y 0]
-    [set-children stack (list form terminal prompt)]
+    [set-children stack (list split terminal prompt)]
+    ;;
+    [resize split :width *screen-width* :height (- *screen-height* *pager-height* *terminal-height* *prompt-height*)]
+    [move split :x 0 :y 0]
+    [set-children split (list form form2)]
     ;;
     [resize terminal :height *terminal-height* :width *screen-width*]
     [move terminal :x 0 :y (- *screen-height* *terminal-height*)]
@@ -116,7 +138,7 @@
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     ;;
-    [add-page *pager* :edit (list stack prompt form terminal )]
+    [add-page *pager* :edit (list prompt stack split terminal)]
     [add-page *pager* :help (list help)]
     [select *pager* :edit]
     (xe2:enable-classic-key-repeat 100 100)

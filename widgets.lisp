@@ -152,6 +152,52 @@ possibly return one of them."
 (define-method hit stack (x y)
   (hit-widgets x y <children>))
 
+;;; Splitscreen view on 2 widgets with focus border
+
+(define-prototype split (:parent =widget=)
+  (active-color :initform ".red")
+  (inactive-color :initform ".blue")
+  (focus :initform 0)
+  children)
+
+(define-method initialize split (&rest children)
+  (setf <children> children))
+  
+(define-method set-children split (children)
+  (setf <children> children))
+
+(define-method render split ()
+  (when <visible>
+    (let ((y <y>)
+          (x <x>)
+	  (image <image>)
+	  (focused-widget (nth <focus> <children>)))
+      (dolist (widget <children>)
+        [move widget :x x :y y]
+	[render widget]
+	(draw-image (field-value :image widget) x y :destination image)
+	(when (eq widget focused-widget)
+	  (draw-rectangle x y (field-value :width widget)
+			  (field-value :height widget)
+			  :color <active-color>
+			  :destination <image>))
+        (incf x (1+ (field-value :width widget)))))))
+
+(define-method hit split (x y)
+  (hit-widgets x y <children>))
+
+(define-method tab split ()
+  (let ((newpos (mod (1+ <focus>) (length <children>))))
+    (setf <focus> newpos)))
+
+(define-method handle-key split (event)
+  (if (equal "TAB" (car event))
+      (prog1 t [tab self])
+      [handle-key (nth <focus> <children>) event]))
+
+(define-method forward split (method &rest args)
+  (apply #'send self method (nth <focus> <children>) args))
+
 ;;; Formatted display widget
 
 (defvar *default-formatter-scrollback-size* 1000)
@@ -448,7 +494,7 @@ normally."
 		(prog1 t [goto self])))))
 
 (define-method exit prompt ()
-  [clear self]
+  [clear-line self]  
   (setf <mode> :forward))
 
 (define-method goto prompt ()
@@ -472,7 +518,7 @@ normally."
   (bind-key-to-method self "END" nil :move-end-of-line)
   (bind-key-to-method self "RIGHT" nil :forward-char)
   (bind-key-to-method self "LEFT" nil :backward-char)
-  (bind-key-to-method self "K" '(:control) :clear)
+  (bind-key-to-method self "K" '(:control) :clear-line)
   (bind-key-to-method self "BACKSPACE" nil :backward-delete-char)
   (bind-key-to-method self "RETURN" nil :execute)
   (bind-key-to-method self "X" '(:control) :exit)
@@ -550,26 +596,33 @@ normally."
 	  ;; (condition (c)
 	  ;; 	     [say self "ERROR: during command execution. ~S" c]))
       (queue <line> <history>)
-      [clear self])))
+      [clear-line self])))
 
 (define-method history-item prompt (n)
+  (assert (integerp n))
   (nth (- (clon:queue-count <history>) n)
        (clon:queue-head <history>)))
 
 (define-method forward-history prompt ()
   (when (> <history-position> 0)
-    (setf <line> [history-item self (decf <history-position>)])))
+    (setf <line> [history-item self (progn (decf <history-position>)
+					   <history-position>)])
+    (setf <point> (length <line>))))
+ 
 
 (define-method backward-history prompt ()
   (when (< <history-position> (queue-count <history>))
-    (setf <line> [history-item self (incf <history-position>)])))
+    (setf <line> [history-item self (progn (incf <history-position>)
+					   <history-position>)])
+    (setf <point> (length <line>))))
 
 (define-method set-receiver prompt (receiver)
   (setf <receiver> receiver))
 
-(define-method clear prompt ()
+(define-method clear-line prompt ()
   (setf <line> "")
-  (setf <point> 0))
+  (setf <point> 0)
+  (setf <history-position> 0))
 
 (define-method move-end-of-line prompt ()
   (setf <point> (length <line>)))
@@ -612,6 +665,7 @@ normally."
 			   strings-y
 			   :destination image))
       ;; draw current command line text
+      (when (null <line>) (setf <line> ""))
       (draw-string-solid <line>
 			 (+ *default-prompt-margin* 
 			    (* font-width (length prompt-string)))
@@ -980,6 +1034,7 @@ text INSERTION to be inserted at point."
                           <highlighted-style> <style>))
                 line))
         (incf n))
+      (push (list " ") line)
       (when <pager-message> 
         (push <pager-message> line))
       ;; draw the string

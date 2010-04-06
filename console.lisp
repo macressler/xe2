@@ -539,7 +539,7 @@ Set it to 0 to get a timer event every frame."
 
 (defvar *resizable* nil)
 
-(defvar *resize-hook* nil)
+(defparameter *resize-hook* nil)
 
 (defvar *screen-width* 640 "The width (in pixels) of the game
 window. Set this in the game startup file.")
@@ -991,19 +991,23 @@ OBJECT as the data."
     (message "Saving resource ~S... Done." name)
     (setf (resource-data resource) nil)))
 
+(defun is-special-resource (resource)
+  (string= "*" (string (aref (resource-name resource) 0))))
+  
 (defun save-modified-objects (&optional force)
   (let (index)
     (labels ((save (name resource)
 	       (when (not (stringp resource))
 		 (when (eq :object (resource-type resource))
-		   (when (or force (resource-modified-p resource))
-		     (save-object-resource resource)
-		     ;; make a link resource (i.e. of type :pak) to pull this in later
-		     (let ((link-resource (make-resource :type :pak 
-							 :file (concatenate 'string
-									    (resource-name resource)
-									    *pak-file-extension*))))
-		       (push link-resource index)))))))
+		   (unless (is-special-resource resource)
+		     (when (or force (resource-modified-p resource))
+		       (save-object-resource resource)
+		       ;; make a link resource (i.e. of type :pak) to pull this in later
+		       (let ((link-resource (make-resource :type :pak 
+							   :file (concatenate 'string
+									      (resource-name resource)
+									      *pak-file-extension*))))
+			 (push link-resource index))))))))
       (maphash #'save *resource-table*))
     ;; write auto-generated index
     (write-pak (find-module-file *module* *object-index-filename*) index)))
@@ -1270,6 +1274,8 @@ found."
 
 (defvar *module* nil "The name of the current module.")
 
+(defparameter *after-load-module-hook* nil)
+
 (defun load-module (module &key (autoload t))
   "Load the module named MODULE. Load any resources marked with a
 non-nil :autoload property. This operation also sets the default
@@ -1285,7 +1291,8 @@ object save directory (by setting the current `*module*'. See also
   (let ((object-index-file (find-module-file module *object-index-filename*)))
     (when (probe-file object-index-file)
       (message "Loading saved objects from ~S" object-index-file)
-      (index-pak module object-index-file))))
+      (index-pak module object-index-file)))
+  (run-hook '*after-load-module-hook*))
 
 ;;; Playing music and sound effects
 

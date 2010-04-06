@@ -88,7 +88,7 @@
   (selected-tool :documentation "Keyword symbol identifying the method to be applied.")
   (tool-data :documentation "Arguments for tool method invocation."))
 
-(defparameter *default-page-name* "scratch-page")
+(defparameter *default-page-name* "*scratch*")
 
 (define-method initialize form (&optional (page *default-page-name*))
   (with-fields (entry) self
@@ -282,7 +282,7 @@
   (when <world>
     (with-field-values (cursor-row cursor-column row-heights world page-name 
 				   origin-row origin-column header-line status-line
-				   view-style
+				   view-style header-style
 				   row-spacing rows columns draw-blanks column-widths) self
       [compute self]
       [compute-geometry self]
@@ -299,7 +299,7 @@
 		  (return-from searching (- columns 1)))))
 	     (bottom-visible-row
 	      (block searching
-		(let ((height (if header-line
+		(let ((height (if (and header-line header-style)
 				  (formatted-line-height header-line)
 				  0)))
 		  (loop for row from origin-row to rows 
@@ -315,13 +315,16 @@
 	;;   (when (object-p selected-cell)
 	;;     (setf header-line (field-value :tooltip selected-cell))))
 	;; draw header line with tooltip, if any
-	(when header-line
+	(when (and header-line header-style)
 	  (render-formatted-line header-line 0 y :destination image)
 	  (incf y (formatted-line-height header-line)))
 	;; create status line
 	(setf status-line
-	      (list (list (format nil " Module: ~A  |  Location: (Row ~S, Column ~S)  |  Visiting page: ~S | Color: ~A "
-				  *module* cursor-row cursor-column page-name 
+	      (list 
+	       (list (format nil " [ ~A ]     " page-name) :foreground ".yellow"
+		     :background ".red")
+	       (list (format nil " | Loc: (~S, ~S) | Color : ~A "
+				   cursor-row cursor-column 
 				  (when (field-value :paint <world>)
 				    (get-some-object-name (field-value :paint <world>))))
 			  :foreground ".white")))
@@ -517,7 +520,5 @@
 (define-method select button-cell ()
   (funcall <closure>)
   (setf <clock> *button-cell-highlight-time*))
-
-;; (error cons-game::*form*)
 
 ;;; forms.lisp ends here
