@@ -512,6 +512,7 @@ normally."
     (apply #'bind-key-to-prompt-insertion self k)))
 		     
 (define-method install-keybindings prompt ()
+  ;; TODO fix for international layouts
   ;; install basic keybindings
   (bind-key-to-method self "A" '(:control) :move-beginning-of-line)
   (bind-key-to-method self "E" '(:control) :move-end-of-line)
@@ -587,18 +588,21 @@ normally."
 			      (subseq <line> <point>)))
     (decf <point>)))
 
+(define-method print-data prompt (data &optional comment)
+  (dolist (line (split-string-on-lines (write-to-string data :circle t :pretty t :escape nil :lines 5)))
+    [say self (if comment ";; ~A"
+		  " ~A") line]))
+
 (define-method execute prompt ()
   (labels ((print-it (c) 
-	     (dolist (line (split-string-on-lines (write-to-string c :circle t :pretty t :escape nil :lines 5)))
-	       [say self ";; ~A" line])))
+	     [print-data self c :comment]))
     (let* ((*read-eval* nil)
 	   (sexp (handler-case 
 		     (read-from-string (concatenate 'string "(" <line> ")"))
 		   (condition (c)
-		     [say self "SYNTAX ERROR: ~S" <line>]
-		     [say self "~S" c]))))
+		     (print-it c)))))
       (when sexp 
-	[say self "EXECUTE: ~A" <line>]
+	[say self "~A" <line>]
 	(handler-case
 	    (handler-bind (((not serious-condition)
 			    (lambda (c) 
