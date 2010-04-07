@@ -469,7 +469,8 @@ These are the arguments to `bind-key-to-prompt-insertion', which see.")
   (line :initform "" :documentation "Currently edited command line.")
   (history :initform (make-queue :max *default-prompt-history-size*)
 	   :documentation "A queue of strings containing the command history.")
-  (history-position :initform 0))
+  (history-position :initform 0)
+  (debug-on-error :initform nil))
 
 (defun bind-key-to-prompt-insertion (p key modifiers &optional (insertion key))
   "For prompt P ensure that the event (KEY MODIFIERS) causes the
@@ -595,10 +596,13 @@ normally."
 		   [say self "~S" c]))))
     (when sexp 
       [say self "EXECUTE: ~A" <line>]
-      ;; (handler-case 
+      (handler-case 
 	  (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp)))
-	  ;; (condition (c)
-	  ;; 	     [say self "ERROR: during command execution. ~S" c]))
+	(condition (c)
+	  (let* ((*print-circle* t)
+		 (output (write-to-string c :circle t :pretty t :escape nil :lines 5)))
+	    (dolist (line (split-string-on-lines output))
+	      [say self ";; ~A" line]))))
       (queue <line> <history>)
       [clear-line self])))
 

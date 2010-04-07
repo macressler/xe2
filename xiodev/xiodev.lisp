@@ -137,7 +137,7 @@
 		       :width (- *screen-width* *sidebar-width* 2)]
 	       [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width (- *sidebar-width* 2)]
 	       [resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*]
-	       [resize stack :width *screen-width* :height (- *screen-height* *pager-height*)]
+	       [resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*)]
 	       [resize split :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*)]
 	       [resize terminal :height *terminal-height* :width *screen-width*]
 	       [auto-position *pager*]))

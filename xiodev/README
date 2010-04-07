@@ -29,9 +29,19 @@ default) to enter data in the currently selected cell (in the current
 pane.) If the selected cell is blank, a new data cell is created.
 Press ESCAPE (the EXIT command) to quit entering data.
 
-Other commands, not yet documented:
+To change the active tool, use SET-TOOL at the command line, or the
+shortcut Control-T for NEXT-TOOL.
 
-APPLY-LEFT APPLY-RIGHT VISIT EVAL SELECT SAVE-ALL SAVE LOAD-MODULE
-TILE-VIEW LABEL-VIEW QUIT VISIT
+
+
+NEXT-TOOL
+
+APPLY-LEFT APPLY-RIGHT 
+
+
+
+VISIT EVAL SELECT SAVE-ALL SAVE-MODULE
+LOAD-MODULE TILE-VIEW LABEL-VIEW QUIT VISIT 
+APPLY-TOOL CLONE ERASE CREATE-WORLD
 
 

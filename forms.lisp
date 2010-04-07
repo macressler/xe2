@@ -175,6 +175,7 @@
   (bind-key-to-method self "F9" nil :tile-view)
   (bind-key-to-method self "F10" nil :label-view)
   (bind-key-to-method self "X" '(:control) :goto-prompt)
+  (bind-key-to-method self "T" '(:control) :next-tool)
   (bind-key-to-method self "UP" nil :move-cursor-up)
   (bind-key-to-method self "DOWN" nil :move-cursor-down)
   (bind-key-to-method self "LEFT" nil :move-cursor-left)
