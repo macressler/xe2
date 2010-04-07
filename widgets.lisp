@@ -588,22 +588,30 @@ normally."
     (decf <point>)))
 
 (define-method execute prompt ()
-  (let* ((*read-eval* nil)
-	 (sexp (handler-case 
-		   (read-from-string (concatenate 'string "(" <line> ")"))
-		 (condition (c)
-		   [say self "SYNTAX ERROR: ~S" <line>]
-		   [say self "~S" c]))))
-    (when sexp 
-      [say self "EXECUTE: ~A" <line>]
-      (handler-case 
-	  (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp)))
-	(condition (c)
-	  (let* ((*print-circle* t)
-		 (output (write-to-string c :circle t :pretty t :escape nil :lines 5)))
-	    (dolist (line (split-string-on-lines output))
-	      [say self ";; ~A" line]))))
-      (queue <line> <history>)
+  (labels ((print-it (c) 
+	     (dolist (line (split-string-on-lines (write-to-string c :circle t :pretty t :escape nil :lines 5)))
+	       [say self ";; ~A" line])))
+    (let* ((*read-eval* nil)
+	   (sexp (handler-case 
+		     (read-from-string (concatenate 'string "(" <line> ")"))
+		   (condition (c)
+		     [say self "SYNTAX ERROR: ~S" <line>]
+		     [say self "~S" c]))))
+      (when sexp 
+	[say self "EXECUTE: ~A" <line>]
+	(handler-case
+	    (handler-bind (((not serious-condition)
+			    (lambda (c) 
+			      (print-it c)
+			      ;; If there's a muffle-warning
+			      ;; restart associated, use it to
+			      ;; avoid double-printing.
+			      (let ((r (find-restart 'muffle-warning c)))
+				(when r (invoke-restart r))))))
+	      (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp))))
+	  (serious-condition (c)
+	    (print-it c)))
+	(queue <line> <history>))
       [clear-line self])))
 
 (define-method history-item prompt (n)
