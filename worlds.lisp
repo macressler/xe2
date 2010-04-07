@@ -320,6 +320,8 @@ is the integer on the top of the stack."
 	  (setf <row> r <column> c <direction> dir))
 	(error "Invalid location argument for POPLOC. Must be a list of two integers plus a keyword."))))
 
+
+
 (define-method right world ()
   "Turn N degrees clockwise, where N is 0, 45, or 90."
   (with-fields (direction stack) self

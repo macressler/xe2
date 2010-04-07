@@ -40,6 +40,7 @@
 (defvar *terminal*)
 (defvar *prompt*)
 (defvar *pager*)
+(defvar *forms*)
 
 (add-hook '*after-load-module-hook* (lambda ()
 				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]))
@@ -48,6 +49,51 @@
 
 (define-method say xiodev-prompt (&rest args)
   (apply #'send nil :say *terminal* args))
+
+(define-prototype xiodev-split (:parent xe2:=split=))
+
+(define-method install-keybindings xiodev-split ()
+  (bind-key-to-method self "UP" '(:control) :pickup)
+  (bind-key-to-method self "DOWN" '(:control) :clone)
+  (bind-key-to-method self "LEFT" '(:control) :left-pane)
+  (bind-key-to-method self "RIGHT" '(:control) :right-pane)
+  (bind-key-to-method self "Z" nil :apply-left)
+  (bind-key-to-method self "X" nil :apply-right)
+  (bind-key-to-method self "TAB" nil :tab))
+
+(define-method left-form xiodev-split ()
+  (nth 0 <children>))
+
+(define-method right-form xiodev-split ()
+  (nth 1 <children>))
+
+(define-method left-selected-data xiodev-split ()
+  [get-selected-cell-data [left-form self]])
+
+(define-method right-selected-data xiodev-split ()
+  [get-selected-cell-data [right-form self]])
+
+(define-method left-pane xiodev-split ()
+  [say self "Selecting left pane."]
+  (setf <focus> 0))
+
+(define-method right-pane xiodev-split ()
+  [say self "Selecting right pane."]
+  (setf <focus> 1))
+
+(define-method apply-left xiodev-split ()
+  (let* ((form [left-form self])
+	 (tool (field-value :tool form))
+	 (data [right-selected-data self]))
+    [say self (format nil "Applying LEFT tool ~S to data ~S in LEFT form." tool data)]
+    [apply-tool form data]))
+
+(define-method apply-right xiodev-split ()
+  (let* ((form [right-form self])
+	 (tool (field-value :tool form))
+	 (data [left-selected-data self]))
+    [say self (format nil "Applying RIGHT tool ~S to data ~S in RIGHT form." tool data)]
+    [apply-tool form data]))
 
 (defun xiodev ()
   (setf xe2:*screen-width* *window-width*)
@@ -63,12 +109,13 @@
 	 (form (clone =form=))
 	 (form2 (clone =form= "*index*"))
 	 (terminal (clone =narrator=))
-	 (split (clone =split=))
+	 (split (clone =xiodev-split=))
 	 (stack (clone =stack=)))
     ;;
     (setf *form* form)
     (setf *prompt* prompt)
     (setf *terminal* terminal)
+    (setf *forms* split)
     (labels ((resize-widgets ()
 	       [say terminal "Resizing to ~S" (list :width *screen-width* :height *screen-height*)]
 	       [resize prompt :height *prompt-height* :width *screen-width*]
@@ -87,6 +134,7 @@
     [move prompt :x 0 :y 0]
     [show prompt]
     [install-keybindings prompt]
+    [install-keybindings split]
     [say prompt "Welcome to XIODEV. Press CONTROL-X to enter command mode, or F1 for help."]
     [set-mode prompt :forward] ;; don't start with prompt on
     [set-receiver prompt split]
@@ -101,7 +149,7 @@
     [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *sidebar-width*]
     [move form2 :x 0 :y 0]
     (setf (field-value :header-style form2) nil)
-    ;; [set-prompt form2 prompt]
+    [set-prompt form2 prompt]
     [set-narrator form2 terminal]
     ;;
     (xe2:halt-music 1000)

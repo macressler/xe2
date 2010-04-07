@@ -160,7 +160,7 @@ When nil, the method DRAW is invoked instead of using a tile.")
   nil)
 
 (define-method get cell ()
-  nil)
+  (object-name (object-parent self)))
 
 (define-method form-render cell (image x y width)
   (let ((widget <widget>))

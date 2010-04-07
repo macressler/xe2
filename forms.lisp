@@ -35,7 +35,9 @@
 		(progn (make-object-resource page (create-blank-page))
 		       ;; ;; TODO BUG IS HERE???
 		       ;; (message "OBJEKKT: ~S" (find-resource page))
-		       (find-resource-object page))))))
+		       (let ((object (find-resource-object page)))
+			 (prog1 object
+			   (setf (field-value :name object) page))))))))
 
 ;; (maphash #'(lambda (k v) (when (resource-p v)
 ;; 			   (when (eq :object (resource-type v))
@@ -85,8 +87,8 @@
   (header-style :initform t :documentation "When non-nil, draw row and column headers.")
   (header-line :initform nil :documentation "Formatted line to be displayed at top of window above spreadsheet.")
   (status-line :initform nil :documentation "Formatted line to be displayed at top of window above spreadsheet.")
-  (selected-tool :documentation "Keyword symbol identifying the method to be applied.")
-  (tool-data :documentation "Arguments for tool method invocation."))
+  (tool :initform :clone :documentation "Keyword symbol identifying the method to be applied.")
+  (tool-methods :initform '(:clone :erase :inspect)))
 
 (defparameter *default-page-name* "*scratch*")
 
@@ -99,13 +101,44 @@
 (define-method generate form ()
   [generate <world>])
 
+(define-method set-tool form (tool)
+  (assert (member tool <tool-methods>))
+  (setf <tool> tool))
+
+(define-method get-selected-cell-data form ()
+  (let ((cell [selected-cell self]))
+    (when cell
+      [get cell])))
+
+(define-method next-tool form ()
+  (with-fields (tool tool-methods) self
+    (let ((pos (position tool tool-methods)))
+      (assert pos)
+      (setf tool (nth (mod (1+ pos) (length tool-methods))
+		      tool-methods))
+      [say self (format nil "Changing tool operation to ~S" tool)])))
+
+(define-method apply-tool form (data)
+  (with-fields (tool tool-methods) self
+    (send nil tool self data)))
+
+(define-method clone form (data)
+  (if (and (symbolp data)
+	   (boundp data)
+	   (clon:object-p (symbol-value data)))
+      [drop-cell <world> (clone (symbol-value data)) <cursor-row> <cursor-column>]))
+
+(define-method erase form (data)
+  [say self "Erasing top cell."]
+  (let ((grid (field-value :grid <world>)))
+    (vector-pop (aref grid <cursor-row> <cursor-column>))))
+
 (define-method visit form (&optional (page *default-page-name*))
   "Visit the page PAGE with the current form."
   (let ((world (find-page page)))
     (assert (object-p world))
-    (setf <page-name> (if (stringp page) 
-			  page 
-			  (generate-page-name world)))
+    (setf <page-name> (field-value :name world))
+    [say self (format nil "Visiting page ~S" <page-name>)]
     (setf <world> world)
     (setf *world* world)
     [install-keybindings self]
@@ -157,11 +190,11 @@
   (when <prompt>
     [goto <prompt>]))
 
-(define-method current-cell form ()
+(define-method selected-cell form ()
   [cell-at self <cursor-row> <cursor-column>])
 
 (define-method select form ()
-  (let ((cell [current-cell self]))
+  (let ((cell [selected-cell self]))
     (when cell
       [select cell])))
 
@@ -169,7 +202,8 @@
   [say self (format nil "RESULT: ~A" args)])
 
 (define-method say form (text)
-  [say <prompt> text])
+  (when <prompt>
+    [say <prompt> text]))
 
 (define-method save-all form ()
   [say self "Saving objects..."]
@@ -180,7 +214,7 @@
   (unless <entered>
     [say self "Now entering data. Press ESCAPE to stop editing."]
     (let ((entry (clone =textbox=))
-	  (cell [current-cell self]))
+	  (cell [selected-cell self]))
       (when (null cell)
 	(setf cell (clone =data-cell=))
 	[drop-cell <world> cell <cursor-row> <cursor-column>])
@@ -201,14 +235,14 @@
 
 (define-method exit form ()
   (when <entered>
-    (with-fields (widget) [current-cell self]
+    (with-fields (widget) [selected-cell self]
       (let* ((str [get-buffer-as-string widget])
 	     (data (handler-case
 		       (read-from-string str)
 		     (condition (c) 
 		       [say self (format nil "Error reading data: ~S" c)]))))
 	(when data
-	  [set [current-cell self] data])
+	  [set [selected-cell self] data])
 	(setf widget nil)
 	(setf <entered> nil)
 	[say self "Finished entering data."]))))
@@ -250,7 +284,7 @@
   ;; possibly forward event to current cell. used for the event cell, see below.
   (if (equal "ESCAPE" (car event))
       [parent>>handle-key self event]
-      (let* ((cell [current-cell self])
+      (let* ((cell [selected-cell self])
 	     (widget (when cell (field-value :widget cell))))
 	(cond ((and cell (has-method :handle-key cell))
 	       (or [handle-key cell event]
@@ -259,7 +293,16 @@
 	       [handle-key widget event])
 	      (t [parent>>handle-key self event])))))
 
-;; TODO (define-method hit form (x y) 
+;; (define-method hit form (x0 y0) 
+;;   (with-field-values (row-heights column-widths origin-row origin-column rows columns)
+;;       self
+;;     (let* ((x 0)
+;; 	   (y 0)
+;; 	   (selected-column 
+;; 	    (loop for column from 0 to columns
+;; 		  do (incf x (aref column-widths column))
+;; 		  when (> x x0) return 
+	  
 
 (define-method compute form ()
   (with-fields (rows columns) self
@@ -282,7 +325,7 @@
   (when <world>
     (with-field-values (cursor-row cursor-column row-heights world page-name 
 				   origin-row origin-column header-line status-line
-				   view-style header-style
+				   view-style header-style tool tool-methods
 				   row-spacing rows columns draw-blanks column-widths) self
       [compute self]
       [compute-geometry self]
@@ -323,11 +366,13 @@
 	      (list 
 	       (list (format nil " [ ~A ]     " page-name) :foreground ".yellow"
 		     :background ".red")
-	       (list (format nil " | Loc: (~S, ~S) | Color : ~A "
+	       (list (format nil " | Loc: (~S, ~S) | Data : ~A | Tool: ~S "
 				   cursor-row cursor-column 
 				  (when (field-value :paint <world>)
-				    (get-some-object-name (field-value :paint <world>))))
-			  :foreground ".white")))
+				    (get-some-object-name (field-value :paint <world>)))
+				  tool)
+			  :foreground ".white"
+			  :background ".gray20")))
 	;; draw status line
 	(when status-line 
 	  (render-formatted-line status-line 0 y :destination image)
@@ -372,7 +417,8 @@
 	      ;; move to next column right
 	      (incf x (aref column-widths column))))
 	  ;; move to next row down
-	  (incf y (+ row-spacing (aref row-heights row))))
+	  (incf y (+ (if (eq :tile view-style)
+			 0 row-spacing) (aref row-heights row))))
 	;; render cursor, if any 
 	(when cursor-dimensions
 	  (destructuring-bind (x y w h) cursor-dimensions
