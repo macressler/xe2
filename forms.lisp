@@ -126,7 +126,8 @@
   (if (and (symbolp data)
 	   (boundp data)
 	   (clon:object-p (symbol-value data)))
-      [drop-cell <world> (clone (symbol-value data)) <cursor-row> <cursor-column>]))
+      [drop-cell <world> (clone (symbol-value data)) <cursor-row> <cursor-column>]
+      [say self "Cannot clone."]))
 
 (define-method erase form (data)
   [say self "Erasing top cell."]

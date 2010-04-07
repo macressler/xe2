@@ -57,8 +57,8 @@
   (bind-key-to-method self "DOWN" '(:control) :clone)
   (bind-key-to-method self "LEFT" '(:control) :left-pane)
   (bind-key-to-method self "RIGHT" '(:control) :right-pane)
-  (bind-key-to-method self "Z" nil :apply-left)
-  (bind-key-to-method self "X" nil :apply-right)
+  (bind-key-to-method self "LEFTBRACKET" nil :apply-left)
+  (bind-key-to-method self "RIGHTBRACKET" nil :apply-right)
   (bind-key-to-method self "TAB" nil :tab))
 
 (define-method left-form xiodev-split ()
