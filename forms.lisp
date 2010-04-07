@@ -37,7 +37,7 @@
 		       ;; (message "OBJEKKT: ~S" (find-resource page))
 		       (let ((object (find-resource-object page)))
 			 (prog1 object
-			   (setf (field-value :name object) page))))))))
+			   (setf (field-value :name object) (generate-page-name object)))))))))
 
 ;; (maphash #'(lambda (k v) (when (resource-p v)
 ;; 			   (when (eq :object (resource-type v))

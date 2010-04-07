@@ -189,5 +189,5 @@
  (:name "forest-lisp" :type :lisp :file "forest.lisp" :properties (:autoload t))
  (:name "mountain-lisp" :type :lisp :file "mountain.lisp" :properties (:autoload t))
  (:name "monastery-lisp" :type :lisp :file "monastery.lisp" :properties (:autoload t))
- (:name ".startup" :type :lisp :file "startup.lisp" :properties (:autoload t))
+ (:name ".startup" :type :lisp :file "startup.lisp")
 )

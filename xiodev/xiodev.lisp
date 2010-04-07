@@ -42,6 +42,18 @@
 (defvar *pager*)
 (defvar *forms*)
 
+(define-prototype help-prompt (:parent =prompt=)
+  (default-keybindings :initform '(("N" nil "page-down .")
+				   ("P" nil "page-up ."))))
+
+(define-prototype help-textbox (:parent =textbox=))
+
+(define-method render help-textbox ()
+  [parent>>render self]
+  [message *pager* 
+	   (list (format nil " --- Line ~A of ~A. Use N (NEXT) and P (PREVIOUS) to scroll the text." 
+			 <point-row> (length <buffer>)))])
+
 (add-hook '*after-load-module-hook* (lambda ()
 				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]))
 
@@ -104,7 +116,8 @@
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
   (let* ((prompt (clone =xiodev-prompt=))
-	 (help (clone =formatter=))
+	 (help (clone =help-textbox=))
+	 (help-prompt (clone =help-prompt=))
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
 	 (form2 (clone =form= "*index*"))
@@ -123,7 +136,7 @@
 				       *prompt-height* *pager-height*) 
 		       :width (- *screen-width* *sidebar-width* 2)]
 	       [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width (- *sidebar-width* 2)]
-	       [resize help :height 540 :width 800] 
+	       [resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*]
 	       [resize stack :width *screen-width* :height (- *screen-height* *pager-height*)]
 	       [resize split :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*)]
 	       [resize terminal :height *terminal-height* :width *screen-width*]
@@ -146,6 +159,18 @@
     [set-prompt form prompt]
     [set-narrator form terminal]
     ;;
+    [resize-to-scroll help :height 540 :width 800] 
+    [move help :x 0 :y 0]
+    (setf (field-value :read-only help) t)
+    (let ((text	(find-resource-object "help-message")))
+      [set-buffer help text])
+    ;;
+    [resize help-prompt :width 10 :height 10]
+    [move help-prompt :x 0 :y 0]
+    [hide help-prompt]
+    [set-receiver help-prompt help]
+
+    ;;
     [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *sidebar-width*]
     [move form2 :x 0 :y 0]
     (setf (field-value :header-style form2) nil)
@@ -154,13 +179,12 @@
     ;;
     (xe2:halt-music 1000)
     ;;
-    [resize help :height 540 :width 800] 
+    ;; [resize help :height 540 :width 800] 
+    ;; [move help :x 0 :y 0]
+    [resize-to-scroll help :height 540 :width 800] 
     [move help :x 0 :y 0]
     (let ((text	(find-resource-object "help-message")))
-      (dolist (line text)
-    	(dolist (string line)
-    	  (funcall #'send nil :print-formatted-string help string))
-    	[newline help]))
+      [set-buffer help text])
     ;; ;;
     ;; [resize quickhelp :height 72 :width 250] 
     ;; [move quickhelp :y (- *screen-height* 130) :x (- *screen-width* 250)]

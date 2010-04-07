@@ -687,6 +687,7 @@ normally."
 (define-prototype textbox (:parent =widget=)
   (font :initform ".default-font")
   (buffer :initform nil)
+  (read-only :initform nil)
   (bordered :initform nil)
   (max-displayed-rows :initform nil :documentation "An integer when scrolling is enabled.")
   (max-displayed-columns :initform nil)
@@ -696,6 +697,13 @@ normally."
   (point-row :initform 0)
   (point-column :initform 0)
   (visible :initform t))
+
+(define-method handle-key textbox (event)
+  (unless <read-only>
+    (let ((func (gethash event <keymap>)))
+      (when func
+	(prog1 t
+	  (funcall func))))))
 
 (define-method set-buffer textbox (buffer)
   (setf <buffer> buffer))
@@ -951,6 +959,8 @@ text INSERTION to be inserted at point."
 	    		      :color <cursor-color>
 	    		      :destination image)))))))
 
+
+
 ;;; The pager switches between different visible groups of widgets
 
 (define-prototype pager (:parent =widget=)
@@ -1049,4 +1059,3 @@ text INSERTION to be inserted at point."
       ;; draw the string
       (render-formatted-line (nreverse line) 0 0 :destination <image>))))
    
-;;; widgets.lisp ends here

@@ -197,5 +197,5 @@
  (:name "player-lisp" :type :lisp :file "player.lisp" :properties (:autoload t))
  (:name "enemy-lisp" :type :lisp :file "enemy.lisp" :properties (:autoload t))
  (:name "tutorial-lisp" :type :lisp :file "tutorial.lisp" :properties (:autoload t))
- (:name ".startup" :type :lisp :file "xong.lisp" :properties (:autoload t))
+ (:name ".startup" :type :lisp :file "xong.lisp")
 )

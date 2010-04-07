@@ -1,5 +1,5 @@
 (
- (:name "help-message" :type :formatted-text :file "README")
+ (:name "help-message" :type :text :file "README")
  (:name ".default-font" :type :font :properties (:height 14 :width 7) :data "7x14b")
  (:name ".startup" :type :lisp :file "xiodev.lisp" :properties (:autoload t))
 ) 
