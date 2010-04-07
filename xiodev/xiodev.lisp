@@ -65,13 +65,13 @@
 (define-prototype xiodev-split (:parent xe2:=split=))
 
 (define-method install-keybindings xiodev-split ()
-  (bind-key-to-method self "UP" '(:control) :pickup)
-  (bind-key-to-method self "DOWN" '(:control) :clone)
+  ;; (bind-key-to-method self "UP" '(:control) :pickup)
+  ;; (bind-key-to-method self "DOWN" '(:control) :clone)
   (bind-key-to-method self "LEFT" '(:control) :left-pane)
   (bind-key-to-method self "RIGHT" '(:control) :right-pane)
   (bind-key-to-method self "LEFTBRACKET" nil :apply-left)
   (bind-key-to-method self "RIGHTBRACKET" nil :apply-right)
-  (bind-key-to-method self "TAB" nil :tab))
+  (bind-key-to-method self "TAB" nil :switch-panes))
 
 (define-method left-form xiodev-split ()
   (nth 0 <children>))
@@ -211,7 +211,7 @@
     [auto-position *pager*]
     ;;
     [add-page *pager* :edit (list prompt stack split terminal)]
-    [add-page *pager* :help (list help)]
+    [add-page *pager* :help (list help-prompt help)]
     [select *pager* :edit]
     (xe2:enable-classic-key-repeat 100 100)
 ;;    (run-hook 'xe2:*resize-hook*)

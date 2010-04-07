@@ -32,7 +32,7 @@ interacting cells. The world object performs the following tasks:
   - Keeps track of lit squares 
   - Performs collision detection for sprites and cells
 ")
-  (name :initform "Unknown" :documentation "Name of the world.")
+  (name :initform nil :documentation "Name of the world.")
   (overworld :initform nil)
   (paused :initform nil :documentation "Non-nil when the game is paused.")
   (description :initform "Unknown area." :documentation "Brief description of area.")
@@ -99,7 +99,9 @@ At the moment, only 0=off and 1=on are supported.")
 (defparameter *default-world-axis-size* 10)
 (defparameter *default-world-z-size* 4)
 
-(define-method initialize world ()
+(define-method initialize world (&key height width)
+  (when height (setf <height> height))
+  (when width (setf <width> width))
   (setf <variables> (make-hash-table :test 'equal))
   [create-default-grid self])
 

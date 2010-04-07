@@ -20,24 +20,26 @@
 
 (in-package :xe2)
 
-(defun create-blank-page ()
-  (let ((world (clone =world=)))
-    (prog1 world
-      [generate world])))
-
 (defun generate-page-name (world)
   (concatenate 'string (get-some-object-name world) "::" (format nil "~S" (genseq))))
 
+(defun create-blank-page (&key height width name)
+  (let ((world (clone =world= :height height :width width)))
+    (prog1 world
+      (setf (field-value :name world)
+	    (or name (generate-page-name world)))
+      [generate world])))
+
 (defun find-page (page)
   (etypecase page
-    (clon:object (prog1 page (make-object-resource (generate-page-name page) page)))
+    (clon:object (prog1 page (make-object-resource 
+			      (or (field-value :name page)
+				  (generate-page-name page)) page)))
     (string (or (find-resource-object page :noerror)
-		(progn (make-object-resource page (create-blank-page))
-		       ;; ;; TODO BUG IS HERE???
-		       ;; (message "OBJEKKT: ~S" (find-resource page))
+		(progn (make-object-resource page (create-blank-page :name page))
 		       (let ((object (find-resource-object page)))
 			 (prog1 object
-			   (setf (field-value :name object) (generate-page-name object)))))))))
+			   (setf (field-value :name object) page))))))))
 
 ;; (maphash #'(lambda (k v) (when (resource-p v)
 ;; 			   (when (eq :object (resource-type v))
@@ -210,6 +212,10 @@
   [say self "Saving objects..."]
   (xe2:save-modified-objects t)
   [say self "Saving objects... Done."])
+
+(define-method create-world form (&key height width name)
+  (let ((world (create-blank-page :height height :width width :name name)))
+    [visit self world]))
     
 (define-method enter form ()
   (unless <entered>
@@ -259,7 +265,7 @@
     (ecase <view-style>
       (:label (max (formatted-string-height *blank-cell-string*) height))
       (:tile <tile-size>))))
-       
+
 (define-method column-width form (column)
   (let ((width 0) cell)
     (dotimes (row <rows>)

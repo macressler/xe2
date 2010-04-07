@@ -186,7 +186,7 @@ possibly return one of them."
 (define-method hit split (x y)
   (hit-widgets x y <children>))
 
-(define-method tab split ()
+(define-method switch-panes split ()
   (let ((newpos (mod (1+ <focus>) (length <children>))))
     (setf <focus> newpos)))
 
@@ -946,8 +946,9 @@ text INSERTION to be inserted at point."
 	      (draw-string-solid line x0 y0 :destination image
 				 :font font :color <foreground-color>)
 	      (incf y0 line-height)))
-	    ;; draw cursor
-	    ;; TODO fix <point-row> to be drawn relative pos in scrolling
+	  ;; draw cursor
+	  ;; TODO fix <point-row> to be drawn relative pos in scrolling
+	  (when (null <read-only>)
 	    (let* ((current-line (nth <point-row> buffer))
 	    	   (cursor-width (font-width font))
 	    	   (x1 (+ 0 *textbox-margin*
@@ -957,8 +958,8 @@ text INSERTION to be inserted at point."
 	    		  (* line-height <point-row>))))
 	      (draw-rectangle x1 y1 cursor-width line-height 
 	    		      :color <cursor-color>
-	    		      :destination image)))))))
-
+	    		      :destination image))))))))
+  
 
 
 ;;; The pager switches between different visible groups of widgets
