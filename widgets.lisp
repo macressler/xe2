@@ -545,7 +545,7 @@ normally."
   ;; other characters
   (bind-key-to-prompt-insertion self "MINUS" nil "-")
   (bind-key-to-prompt-insertion self "EQUALS" nil "=")
-  (bind-key-to-prompt-insertion self "EQUALS" '(:control) "+")
+  (bind-key-to-prompt-insertion self "EQUALS" '(:shift) "+")
   (bind-key-to-prompt-insertion self "SEMICOLON" nil ";")
   (bind-key-to-prompt-insertion self "SEMICOLON" '(:shift) ":")
   (bind-key-to-prompt-insertion self "0" '(:shift) ")")
