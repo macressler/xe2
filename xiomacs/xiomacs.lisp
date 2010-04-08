@@ -58,7 +58,10 @@
 			 <point-row> (+ <point-row> <max-displayed-rows>) (length <buffer>)))])
 
 (add-hook '*after-load-module-hook* (lambda ()
-				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]))
+				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]
+				      (when (string= *module* "xiomacs")
+					[visit *form* "WelcomePage"])))
+
 
 (define-prototype xiomacs-prompt (:parent xe2:=prompt=))
 
@@ -142,7 +145,7 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
 	 (help-prompt (clone =help-prompt=))
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
-	 (form2 (clone =form= "*index*"))
+	 (form2 (clone =form= "*scratch*"))
 	 (terminal (clone =narrator=))
 	 (split (clone =xiomacs-split=))
 	 (stack (clone =stack=)))
@@ -238,6 +241,7 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
     [add-page *pager* :help (list help-prompt help)]
     [select *pager* :edit]
     (xe2:enable-classic-key-repeat 100 100)
+    (in-package :xe2)
 ;;    (run-hook 'xe2:*resize-hook*)
 ))
 

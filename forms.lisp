@@ -190,7 +190,8 @@ default page is created. See also CREATE-WORLD."
 
 (define-method install-keybindings form ()
   (bind-key-to-method self "RETURN" nil :enter)
-  (bind-key-to-method self "ESCAPE" nil :exit)
+  (bind-key-to-method self "RETURN" '(:control) :exit) ;; see also handle-key
+  (bind-key-to-method self "ESCAPE" nil :cancel)
   (bind-key-to-method self "F9" nil :tile-view)
   (bind-key-to-method self "F10" nil :label-view)
   (bind-key-to-method self "X" '(:control) :goto-prompt)
@@ -257,35 +258,41 @@ Type HELP :COMMANDS for a list of available commands."
 (define-method create-world form (&key height width name)
   "Create and visit a blank world of height HEIGHT, width WIDTH, and name NAME."
   (let ((world (create-blank-page :height height :width width :name name)))
+    [say self "Created new blank page."]
     [visit self world]))
-    
+
 (define-method enter form ()
   "Begin entering LISP data into the current cell."
   (unless <entered>
-    [say self "Now entering data. Press ESCAPE to stop editing."]
+    [say self "Now entering data. Press Control-ENTER to finish, or ESCAPE to cancel."]
     (let ((entry (clone =textbox=))
 	  (cell [selected-cell self]))
+      [resize entry :width 150 :height 30]
+      [move entry :x 0 :y 0]
       (when (null cell)
 	(setf cell (clone =data-cell=))
 	[drop-cell <world> cell <cursor-row> <cursor-column>])
+      (let ((data [get cell]))
+	(when data 
+	  [insert entry (write-to-string data :circle t :pretty t :escape nil :lines 1)]
+	  [move-end-of-line entry]))
       [install-keybindings entry]
-      [resize entry :width 120
-	      :height 40]
-      [move entry :x 0 :y 0]
+      (setf (field-value :auto-fit entry) t)
+      [resize-to-fit entry]
       (setf <entered> t)
       (setf (field-value :widget cell)
 	    entry))))
     
 (define-method load-module form (name)
   "Load the XE2 module NAME for development."
-  [say self (format nil"Loading module ~S" name)]
+  [say self (format nil "Loading module ~S" name)]
   (xe2:load-module name))
 
 (define-method quit form ()
   "Quit XIODEV."
   (xe2:quit t))
 
-(define-method exit form ()
+(define-method exit form (&optional nosave)
   "Stop entering data into the current cell."
   (when <entered>
     (with-fields (widget) [selected-cell self]
@@ -295,10 +302,14 @@ Type HELP :COMMANDS for a list of available commands."
 		     (condition (c) 
 		       [say self (format nil "Error reading data: ~S" c)]))))
 	(when data
-	  [set [selected-cell self] data])
+	  (unless nosave
+	    [set [selected-cell self] data]))
 	(setf widget nil)
 	(setf <entered> nil)
 	[say self "Finished entering data."]))))
+
+(define-method cancel form ()
+  [exit self :nosave])
 
 (defparameter *blank-cell-string* '(" ........ "))
 
@@ -335,7 +346,7 @@ Type HELP :COMMANDS for a list of available commands."
 
 (define-method handle-key form (event)
   ;; possibly forward event to current cell. used for the event cell, see below.
-  (if (equal "ESCAPE" (car event))
+  (if (equal "RETURN" (car event))
       [parent>>handle-key self event]
       (let* ((cell [selected-cell self])
 	     (widget (when cell (field-value :widget cell))))
@@ -452,9 +463,9 @@ Type HELP :COMMANDS for a list of available commands."
 		(setf cursor-dimensions (list x y column-width row-height)))
 	      ;; move to next column right
 	      (incf x (aref column-widths column))))
-	  ;; move to next row down
+	  ;; move to next row down ;; TODO fix row-spacing
 	  (incf y (+ (if (eq :tile view-style)
-			 0 row-spacing) (aref row-heights row))))
+			 0 0) (aref row-heights row))))
 	;; create status line
 	(setf status-line
 	      (list 
@@ -583,16 +594,27 @@ DIRECTION is one of :up :down :right :left."
 
 (defcell comment-cell comment)
 
-(define-method initialize comment-cell (comment)
+(define-method set comment-cell (comment)
   (setf <comment> comment))
-  
-(define-method set comment-cell (comment) nil)
 
 (define-method get comment-cell ()
   <comment>)
 
 (define-method compute comment-cell () 
   (setf <label> (list (cons (format nil " ~A " <comment>) *comment-cell-style*))))
+
+;;; Image cell just displays an image.
+
+(defcell image-cell image)
+
+(define-method set image-cell (image) 
+  (setf <image> image))
+
+(define-method get image-cell ()
+  <image>)
+
+(define-method compute image-cell () 
+  (when <image> (setf <label> (list (list nil :image <image>)))))
 
 ;;; Button cell executes some lambda.
 

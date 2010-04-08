@@ -712,6 +712,7 @@ normally."
   (cursor-color :initform ".yellow")
   (point-row :initform 0)
   (point-column :initform 0)
+  (auto-fit :initform nil)
   (visible :initform t))
 
 (define-method handle-key textbox (event)
@@ -773,14 +774,14 @@ This method allocates a new SDL surface when necessary."
 			       buffer)))
     ;; update geometry
     (let ((width0 (max *textbox-minimum-width*
-		       (+ (* 2 *textbox-margin*)
+		       (+ (* 2 *textbox-margin*) 4
 			  (if (null line-lengths)
 			      0 
 			      (apply #'max line-lengths)))))
 	  (height0 (+ (* 2 *textbox-margin*)
 		      (* line-height (max 1 (length buffer))))))
-      (when (or (not (equal <width> width0))
-		(not (equal <height> height0)))
+      (when (or (< <width> width0)
+		(< <height> height0))
 	(message "resizing textbox H:~S W:~S" height0 width0)
 	[resize self :height height0 :width width0]))))
 
@@ -941,6 +942,8 @@ text INSERTION to be inserted at point."
 (define-method render textbox ()
   (when <visible>
     [clear self]
+    (when <auto-fit>
+      [resize-to-fit self])
     (with-fields (buffer x y width height) self
       (with-field-values (font image point-row) self
 	;; measure text
@@ -956,8 +959,11 @@ text INSERTION to be inserted at point."
 		    :color <background-color>)
 	  ;; draw text
 	  (let ((x0 (+ 0 *textbox-margin*))
-		(y0 (+ 0 *textbox-margin*)))
-	    (dolist (line (nthcdr <point-row> buffer))
+		(y0 (+ 0 *textbox-margin*))
+		(lines (if <auto-fit> 
+			   buffer
+			   (nthcdr <point-row> buffer))))
+	    (dolist (line lines)
 	      (draw-string-solid line x0 y0 :destination image
 				 :font font :color <foreground-color>)
 	      (incf y0 line-height)))
