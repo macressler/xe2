@@ -14,6 +14,8 @@ screen. The syntax is:
 
 Press ENTER while in the command prompt to execute the typed command.
 
+For help on a command, type HELP :COMMAND at the prompt. 
+
 In the spreadsheet area, two panes are shown side by side; the left
 pane, and the right pane. Use the arrow keys to move the cursor in the
 currently selected pane.
@@ -31,16 +33,7 @@ Press ESCAPE (the EXIT command) to quit entering data.
 
 To change the active tool, use SET-TOOL at the command line, or the
 shortcut Control-T for NEXT-TOOL. Usable tools are CLONE (create a new
-object)
+object).
 
-EVAL
-
-NEXT-TOOL
-
-APPLY-LEFT APPLY-RIGHT 
-
-VISIT SELECT SAVE-ALL SAVE-MODULE
-LOAD-MODULE TILE-VIEW LABEL-VIEW QUIT VISIT 
-APPLY-TOOL CLONE ERASE CREATE-WORLD
 
 

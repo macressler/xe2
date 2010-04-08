@@ -343,10 +343,9 @@ Type HELP :COMMANDS for a list of available commands."
 ;;     (let* ((x 0)
 ;; 	   (y 0)
 ;; 	   (selected-column 
-;; 	    (loop for column from 0 to columns
+;; 	    (loop for column from origin-column to columns
 ;; 		  do (incf x (aref column-widths column))
 ;; 		  when (> x x0) return 
-	  
 
 (define-method compute form ()
   (with-fields (rows columns) self
@@ -405,22 +404,6 @@ Type HELP :COMMANDS for a list of available commands."
 	(when (and header-line header-style)
 	  (render-formatted-line header-line 0 y :destination image)
 	  (incf y (formatted-line-height header-line)))
-	;; create status line
-	(setf status-line
-	      (list 
-	       (list (format nil " [ ~A ]     " page-name) :foreground ".yellow"
-		     :background ".red")
-	       (list (format nil " | Loc: (~S, ~S) | Data : ~A | Tool: ~S "
-				   cursor-row cursor-column 
-				  (when (field-value :paint <world>)
-				    (get-some-object-name (field-value :paint <world>)))
-				  tool)
-			  :foreground ".white"
-			  :background ".gray20")))
-	;; draw status line
-	(when status-line 
-	  (render-formatted-line status-line 0 y :destination image)
-	  (incf y (formatted-line-height status-line)))
 	;; TODO column header, if any
 	;; (message "GEOMETRY: ~S" (list :origin-row origin-row
 	;; 			      :origin-column origin-column
@@ -463,6 +446,27 @@ Type HELP :COMMANDS for a list of available commands."
 	  ;; move to next row down
 	  (incf y (+ (if (eq :tile view-style)
 			 0 row-spacing) (aref row-heights row))))
+	;; create status line
+	(setf status-line
+	      (list 
+	       (list (format nil " [ ~A ]     " page-name) :foreground ".yellow"
+		     :background ".red")
+	       (list (format nil " | Loc: (~S, ~S) | Data : ~A | Tool: ~S "
+				   cursor-row cursor-column 
+				  (when (field-value :paint <world>)
+				    (get-some-object-name (field-value :paint <world>)))
+				  tool)
+			  :foreground ".white"
+			  :background ".gray20")))
+	;; draw status line
+	(when status-line 
+	  (let* ((ht (formatted-line-height status-line))
+		 (sy (- <height> 1 ht)))
+	    (draw-box 0 sy <width> ht :color ".gray20" 
+		      :stroke-color ".gray20" :destination image)
+	    (render-formatted-line status-line 
+				   0 sy 
+				   :destination image)))
 	;; render cursor, if any 
 	(when cursor-dimensions
 	  (destructuring-bind (x y w h) cursor-dimensions

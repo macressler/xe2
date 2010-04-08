@@ -32,6 +32,9 @@
 (defparameter *window-width* 1200)
 (defparameter *window-height* 720)
 (defparameter *prompt-height* 20)
+(defparameter *quickhelp-height* 100)
+(defparameter *quickhelp-width* 390)
+(defparameter *quickhelp-spacer* 0)
 (defparameter *terminal-height* 100)
 (defparameter *pager-height* 20)
 (defparameter *sidebar-width* 400)
@@ -64,7 +67,7 @@
 
 (define-method goto xiodev-prompt ()
   [say self "Enter command below. Press ENTER when finished, or CONTROL-X to cancel."]
-  [say self "Use HELP COMMANDS to get a list of commands."]
+  [say self "Type HELP :COMMANDS to get a list of commands."]
   (setf <mode> :direct))
 
 (define-prototype xiodev-split (:parent xe2:=split=))
@@ -159,6 +162,8 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
 	       [resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*)]
 	       [resize split :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*)]
 	       [resize terminal :height *terminal-height* :width *screen-width*]
+	       [resize quickhelp :height *quickhelp-height* :width *quickhelp-width*]
+	       [move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*)]
 	       [auto-position *pager*]))
       (add-hook 'xe2:*resize-hook* #'resize-widgets))
     ;;
@@ -181,7 +186,7 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
     [resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*]
     [move help :x 0 :y 0]
     (setf (field-value :read-only help) t)
-    (let ((text	(find-resource-object "help-message")))
+    (let ((text	(find-resource-object "xiodev-help-message")))
       [set-buffer help text])
     ;;
     [resize help-prompt :width 10 :height 10]
@@ -202,16 +207,16 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
     ;; [move help :x 0 :y 0]
     [resize-to-scroll help :height 540 :width 800] 
     [move help :x 0 :y 0]
-    (let ((text	(find-resource-object "help-message")))
+    (let ((text	(find-resource-object "xiodev-help-message")))
       [set-buffer help text])
-    ;; ;;
-    ;; [resize quickhelp :height 72 :width 250] 
-    ;; [move quickhelp :y (- *screen-height* 130) :x (- *screen-width* 250)]
-    ;; (let ((text	(find-resource-object "quickhelp-message")))
-    ;;   (dolist (line text)
-    ;; 	(dolist (string line)
-    ;; 	  (funcall #'send nil :print-formatted-string quickhelp string))
-    ;; 	[newline quickhelp]))
+    ;;
+    [resize quickhelp :height *quickhelp-height* :width *quickhelp-width*]
+    [move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*)]
+    (let ((text	(find-resource-object "xiodev-quickhelp-message")))
+      (dolist (line text)
+    	(dolist (string line)
+    	  (funcall #'send nil :print-formatted-string quickhelp string))
+    	[newline quickhelp]))
     ;;
     [resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*)]
     [move stack :x 0 :y 0]
@@ -229,7 +234,7 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     ;;
-    [add-page *pager* :edit (list prompt stack split terminal)]
+    [add-page *pager* :edit (list prompt stack split terminal quickhelp)]
     [add-page *pager* :help (list help-prompt help)]
     [select *pager* :edit]
     (xe2:enable-classic-key-repeat 100 100)
