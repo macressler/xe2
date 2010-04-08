@@ -51,8 +51,8 @@
 (define-method render help-textbox ()
   [parent>>render self]
   [message *pager* 
-	   (list (format nil " --- Line ~A of ~A. Use N (NEXT) and P (PREVIOUS) to scroll the text." 
-			 <point-row> (length <buffer>)))])
+	   (list (format nil " --- Showing lines ~A-~A of ~A. Use PAGE UP and PAGE DOWN to scroll the text." 
+			 <point-row> (+ <point-row> <max-displayed-rows>) (length <buffer>)))])
 
 (add-hook '*after-load-module-hook* (lambda ()
 				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]))
@@ -61,6 +61,11 @@
 
 (define-method say xiodev-prompt (&rest args)
   (apply #'send nil :say *terminal* args))
+
+(define-method goto xiodev-prompt ()
+  [say self "Enter command below. Press ENTER when finished, or CONTROL-X to cancel."]
+  [say self "Use HELP COMMANDS to get a list of commands."]
+  (setf <mode> :direct))
 
 (define-prototype xiodev-split (:parent xe2:=split=))
 
@@ -86,14 +91,18 @@
   [get-selected-cell-data [right-form self]])
 
 (define-method left-pane xiodev-split ()
+  "Select the left spreadsheet pane."
   [say self "Selecting left pane."]
   (setf <focus> 0))
 
 (define-method right-pane xiodev-split ()
+  "Select the right spreadsheet pane."
   [say self "Selecting right pane."]
   (setf <focus> 1))
 
 (define-method apply-left xiodev-split ()
+  "Move data LEFTWARD from right pane to left pane, applying current
+left side tool to the right side data."
   (let* ((form [left-form self])
 	 (tool (field-value :tool form))
 	 (data [right-selected-data self]))
@@ -101,11 +110,21 @@
     [apply-tool form data]))
 
 (define-method apply-right xiodev-split ()
+  "Move data RIGHTWARD from left pane to right pane, applying current
+right side tool to the left side data."
   (let* ((form [right-form self])
 	 (tool (field-value :tool form))
 	 (data [left-selected-data self]))
     [say self (format nil "Applying RIGHT tool ~S to data ~S in RIGHT form." tool data)]
     [apply-tool form data]))
+
+(define-method commands xiodev-split ()
+  "Syntax: command-name arg1 arg2 ...
+Available commands: HELP EVAL SWITCH-PANES LEFT-PANE RIGHT-PANE
+NEXT-TOOL SET-TOOL APPLY-LEFT APPLY-RIGHT VISIT SELECT SAVE-ALL
+SAVE-MODULE LOAD-MODULE TILE-VIEW LABEL-VIEW QUIT VISIT APPLY-TOOL
+CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
+ nil)
 
 (defun xiodev ()
   (setf xe2:*screen-width* *window-width*)
@@ -159,7 +178,7 @@
     [set-prompt form prompt]
     [set-narrator form terminal]
     ;;
-    [resize-to-scroll help :height 540 :width 800] 
+    [resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*]
     [move help :x 0 :y 0]
     (setf (field-value :read-only help) t)
     (let ((text	(find-resource-object "help-message")))

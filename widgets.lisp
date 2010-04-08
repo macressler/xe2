@@ -753,7 +753,6 @@ normally."
       (setf <x> (- center-x (truncate (/ width 2)))
 	    <y> (- center-y (truncate (/ height 2)))))))
 
-
 (define-method resize-to-scroll textbox (&key width height)
   "Resize the textbox to WIDTH * HEIGHT and enable scrolling of contents.
 This method allocates a new SDL surface."
@@ -943,7 +942,7 @@ text INSERTION to be inserted at point."
   (when <visible>
     [clear self]
     (with-fields (buffer x y width height) self
-      (with-field-values (font image) self
+      (with-field-values (font image point-row) self
 	;; measure text
 	(let* ((line-height (font-height font))
 	       (line-lengths (mapcar #'(lambda (s)
@@ -958,7 +957,7 @@ text INSERTION to be inserted at point."
 	  ;; draw text
 	  (let ((x0 (+ 0 *textbox-margin*))
 		(y0 (+ 0 *textbox-margin*)))
-	    (dolist (line buffer)
+	    (dolist (line (nthcdr <point-row> buffer))
 	      (draw-string-solid line x0 y0 :destination image
 				 :font font :color <foreground-color>)
 	      (incf y0 line-height)))
@@ -976,7 +975,6 @@ text INSERTION to be inserted at point."
 	    		      :color <cursor-color>
 	    		      :destination image))))))))
   
-
 
 ;;; The pager switches between different visible groups of widgets
 

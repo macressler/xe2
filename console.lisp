@@ -167,7 +167,7 @@ for backward-compatibility."
 ;;  (sdl:disable-key-repeat))
 
 (defun hold-event (event)
-  (when (null (gethash event *key-table*))
+  (when (null (gethash event *key-table*)) 
     (setf (gethash event *key-table*) 0)))
 
 (defun release-held-event (event)

@@ -100,10 +100,12 @@
       [parent>>initialize self]
       [visit self page])))
 
-(define-method generate form ()
-  [generate <world>])
+(define-method generate form (&rest parameters)
+  "Invoke the current page's default :generate method, passing PARAMETERS."
+  [generate-with <world> parameters])
 
 (define-method set-tool form (tool)
+  "Set the current sheet's selected tool to TOOL."
   (assert (member tool <tool-methods>))
   (setf <tool> tool))
 
@@ -113,6 +115,7 @@
       [get cell])))
 
 (define-method next-tool form ()
+  "Switch to the next available tool." 
   (with-fields (tool tool-methods) self
     (let ((pos (position tool tool-methods)))
       (assert pos)
@@ -121,23 +124,30 @@
       [say self (format nil "Changing tool operation to ~S" tool)])))
 
 (define-method apply-tool form (data)
+  "Apply the current form's tool to the DATA."
   (with-fields (tool tool-methods) self
     (send nil tool self data)))
 
 (define-method clone form (data)
+  "Clone the prototype named by the symbol DATA and drop the clone
+at the current cursor location. See also APPLY-LEFT and APPLY-RIGHT."
   (if (and (symbolp data)
 	   (boundp data)
 	   (clon:object-p (symbol-value data)))
       [drop-cell <world> (clone (symbol-value data)) <cursor-row> <cursor-column>]
       [say self "Cannot clone."]))
 
-(define-method erase form (data)
+(define-method erase form (&optional data)
+  "Erase the top cell at the current location."
   [say self "Erasing top cell."]
   (let ((grid (field-value :grid <world>)))
     (vector-pop (aref grid <cursor-row> <cursor-column>))))
 
 (define-method visit form (&optional (page *default-page-name*))
-  "Visit the page PAGE with the current form."
+  "Visit the page PAGE with the current form. If PAGE is a =world=
+object, visit it and add the page to the page collection. If PAGE is a
+string, visit the named page. If the named page does not exist, a
+default page is created. See also CREATE-WORLD."
   (let ((world (find-page page)))
     (assert (object-p world))
     (setf <page-name> (field-value :name world))
@@ -182,15 +192,20 @@
   (bind-key-to-method self "RIGHT" nil :move-cursor-right))
 
 (define-method set-view-style form (style)
+  "Set the rendering style of the current form to STYLE.
+Must be one of (:tile :label)."
   (setf <view-style> style))
 
 (define-method tile-view form ()
+  "Switch to tile view in the current form."
   [set-view-style self :tile])
 
 (define-method label-view form ()
+  "Switch to label view in the current form."
   [set-view-style self :label])
 
 (define-method goto-prompt form ()
+  "Jump to the command prompt."
   (when <prompt>
     [goto <prompt>]))
 
@@ -203,11 +218,27 @@
       [select cell])))
 
 (define-method eval form (&rest args)
-  [say self (format nil "RESULT: ~A" args)])
-
+  "Evaluate all the ARGS and print the result."
+  (when <prompt> 
+    [print-data <prompt> args :comment]))
+ 
 (define-method say form (text)
   (when <prompt>
     [say <prompt> text]))
+
+(define-method help form (&optional (command-name :commands))
+  "Print documentation for the command COMMAND-NAME.
+Type HELP :COMMANDS for a list of available commands."
+  (let* ((command (make-keyword command-name))
+	 (docstring (method-documentation command))
+	 (arglist (method-arglist command)))
+    (with-field-values (prompt) self
+      (when prompt
+	[print-data prompt (format nil "Command name: ~A" command) :comment]
+	[print-data prompt (format nil "Arguments: ~S" (if (eq arglist :not-available)
+					       :none arglist))
+		    :comment]
+	[print-data prompt (format nil" ~A" docstring) :comment]))))
 
 (define-method save-all form ()
   [say self "Saving objects..."]
@@ -215,10 +246,12 @@
   [say self "Saving objects... Done."])
 
 (define-method create-world form (&key height width name)
+  "Create and visit a blank world of height HEIGHT, width WIDTH, and name NAME."
   (let ((world (create-blank-page :height height :width width :name name)))
     [visit self world]))
     
 (define-method enter form ()
+  "Begin entering LISP data into the current cell."
   (unless <entered>
     [say self "Now entering data. Press ESCAPE to stop editing."]
     (let ((entry (clone =textbox=))
@@ -235,13 +268,16 @@
 	    entry))))
     
 (define-method load-module form (name)
+  "Load the XE2 module NAME for development."
   [say self (format nil"Loading module ~S" name)]
   (xe2:load-module name))
 
 (define-method quit form ()
+  "Quit XIODEV."
   (xe2:quit t))
 
 (define-method exit form ()
+  "Stop entering data into the current cell."
   (when <entered>
     (with-fields (widget) [selected-cell self]
       (let* ((str [get-buffer-as-string widget])
@@ -438,6 +474,8 @@
   (draw-rectangle x y width height :color <cursor-color> :destination <image>))
 
 (define-method move-cursor form (direction)
+  "Move the cursor one step in DIRECTION. 
+DIRECTION is one of :up :down :right :left."
   (with-field-values (cursor-row cursor-column rows columns) self
     (let ((cursor (list cursor-row cursor-column)))
       (setf cursor (ecase direction
