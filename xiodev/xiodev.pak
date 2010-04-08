@@ -1,6 +1,0 @@
-(
- (:name "xiodev-help-message" :type :text :file "README")
- (:name "xiodev-quickhelp-message" :type :formatted-text :file "quickhelp.text")
- (:name ".default-font" :type :font :properties (:height 14 :width 7) :data "7x14b")
- (:name ".startup" :type :lisp :file "xiodev.lisp" :properties (:autoload t))
-) 

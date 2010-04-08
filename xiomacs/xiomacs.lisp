@@ -1,4 +1,4 @@
-;;; xiodev.lisp --- XE2 dev module
+;;; xiomacs.lisp --- XE2 dev module
 
 ;; Copyright (C) 2010  David O'Toole
 
@@ -18,11 +18,11 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(defpackage :xiodev
+(defpackage :xiomacs
   (:use :xe2 :common-lisp)
-  (:export xiodev))
+  (:export xiomacs))
 
-(in-package :xiodev)
+(in-package :xiomacs)
 
 (setf xe2:*dt* 20)
 (setf xe2:*resizable* t)
@@ -60,19 +60,19 @@
 (add-hook '*after-load-module-hook* (lambda ()
 				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]))
 
-(define-prototype xiodev-prompt (:parent xe2:=prompt=))
+(define-prototype xiomacs-prompt (:parent xe2:=prompt=))
 
-(define-method say xiodev-prompt (&rest args)
+(define-method say xiomacs-prompt (&rest args)
   (apply #'send nil :say *terminal* args))
 
-(define-method goto xiodev-prompt ()
+(define-method goto xiomacs-prompt ()
   [say self "Enter command below. Press ENTER when finished, or CONTROL-X to cancel."]
   [say self "Type HELP :COMMANDS to get a list of commands."]
   (setf <mode> :direct))
 
-(define-prototype xiodev-split (:parent xe2:=split=))
+(define-prototype xiomacs-split (:parent xe2:=split=))
 
-(define-method install-keybindings xiodev-split ()
+(define-method install-keybindings xiomacs-split ()
   ;; (bind-key-to-method self "UP" '(:control) :pickup)
   ;; (bind-key-to-method self "DOWN" '(:control) :clone)
   (bind-key-to-method self "LEFT" '(:control) :left-pane)
@@ -81,29 +81,29 @@
   (bind-key-to-method self "RIGHTBRACKET" nil :apply-right)
   (bind-key-to-method self "TAB" nil :switch-panes))
 
-(define-method left-form xiodev-split ()
+(define-method left-form xiomacs-split ()
   (nth 0 <children>))
 
-(define-method right-form xiodev-split ()
+(define-method right-form xiomacs-split ()
   (nth 1 <children>))
 
-(define-method left-selected-data xiodev-split ()
+(define-method left-selected-data xiomacs-split ()
   [get-selected-cell-data [left-form self]])
 
-(define-method right-selected-data xiodev-split ()
+(define-method right-selected-data xiomacs-split ()
   [get-selected-cell-data [right-form self]])
 
-(define-method left-pane xiodev-split ()
+(define-method left-pane xiomacs-split ()
   "Select the left spreadsheet pane."
   [say self "Selecting left pane."]
   (setf <focus> 0))
 
-(define-method right-pane xiodev-split ()
+(define-method right-pane xiomacs-split ()
   "Select the right spreadsheet pane."
   [say self "Selecting right pane."]
   (setf <focus> 1))
 
-(define-method apply-left xiodev-split ()
+(define-method apply-left xiomacs-split ()
   "Move data LEFTWARD from right pane to left pane, applying current
 left side tool to the right side data."
   (let* ((form [left-form self])
@@ -112,7 +112,7 @@ left side tool to the right side data."
     [say self (format nil "Applying LEFT tool ~S to data ~S in LEFT form." tool data)]
     [apply-tool form data]))
 
-(define-method apply-right xiodev-split ()
+(define-method apply-right xiomacs-split ()
   "Move data RIGHTWARD from left pane to right pane, applying current
 right side tool to the left side data."
   (let* ((form [right-form self])
@@ -121,7 +121,7 @@ right side tool to the left side data."
     [say self (format nil "Applying RIGHT tool ~S to data ~S in RIGHT form." tool data)]
     [apply-tool form data]))
 
-(define-method commands xiodev-split ()
+(define-method commands xiomacs-split ()
   "Syntax: command-name arg1 arg2 ...
 Available commands: HELP EVAL SWITCH-PANES LEFT-PANE RIGHT-PANE
 NEXT-TOOL SET-TOOL APPLY-LEFT APPLY-RIGHT VISIT SELECT SAVE-ALL
@@ -129,22 +129,22 @@ SAVE-MODULE LOAD-MODULE TILE-VIEW LABEL-VIEW QUIT VISIT APPLY-TOOL
 CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
  nil)
 
-(defun xiodev ()
+(defun xiomacs ()
   (setf xe2:*screen-width* *window-width*)
   (setf xe2:*screen-height* *window-height*)
-  (xe2:message "Initializing XIODEV...")
-  (setf xe2:*window-title* "XIODEV")
+  (xe2:message "Initializing XIOMACS...")
+  (setf xe2:*window-title* "XIOMACS")
   (clon:initialize)
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
-  (let* ((prompt (clone =xiodev-prompt=))
+  (let* ((prompt (clone =xiomacs-prompt=))
 	 (help (clone =help-textbox=))
 	 (help-prompt (clone =help-prompt=))
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
 	 (form2 (clone =form= "*index*"))
 	 (terminal (clone =narrator=))
-	 (split (clone =xiodev-split=))
+	 (split (clone =xiomacs-split=))
 	 (stack (clone =stack=)))
     ;;
     (setf *form* form)
@@ -172,7 +172,7 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
     [show prompt]
     [install-keybindings prompt]
     [install-keybindings split]
-    [say prompt "Welcome to XIODEV. Press CONTROL-X to enter command mode, or F1 for help."]
+    [say prompt "Welcome to XIOMACS. Press CONTROL-X to enter command mode, or F1 for help."]
     [set-mode prompt :forward] ;; don't start with prompt on
     [set-receiver prompt split]
     ;; 
@@ -186,7 +186,7 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
     [resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*]
     [move help :x 0 :y 0]
     (setf (field-value :read-only help) t)
-    (let ((text	(find-resource-object "xiodev-help-message")))
+    (let ((text	(find-resource-object "xiomacs-help-message")))
       [set-buffer help text])
     ;;
     [resize help-prompt :width 10 :height 10]
@@ -207,12 +207,12 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
     ;; [move help :x 0 :y 0]
     [resize-to-scroll help :height 540 :width 800] 
     [move help :x 0 :y 0]
-    (let ((text	(find-resource-object "xiodev-help-message")))
+    (let ((text	(find-resource-object "xiomacs-help-message")))
       [set-buffer help text])
     ;;
     [resize quickhelp :height *quickhelp-height* :width *quickhelp-width*]
     [move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*)]
-    (let ((text	(find-resource-object "xiodev-quickhelp-message")))
+    (let ((text	(find-resource-object "xiomacs-quickhelp-message")))
       (dolist (line text)
     	(dolist (string line)
     	  (funcall #'send nil :print-formatted-string quickhelp string))
@@ -241,7 +241,7 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
 ;;    (run-hook 'xe2:*resize-hook*)
 ))
 
-(xiodev)
+(xiomacs)
 
 
-;;; xiodev.lisp ends here
+;;; xiomacs.lisp ends here
