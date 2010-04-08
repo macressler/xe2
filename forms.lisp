@@ -212,10 +212,10 @@ Must be one of (:tile :label)."
 (define-method selected-cell form ()
   [cell-at self <cursor-row> <cursor-column>])
 
-(define-method select form ()
+(define-method activate form ()
   (let ((cell [selected-cell self]))
     (when cell
-      [select cell])))
+      [activate cell])))
 
 (define-method eval form (&rest args)
   "Evaluate all the ARGS and print the result."
