@@ -32,9 +32,18 @@
 
 (defun find-page (page)
   (etypecase page
-    (clon:object (prog1 page (make-object-resource 
-			      (or (field-value :name page)
-				  (generate-page-name page)) page)))
+    (clon:object 
+       ;; check for name collision
+       (message "Indexing new page ~S" (field-value :name page))
+       (let* ((old-name (or (field-value :name page)
+			    (generate-page-name page)))
+	      (new-name (if (find-resource old-name :noerror)
+			    (generate-page-name page)
+			    old-name)))
+	 (message "Indexing new page ~S as ~S" old-name new-name)
+	 (prog1 page 
+	   (make-object-resource new-name page)
+	   (setf (field-value :name page) new-name))))
     (string (or (find-resource-object page :noerror)
 		(progn (make-object-resource page (create-blank-page :name page))
 		       (let ((object (find-resource-object page)))
