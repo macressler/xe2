@@ -379,6 +379,4 @@
 (cons-game)
 
 
-
-(provide 'cons)
 ;;; cons.lisp ends here

@@ -69,15 +69,21 @@
   (apply #'send nil :say *terminal* args))
 
 (define-method goto xiomacs-prompt ()
+  [unfocus [left-form *forms*]]
+  [unfocus [right-form *forms*]]
   [say self "Enter command below. Press ENTER when finished, or CONTROL-X to cancel."]
   [say self "Type HELP :COMMANDS to get a list of commands."]
   (setf <mode> :direct))
 
+(define-method exit xiomacs-prompt ()
+  [parent>>exit self]
+  [refocus *forms*])
+
 (define-prototype xiomacs-split (:parent xe2:=split=))
 
 (define-method install-keybindings xiomacs-split ()
-  ;; (bind-key-to-method self "UP" '(:control) :pickup)
-  ;; (bind-key-to-method self "DOWN" '(:control) :clone)
+  (bind-key-to-method self "UP" '(:control) :apply-right)
+  (bind-key-to-method self "DOWN" '(:control) :apply-left)
   (bind-key-to-method self "LEFT" '(:control) :left-pane)
   (bind-key-to-method self "RIGHT" '(:control) :right-pane)
   (bind-key-to-method self "LEFTBRACKET" nil :apply-left)
@@ -96,15 +102,37 @@
 (define-method right-selected-data xiomacs-split ()
   [get-selected-cell-data [right-form self]])
 
+(define-method focus-left xiomacs-split ()
+  [focus [left-form self]]
+  [unfocus [right-form self]])
+
+(define-method focus-right xiomacs-split ()
+  [focus [right-form self]]
+  [unfocus [left-form self]])
+
+(define-method refocus xiomacs-split ()
+  (ecase <focus>
+    (0 [focus-left self])
+    (1 [focus-right self])))
+
 (define-method left-pane xiomacs-split ()
   "Select the left spreadsheet pane."
   [say self "Selecting left pane."]
+  [focus-left self]
   (setf <focus> 0))
 
 (define-method right-pane xiomacs-split ()
   "Select the right spreadsheet pane."
   [say self "Selecting right pane."]
+  [focus-right self]
   (setf <focus> 1))
+
+(define-method switch-panes xiomacs-split ()
+  (let ((newpos (mod (1+ <focus>) (length <children>))))
+    (setf <focus> newpos)
+    (ecase newpos
+      (0 [focus-left self])
+      (1 [focus-right self]))))
 
 (define-method apply-left xiomacs-split ()
   "Move data LEFTWARD from right pane to left pane, applying current
@@ -242,6 +270,7 @@ CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
     [select *pager* :edit]
     (xe2:enable-classic-key-repeat 100 100)
     (in-package :xe2)
+    [focus-left *forms*]
 ;;    (run-hook 'xe2:*resize-hook*)
 ))
 

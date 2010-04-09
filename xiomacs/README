@@ -29,7 +29,8 @@ action; this is true in general for interactive commands in XIODEV.)
 While in the spreadsheet view, use the ENTER command (ENTER key by
 default) to enter data in the currently selected cell (in the current
 pane.) If the selected cell is blank, a new data cell is created.
-Press ESCAPE (the EXIT command) to quit entering data.
+Press Control-ENTER to save, or ESCAPE (the CANCEL command) to discard
+changes.
 
 To change the active tool, use SET-TOOL at the command line, or the
 shortcut Control-T for NEXT-TOOL. Usable tools are CLONE (create a new

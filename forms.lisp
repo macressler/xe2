@@ -73,6 +73,8 @@
 
 ;;; The form widget browses workbook pages
 
+(defparameter *form-cursor-blink-time* 10)
+
 (define-prototype form 
     (:parent =widget= :documentation  "An interactive graphical spreadsheet.")
   prompt narrator
@@ -85,6 +87,9 @@
   (view-style :initform :label)
   (tile-size :initform 16)
   (cursor-color :initform ".yellow")
+  (focused :initform nil)
+  (cursor-blink-color :initform ".magenta")
+  (cursor-blink-clock :initform 0)
   (origin-row :initform 0 :documentation "Row number of top-left displayed cell.") 
   (origin-column :initform 0 :documentation "Column number of top-left displayed cell.")
   (column-widths :documentation "A vector of integers where v[x] is the pixel width of form column x.")
@@ -122,6 +127,12 @@
   (let ((cell [selected-cell self]))
     (when cell
       [get cell])))
+
+(define-method focus form ()
+  (setf <focused> t))
+
+(define-method unfocus form ()
+  (setf <focused> nil))
 
 (define-method next-tool form ()
   "Switch to the next available tool." 
@@ -495,7 +506,16 @@ Type HELP :COMMANDS for a list of available commands."
 ;;; Cursor
 
 (define-method draw-cursor form (x y width height)
-  (draw-rectangle x y width height :color <cursor-color> :destination <image>))
+  (with-fields (cursor-color cursor-blink-color cursor-blink-clock focused) self
+    (decf cursor-blink-clock)
+    (when (minusp cursor-blink-clock)
+      (setf cursor-blink-clock *form-cursor-blink-time*))
+    (let ((color (if (or (null focused)
+			 (< (truncate (/ *form-cursor-blink-time* 2))
+			    cursor-blink-clock))
+		     cursor-color
+		     cursor-blink-color)))
+      (draw-rectangle x y width height :color color :destination <image>))))
 
 (define-method move-cursor form (direction)
   "Move the cursor one step in DIRECTION. 
