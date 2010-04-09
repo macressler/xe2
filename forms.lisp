@@ -90,6 +90,9 @@
   (entered :initform nil :documentation "When non-nil, forward key events to the entry and/or any attached widget.")
   (cursor-row :initform 0) 
   (cursor-column :initform 0)
+  (mark-row :initform nil)
+  (mark-column :initform nil)
+  (scroll-margin :initform 0)
   (view-style :initform :label)
   (tile-size :initform 16)
   (cursor-color :initform ".yellow")
@@ -98,6 +101,8 @@
   (cursor-blink-clock :initform 0)
   (origin-row :initform 0 :documentation "Row number of top-left displayed cell.") 
   (origin-column :initform 0 :documentation "Column number of top-left displayed cell.")
+  (origin-height :initform nil)
+  (origin-width :initform nil)
   (column-widths :documentation "A vector of integers where v[x] is the pixel width of form column x.")
   (row-heights :documentation "A vector of integers where v[x] is the pixel height of form row x.")
   (column-styles :documentation "A vector of property lists used to customize the appearance of columns.")
@@ -206,17 +211,7 @@ default page is created. See also CREATE-WORLD."
   (setf <narrator> narrator))
 
 (define-method install-keybindings form ()
-  (bind-key-to-method self "RETURN" nil :enter)
-  (bind-key-to-method self "RETURN" '(:control) :exit) ;; see also handle-key
-  (bind-key-to-method self "ESCAPE" nil :cancel)
-  (bind-key-to-method self "F9" nil :tile-view)
-  (bind-key-to-method self "F10" nil :label-view)
-  (bind-key-to-method self "X" '(:control) :goto-prompt)
-  (bind-key-to-method self "T" '(:control) :next-tool)
-  (bind-key-to-method self "UP" nil :move-cursor-up)
-  (bind-key-to-method self "DOWN" nil :move-cursor-down)
-  (bind-key-to-method self "LEFT" nil :move-cursor-left)
-  (bind-key-to-method self "RIGHT" nil :move-cursor-right))
+  nil)
 
 (define-method set-view-style form (style)
   "Set the rendering style of the current form to STYLE.
@@ -370,8 +365,9 @@ Type HELP :COMMANDS for a list of available commands."
 
 (define-method handle-key form (event)
   ;; possibly forward event to current cell. used for the event cell, see below.
-  (if (or (equal "RETURN" (car event))
-	  (equal "ESCAPE" (car event)))
+  (if (or (and (equal "RETURN" (first event))
+	       (equal :control (second event)))
+	  (equal "ESCAPE" (first event)))
       [parent>>handle-key self event]
       (let* ((cell [selected-cell self])
 	     (widget (when cell (field-value :widget cell))))
@@ -441,6 +437,9 @@ Type HELP :COMMANDS for a list of available commands."
 	     (x 0) 
 	     (y 0)
 	     (cursor-dimensions nil))
+	;; store some geometry
+	(setf <origin-width> (- rightmost-visible-column origin-column))
+	(setf <origin-height> (- bottom-visible-row origin-row))
 	;; see if current cell has a tooltip
 	;; (let ((selected-cell [cell-at self cursor-row cursor-column]))
 	;;   (when (object-p selected-cell)
@@ -519,6 +518,36 @@ Type HELP :COMMANDS for a list of available commands."
 
 ;;; Cursor
 
+(define-method scroll form ()
+  (with-fields (cursor-row cursor-column origin-row origin-column scroll-margin
+			   origin-height origin-width world rows columns) self
+    (when (or 
+	   ;; too far left
+	   (> (+ origin-column scroll-margin) 
+	      cursor-column)
+	   ;; too far right
+	   (> cursor-column
+	      (- (+ origin-column origin-width)
+		 scroll-margin))
+	   ;; too far up
+	   (> (+ origin-row scroll-margin) 
+	      cursor-row)
+	   ;; too far down 
+	   (> cursor-row 
+	      (- (+ origin-row origin-height)
+		 scroll-margin)))
+      ;; yes. recenter.
+      (setf origin-column
+	    (max 0
+		 (min (- columns origin-width)
+		      (- cursor-column 
+			 (truncate (/ origin-width 2))))))
+      (setf origin-row
+	    (max 0 
+		 (min (- rows origin-height)
+		      (- cursor-row
+			 (truncate (/ origin-height 2)))))))))
+
 (define-method draw-cursor form (x y width height)
   (with-fields (cursor-color cursor-blink-color cursor-blink-clock focused) self
     (decf cursor-blink-clock)
@@ -550,7 +579,9 @@ DIRECTION is one of :up :down :right :left."
 				 (list cursor-row (+ cursor-column 1))
 				 cursor))))
       (destructuring-bind (r c) cursor
-	(setf <cursor-row> r <cursor-column> c)))))
+	(setf <cursor-row> r <cursor-column> c))
+      ;; possibly scroll
+      [scroll self])))
 
 (define-method move-cursor-up form ()
   [move-cursor self :up])
@@ -563,6 +594,24 @@ DIRECTION is one of :up :down :right :left."
 
 (define-method move-cursor-right form ()
   [move-cursor self :right])
+
+(define-method move-end-of-line form ()
+  (setf <cursor-column> (1- <columns>))
+  [scroll self])
+
+(define-method move-beginning-of-line form ()
+  (setf <cursor-column> 0)
+  [scroll self])
+
+(define-method move-end-of-column form ()
+  (setf <cursor-row> (1- <rows>))
+  [scroll self])
+
+(define-method move-beginning-of-column form ()
+  (setf <cursor-row> 0)
+  [scroll self])
+
+
 
 ;;; A var cell stores a value into a variable, and reads it.
 

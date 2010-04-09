@@ -113,6 +113,25 @@ if a binding was found, nil otherwise."
       (prog1 t
 	(funcall func)))))
 
+(defun bind-key-to-prompt-insertion (p key modifiers &optional (insertion key))
+  "For prompt P ensure that the event (KEY MODIFIERS) causes the
+text INSERTION to be inserted at point."
+ [define-key p (string-upcase key) modifiers
+	      #'(lambda ()
+		  [insert p insertion])])
+
+(defun bind-key-to-method (p key modifiers method-keyword)
+  [define-key p (string-upcase key) modifiers
+	      #'(lambda ()
+		  (send nil method-keyword p))])
+
+(define-method generic-keybind widget (binding) 
+  (destructuring-bind (key modifiers data) binding
+    (apply (etypecase data
+	     (keyword #'bind-key-to-method)
+	     (string #'bind-key-to-prompt-insertion))
+	   self binding)))
+
 ;;; Hit testing for mouse cursor support
 
 (define-method hit widget (x y)
@@ -472,18 +491,6 @@ These are the arguments to `bind-key-to-prompt-insertion', which see.")
   (history-position :initform 0)
   (debug-on-error :initform nil))
 
-(defun bind-key-to-prompt-insertion (p key modifiers &optional (insertion key))
-  "For prompt P ensure that the event (KEY MODIFIERS) causes the
-text INSERTION to be inserted at point."
- [define-key p (string-upcase key) modifiers
-	      #'(lambda ()
-		  [insert p insertion])])
-
-(defun bind-key-to-method (p key modifiers method-keyword)
-  [define-key p (string-upcase key) modifiers
-	      #'(lambda ()
-		  (send nil method-keyword p))])
-
 (define-method handle-key prompt (keylist)
   "Reject all keypresses when in :forward mode; otherwise handle them
 normally."
@@ -576,11 +583,7 @@ normally."
   (dolist (binding (ecase *user-keyboard-layout*
 		     (:qwerty *prompt-qwerty-keybindings*)
 		     (:sweden *prompt-sweden-keybindings*)))
-    (destructuring-bind (key modifiers data) binding
-      (apply (etypecase data
-	       (keyword #'bind-key-to-method)
-	       (string #'bind-key-to-prompt-insertion))
-	     self binding)))
+    [generic-keybind self binding])
   ;; install keybindings for self-inserting characters
   (map nil #'(lambda (char)
 	       (bind-key-to-prompt-insertion self (string char) nil

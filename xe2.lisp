@@ -61,7 +61,7 @@
   (:use :common-lisp :clon) 
   (:export *default-frame-width* *default-frame-height* =viewport=
 *frequency* *output-chunksize* *output-channels* halt-sample *dt*
-*physics-function* =equipment= *default-world-axis-size*
+*physics-function* =equipment= *default-world-axis-size* generic-keybind
 *default-world-z-size* =browser= install-widgets =label= =form=
 =data-cell= =var-cell= =option-cell= =toggle-cell= =event-cell=
 =buffer-cell= =comment-cell= install-widget uninstall-widget

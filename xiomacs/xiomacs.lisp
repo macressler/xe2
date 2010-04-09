@@ -81,14 +81,44 @@
 
 (define-prototype xiomacs-split (:parent xe2:=split=))
 
+(defparameter *qwerty-keybindings*
+  '(;; cursor movement
+    ("UP" nil :move-cursor-up)
+    ("DOWN" nil :move-cursor-down)
+    ("LEFT" nil :move-cursor-left)
+    ("RIGHT" nil :move-cursor-right)
+    ;; emacs-style 
+    ("A" (:control) :move-beginning-of-line)
+    ("E" (:control) :move-end-of-line)
+    ("F" (:control) :move-cursor-right)
+    ("B" (:control) :move-cursor-left)
+    ("HOME" nil :move-beginning-of-line)
+    ("END" nil :move-end-of-line)
+    ("PAGEUP" nil :move-beginning-of-column)
+    ("PAGEDOWN" nil :move-end-of-column)
+;;    ("K" (:control) :clear-line)
+;;    ("BACKSPACE" nil :backward-delete-char)
+    ("UP" (:control) :apply-right)
+    ("DOWN" (:control) :apply-left)
+    ("LEFT" (:control) :left-pane)
+    ("RIGHT" (:control) :right-pane)
+    ;; ("LEFTBRACKET" nil :apply-left)
+    ;; ("RIGHTBRACKET" nil :apply-right)
+    ("TAB" nil :switch-panes)
+    ("TAB" (:control) :switch-panes)
+    ("RETURN" nil :enter)
+    ("RETURN" (:control) :exit) ;; see also handle-key
+    ("ESCAPE" nil :cancel)
+    ("F9" nil :tile-view)
+    ("F10" nil :label-view)
+    ("X" (:control) :goto-prompt)
+    ("T" (:control) :next-tool)))
+
 (define-method install-keybindings xiomacs-split ()
-  (bind-key-to-method self "UP" '(:control) :apply-right)
-  (bind-key-to-method self "DOWN" '(:control) :apply-left)
-  (bind-key-to-method self "LEFT" '(:control) :left-pane)
-  (bind-key-to-method self "RIGHT" '(:control) :right-pane)
-  (bind-key-to-method self "LEFTBRACKET" nil :apply-left)
-  (bind-key-to-method self "RIGHTBRACKET" nil :apply-right)
-  (bind-key-to-method self "TAB" nil :switch-panes))
+  (dolist (binding (case *user-keyboard-layout*
+		     (:qwerty *qwerty-keybindings*)
+		     (otherwise *qwerty-keybindings*)))
+    [generic-keybind self binding]))
 
 (define-method left-form xiomacs-split ()
   (nth 0 <children>))
