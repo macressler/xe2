@@ -370,7 +370,8 @@ Type HELP :COMMANDS for a list of available commands."
 
 (define-method handle-key form (event)
   ;; possibly forward event to current cell. used for the event cell, see below.
-  (if (equal "RETURN" (car event))
+  (if (or (equal "RETURN" (car event))
+	  (equal "ESCAPE" (car event)))
       [parent>>handle-key self event]
       (let* ((cell [selected-cell self])
 	     (widget (when cell (field-value :widget cell))))
