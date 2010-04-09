@@ -538,7 +538,7 @@ normally."
     ("9" (:shift) "(")
     ("8" (:shift) "*")
     ("SPACE" nil " ")
-    ("QUOTE" nil "")
+    ("QUOTE" nil "'")
     ("QUOTE" (:shift) "\"")))
 
 (define-method install-keybindings prompt ()

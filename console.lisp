@@ -300,6 +300,7 @@ key event symbols."
 	(:SDL-KEY-MOD-NUM nil)
 	(:SDL-KEY-CAPS :caps-lock)
 	(:SDL-KEY-MODE nil)
+	(:SDL-KEY-MOD-MODE nil)
 	(:SDL-KEY-RESERVED nil)
 	)))
   
