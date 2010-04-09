@@ -63,19 +63,21 @@
 *frequency* *output-chunksize* *output-channels* halt-sample *dt*
 *physics-function* =equipment= *default-world-axis-size*
 *default-world-z-size* =browser= install-widgets =label= =form=
-=data-cell= =var-cell= =option-cell= =toggle-cell= =event-cell= =buffer-cell=
-=comment-cell= install-widget uninstall-widget =button-cell= =image-cell=
-*initialization-hook* initialize-engine split-string-on-lines message
-*screen-width* transform-method-body roll-under make-stat =formatter=
-initialize-colors *standard-categories* *left-turn* *right-turn*
-*default-action-points* =world= roll bind-key-to-method *colors*
-enable-classic-key-repeat disable-classic-key-repeat get-color
-=prompt= =menu-item= =direction-chooser= define-method *default-font*
-*startup* field-value set-field-value object-fields dispatch-event run
-*user-init-file-name* distance icon-resource icon-image
-*compass-directions* *compass-opposites* find-resource-property
-compose-blank-fields font-width font-height *browser* browser
-set-browser transform-field-reference *screen-height* =inventory=
+=data-cell= =var-cell= =option-cell= =toggle-cell= =event-cell=
+=buffer-cell= =comment-cell= install-widget uninstall-widget
+=button-cell= =image-cell= *initialization-hook* initialize-engine
+split-string-on-lines message *prompt-sweden-keybindings*
+*prompt-qwerty-keybindings* *screen-width* transform-method-body
+roll-under make-stat =formatter= initialize-colors
+*standard-categories* *left-turn* *right-turn* *default-action-points*
+=world= roll bind-key-to-method *colors* enable-classic-key-repeat
+disable-classic-key-repeat get-color =prompt= =menu-item=
+=direction-chooser= define-method *default-font* *startup* field-value
+set-field-value object-fields dispatch-event run *user-init-file-name*
+distance icon-resource icon-image *compass-directions*
+*compass-opposites* find-resource-property compose-blank-fields
+font-width font-height *browser* browser set-browser
+transform-field-reference *screen-height* =inventory=
 formatted-line-width *last-event* formatted-line-height
 formatted-string-height formatted-string-width get-color create-image
 draw-image play define-prototype has-field defcell
@@ -118,15 +120,14 @@ set-music-volume add-message-verbosities with-message-queue =minimap=
 draw-pixel *user-keyboard-layout* *fullscreen* draw-circle
 set-field-option-value =pager= =pager-prompt= load-module
 field-options world set-frame-rate *frame-rate* =stack= *workbook*
-*pak-file-extension* *window-title* *window-position*
-=split= set-timer-interval *message-logging* overlay
-poll-joystick-axis reset-joystick set-screen-width =universe=
-*universe* *play-args* set-screen-height genseq *zoom-factor*
-zoom-image is-zoomed-resource *timer-interval* save-modified-objects
-enable-timer disable-timer while enable-held-keys disable-held-keys
-do-cells draw-box *resizable* *resize-hook* draw-rectangle *quitting*
-*after-load-module-hook* *module*
-quit reset))
+*pak-file-extension* *window-title* *window-position* =split=
+set-timer-interval *message-logging* overlay poll-joystick-axis
+reset-joystick set-screen-width =universe= *universe* *play-args*
+set-screen-height genseq *zoom-factor* zoom-image is-zoomed-resource
+*timer-interval* save-modified-objects enable-timer disable-timer
+while enable-held-keys disable-held-keys do-cells draw-box *resizable*
+*resize-hook* draw-rectangle *quitting* *after-load-module-hook*
+*module* quit reset))
 
 (in-package :xe2)
 
