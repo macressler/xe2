@@ -67,6 +67,12 @@
 (define-method get data-cell ()
   <data>)
 
+(define-method print data-cell ()
+  (write-to-string <data> :circle t :pretty t :escape nil :lines 1))
+
+(define-method read data-cell (text)
+  (read-from-string text))
+
 (define-method compute data-cell ()
   ;; update the label
   (setf <label> (list (cons (format nil " ~S  " <data>) *data-cell-style*))))
@@ -285,7 +291,13 @@ Type HELP :COMMANDS for a list of available commands."
 	[drop-cell <world> cell <cursor-row> <cursor-column>])
       (let ((data [get cell]))
 	(when data 
-	  [insert entry (write-to-string data :circle t :pretty t :escape nil :lines 1)]
+	  (let* ((output [print cell])
+		 (lines (etypecase output
+			  (string (list output))
+			  (list output))))
+	    (dolist (line lines)
+	      [insert entry line]
+	      [newline entry]))
 	  [move-end-of-line entry]))
       [install-keybindings entry]
       (setf (field-value :auto-fit entry) t)
@@ -293,6 +305,23 @@ Type HELP :COMMANDS for a list of available commands."
       (setf <entered> t)
       (setf (field-value :widget cell)
 	    entry))))
+
+(define-method exit form (&optional nosave)
+  "Stop entering data into the current cell."
+  (when <entered>
+    (when nosave [say self "Canceled data entry."])
+    (with-fields (widget) [selected-cell self]
+      (let* ((data [get-buffer-as-string widget]))
+	(when data
+	  (unless nosave
+	    (let ((cell [selected-cell self]))
+	      (handler-case 
+		  [set cell [read cell data]]
+		(condition (c) 
+		  [say self (format nil "Error reading data: ~S" c)])))))
+	(setf widget nil)
+	(setf <entered> nil)
+	[say self "Finished entering data."]))))
     
 (define-method load-module form (name)
   "Load the XE2 module NAME for development."
@@ -302,22 +331,6 @@ Type HELP :COMMANDS for a list of available commands."
 (define-method quit form ()
   "Quit XIODEV."
   (xe2:quit t))
-
-(define-method exit form (&optional nosave)
-  "Stop entering data into the current cell."
-  (when <entered>
-    (with-fields (widget) [selected-cell self]
-      (let* ((str [get-buffer-as-string widget])
-	     (data (handler-case
-		       (read-from-string str)
-		     (condition (c) 
-		       [say self (format nil "Error reading data: ~S" c)]))))
-	(when data
-	  (unless nosave
-	    [set [selected-cell self] data]))
-	(setf widget nil)
-	(setf <entered> nil)
-	[say self "Finished entering data."]))))
 
 (define-method cancel form ()
   [exit self :nosave])
@@ -668,4 +681,23 @@ DIRECTION is one of :up :down :right :left."
   (funcall <closure>)
   (setf <clock> *button-cell-highlight-time*))
 
+;;; Plain text buffer widget 
+
+(defcell buffer-cell buffer)
+
+(define-method set buffer-cell (buffer) 
+  (setf <buffer> buffer))
+
+(define-method get buffer-cell ()
+  <buffer>)
+
+(define-method print buffer-cell ()
+  <buffer>)
+
+(define-method read buffer-cell (newdata)
+  (let ((lines (etypecase newdata
+		 (list newdata)
+		 (string (list newdata)))))
+    (setf <buffer> lines)))
+      
 ;;; forms.lisp ends here

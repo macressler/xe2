@@ -162,6 +162,12 @@ When nil, the method DRAW is invoked instead of using a tile.")
 (define-method get cell ()
   (object-name (object-parent self)))
 
+(define-method print cell ()
+  "")
+
+(define-method read cell ()
+  nil)
+
 (define-method form-render cell (image x y width)
   (let ((widget <widget>))
     (if widget 
