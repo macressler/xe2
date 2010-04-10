@@ -611,8 +611,6 @@ DIRECTION is one of :up :down :right :left."
   (setf <cursor-row> 0)
   [scroll self])
 
-
-
 ;;; A var cell stores a value into a variable, and reads it.
 
 (defparameter *var-cell-style* '(:foreground ".white" :background ".blue"))

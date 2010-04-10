@@ -1277,6 +1277,14 @@ found."
 
 (defparameter *after-load-module-hook* nil)
 
+(defvar *module-package-name* nil)
+
+(defun module-package-name (&optional (module-name *module*))
+  (let ((default-name (or *module-package-name* (make-keyword module-name))))
+    (prog1 default-name
+      (unless (find-package default-name)
+	(error "Cannot find package ~S" default-name)))))
+    
 (defun load-module (module &key (autoload t))
   "Load the module named MODULE. Load any resources marked with a
 non-nil :autoload property. This operation also sets the default
@@ -1293,7 +1301,8 @@ object save directory (by setting the current `*module*'. See also
     (when (probe-file object-index-file)
       (message "Loading saved objects from ~S" object-index-file)
       (index-pak module object-index-file)))
-  (run-hook '*after-load-module-hook*))
+  (run-hook '*after-load-module-hook*)
+  (setf *package* (find-package (module-package-name))))
 
 ;;; Playing music and sound effects
 
@@ -1568,6 +1577,7 @@ also the file LIBSDL-LICENSE for details.
 and its .startup resource is loaded."
   (format t "~A" *copyright-text*)
   (initialize-resource-table)
+  (setf *module-package-name* nil)
   (setf *initialization-hook* nil)
   (setf *play-args* args)
   (setf *random-state* (make-random-state t))

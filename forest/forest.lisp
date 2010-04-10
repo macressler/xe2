@@ -83,7 +83,7 @@
 			     "water-3"))
 
 (defcell water 
-  (tile :initform "floor")
+  (tile :initform "water-1")
   (description :initform "These waters of the wasteland are not always fit to drink.")
   (categories :initform '(:actor :reflective :water :exclusive)))
 
@@ -167,7 +167,7 @@
 (defparameter *snow-clock* 8)
 
 (defcell earth 
-  (tile :initform "floor")
+  (tile :initform "earth-1")
   (categories :initform '(:actor :reflective))
   (snow-clock :initform *snow-clock*)
   (description :initform "The solid earth beneath your feet.")
@@ -515,8 +515,8 @@
 
 (define-method generate forest (&key (height *forest-height*)
 				     (width *forest-width*)
-				     sequence-number
-				     description
+				     (sequence-number (genseq))
+				     (description "Forest")
 				     (fireflies 100)
 				     (graveyards 15)
 				     (ruins 15)
