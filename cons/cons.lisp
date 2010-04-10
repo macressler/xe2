@@ -19,7 +19,6 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (in-package :cons-game)
-(setf xe2:*module-package-name* :cons-game)
 (setf xe2:*dt* 20)
 
 ;;; Splash screen
