@@ -44,6 +44,13 @@
 	 (prog1 page 
 	   (make-object-resource new-name page)
 	   (setf (field-value :name page) new-name))))
+    (list 
+       (message "CUNT")
+       ;; it's an address
+       (destructuring-bind (prototype-name &rest parameters) page
+	 (let ((world (clone (symbol-value prototype-name))))
+	   [generate-with world parameters]
+	   (find-page world))))
     (string (or (find-resource-object page :noerror)
 		(progn (make-object-resource page (create-blank-page :name page))
 		       (let ((object (find-resource-object page)))
@@ -361,7 +368,9 @@ at the current cursor location. See also APPLY-LEFT and APPLY-RIGHT."
   "Visit the page PAGE with the current form. If PAGE is a =world=
 object, visit it and add the page to the page collection. If PAGE is a
 string, visit the named page. If the named page does not exist, a
-default page is created. See also CREATE-WORLD."
+default page is created. If PAGE is a list, it is interpreted as a
+world address, and a new world is generated according to that address.
+See also CREATE-WORLD."
   (let ((world (find-page page)))
     (assert (object-p world))
     (setf <page-name> (field-value :name world))
