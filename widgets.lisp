@@ -646,6 +646,7 @@ normally."
       [clear-line self]
       (when sexp 
 	[say self "~A" line]
+;;	(apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp)))
 	(handler-case
 	    (handler-bind (((not serious-condition)
 			    (lambda (c) 
@@ -658,7 +659,7 @@ normally."
 	      (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp))))
 	  (serious-condition (c)
 	    (print-it c)))
-	(queue <line> <history>)))))
+	(queue line <history>)))))
 
 (define-method history-item prompt (n)
   (assert (integerp n))

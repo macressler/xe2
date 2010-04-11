@@ -77,7 +77,7 @@ disable-classic-key-repeat get-color =prompt= =menu-item=
 set-field-value object-fields dispatch-event run *user-init-file-name*
 distance icon-resource icon-image *compass-directions*
 *compass-opposites* find-resource-property compose-blank-fields
-font-width font-height *browser* browser set-browser
+font-width font-height *browser* browser set-browser find-page
 transform-field-reference *screen-height* =inventory=
 formatted-line-width *last-event* formatted-line-height
 formatted-string-height formatted-string-width get-color create-image

@@ -146,6 +146,20 @@
 (define-method right-form xiomacs-split ()
   (nth 1 <children>))
 
+(define-method other-form xiomacs-split ()
+  (ecase <focus>
+    (0 [right-form self])
+    (1 [left-form self])))
+
+(define-method left-world xiomacs-split ()
+  (field-value :world [left-form self]))
+
+(define-method right-world xiomacs-split ()
+  (field-value :world [right-form self]))
+
+(define-method selected-form xiomacs-split ()
+  (nth <focus> <children>))
+
 (define-method left-selected-data xiomacs-split ()
   [get-selected-cell-data [left-form self]])
 
@@ -201,6 +215,15 @@ right side tool to the left side data."
 	 (data [left-selected-data self]))
     [say self (format nil "Applying RIGHT tool ~S to data ~S in RIGHT form." tool data)]
     [apply-tool form data]))
+
+(define-method paste xiomacs-split (&optional page)
+  (let ((source (if page 
+		    (find-page page)
+		    (field-value :world [other-form self])))
+	(destination (field-value :world [selected-form self])))
+    (with-fields (height width) source 
+      (with-fields (cursor-row cursor-column) [selected-form self]
+	[paste-region destination source cursor-row cursor-column 0 0 height width]))))
 
 (define-method commands xiomacs-split ()
   "Syntax: command-name arg1 arg2 ...

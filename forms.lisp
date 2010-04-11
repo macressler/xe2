@@ -458,10 +458,11 @@ Type HELP :COMMANDS for a list of available commands."
   (xe2:save-modified-objects t)
   [say self "Saving objects... Done."])
 
-(define-method create-world form (&key height width name)
-  "Create and visit a blank world of height HEIGHT, width WIDTH, and name NAME."
-  (let ((world (create-blank-page :height height :width width :name name)))
-    [say self "Created new blank page."]
+(define-method create-world form (&key height width name object)
+  "Create and visit a blank world of height HEIGHT, width WIDTH, and name NAME.
+If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
+  (let ((world (or object (create-blank-page :height height :width width :name name))))
+    (when name (setf (field-value :name world) name))
     [visit self world]))
 
 (define-method enter form ()
@@ -754,26 +755,27 @@ Type HELP :COMMANDS for a list of available commands."
 (define-method move-cursor form (direction)
   "Move the cursor one step in DIRECTION. 
 DIRECTION is one of :up :down :right :left."
-  (with-field-values (cursor-row cursor-column rows columns) self
-    (let ((cursor (list cursor-row cursor-column)))
-      (setf cursor (ecase direction
-		     (:up (if (/= 0 cursor-row)
-			      (list (- cursor-row 1) cursor-column)
-			      cursor))
-		     (:left (if (/= 0 cursor-column)
-				(list cursor-row (- cursor-column 1))
+  (unless <entered>
+    (with-field-values (cursor-row cursor-column rows columns) self
+      (let ((cursor (list cursor-row cursor-column)))
+	(setf cursor (ecase direction
+		       (:up (if (/= 0 cursor-row)
+				(list (- cursor-row 1) cursor-column)
 				cursor))
-		     (:down (if (< cursor-row (- rows 1))
-				(list (+ cursor-row 1) cursor-column)
-				cursor))
-		     (:right (if (< cursor-column (- columns 1))
-				 (list cursor-row (+ cursor-column 1))
-				 cursor))))
-      (destructuring-bind (r c) cursor
-	(setf <cursor-row> r <cursor-column> c))
-      ;; possibly scroll
-      [scroll self])))
-
+		       (:left (if (/= 0 cursor-column)
+				  (list cursor-row (- cursor-column 1))
+				  cursor))
+		       (:down (if (< cursor-row (- rows 1))
+				  (list (+ cursor-row 1) cursor-column)
+				  cursor))
+		       (:right (if (< cursor-column (- columns 1))
+				   (list cursor-row (+ cursor-column 1))
+				   cursor))))
+	(destructuring-bind (r c) cursor
+	  (setf <cursor-row> r <cursor-column> c))
+	;; possibly scroll
+	[scroll self]))))
+  
 (define-method move-cursor-up form ()
   [move-cursor self :up])
 
@@ -787,20 +789,24 @@ DIRECTION is one of :up :down :right :left."
   [move-cursor self :right])
 
 (define-method move-end-of-line form ()
-  (setf <cursor-column> (1- <columns>))
-  [scroll self])
+  (unless <entered>
+    (setf <cursor-column> (1- <columns>))
+    [scroll self]))
 
 (define-method move-beginning-of-line form ()
-  (setf <cursor-column> 0)
-  [scroll self])
+  (unless <entered>
+    (setf <cursor-column> 0)
+    [scroll self]))
 
 (define-method move-end-of-column form ()
-  (setf <cursor-row> (1- <rows>))
-  [scroll self])
+  (unless <entered>
+    (setf <cursor-row> (1- <rows>))
+    [scroll self]))
 
 (define-method move-beginning-of-column form ()
-  (setf <cursor-row> 0)
-  [scroll self])
+  (unless <entered>
+    (setf <cursor-row> 0)
+    [scroll self]))
 
 ;;; Creating commonly used cells
 

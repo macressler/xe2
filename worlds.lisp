@@ -170,6 +170,20 @@ At the moment, only 0=off and 1=on are supported.")
 	(setf <sprite-grid> sprite-grid)
 	(setf <sprite-table> (make-hash-table :test 'equal))))))
 
+(define-method paste-region world (other-world dest-row dest-column source-row source-column source-height source-width)
+    (loop for row from 0 to source-height
+	  do (loop for column from 0 to source-width
+		   do (do-cells (cell [cells-at other-world (+ row source-row) (+ column source-column)])
+			(let ((proto (object-parent cell)))
+			  [drop-cell self (clone proto) (+ row dest-row) (+ column dest-column) :exclusive nil])))))
+  ;; (loop for row from source-row to (+ source-row source-height)
+  ;; 	do (loop for column from source-column to (+ source-column source-width)
+  ;; 		 do (do-cells (cell [cells-at other-world row column])
+  ;; 		      (let ((proto (object-parent cell)))
+  ;; 			[drop-cell self (clone proto) row column :exclusive nil])))))
+
+;; TODO define-method import-region (does not clone)
+
 (define-method serialize world ()
   (clon:with-field-values (width height) self
     (let ((grid <grid>)

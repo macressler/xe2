@@ -15,18 +15,19 @@
 (defcell floor 
   (categories :initform '(:floor)))
   
-(define-method initialize floor (&optional floor)
-  (setf <tile> (or floor (field-value :floor *world*))))
+(define-method initialize floor (&rest ignore)
+  (setf <tile> (if (has-field :floor *world*)
+		   (field-value :floor *world*)
+		   "storage-background")))
 
 (defcell barrier 
   (auto-loadout :initform t)
   (categories :initform '(:obstacle :barrier :target)))
 
-(define-method initialize barrier (&optional barrier)
-  (setf <tile> (or barrier (field-value :barrier *world*))))
-
-(define-method loadout barrier ()
-  (setf <tile> (or <tile> (field-value :barrier *world*))))
+(define-method initialize barrier (&rest ignore)
+  (setf <tile> (if (has-field :barrier *world*)
+		   (field-value :barrier *world*)
+		   "storage-foreground")))
 
 ;;; Generic sector of alien base; this is specialized below.
 
