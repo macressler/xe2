@@ -77,7 +77,190 @@
   ;; update the label
   (setf <label> (list (cons (format nil " ~S  " <data>) *data-cell-style*))))
 
-;;; The form widget browses workbook pages
+;;; A var cell stores a value into a variable, and reads it.
+
+(defparameter *var-cell-style* '(:foreground ".white" :background ".blue"))
+
+(defcell var-cell variable)
+
+(define-method initialize var-cell (variable)
+  (setf <variable> variable))
+
+(define-method set var-cell (value)
+  [set-variable *world* <variable> value])
+
+(define-method get var-cell ()
+  [get-variable *world* <variable>])
+
+(define-method compute var-cell ()
+  (setf <label> (list (cons (format nil ">> ~A  " <variable>) *var-cell-style*))))
+
+;;; Event cell picks up next event when clicked
+
+(defparameter *event-cell-style* '(:foreground ".yellow" :background ".forest green"))
+
+(defcell event-cell event capturing)
+
+(define-method set event-cell (event)
+  (setf <event> event))
+
+(define-method get event-cell ()
+  <event>)
+
+(define-method handle-key event-cell (event)
+  (when <capturing> 
+    ;; signal that we handled this event
+    (prog1 t
+      (setf <event> event)
+      (setf <capturing> nil))))
+  
+(define-method compute event-cell () 
+  (setf <label> 
+	(list (cons (if <capturing>
+			" CAPTURING... "
+			(destructuring-bind (key &rest modifiers) <event>
+			  (if modifiers
+			      (let ((mod-string (format nil " ~A" 
+							(apply #'concatenate 'string 
+							       (mapcar #'(lambda (mod)
+									   (format nil "~A " mod))
+								       modifiers)))))
+				(if (string= "JOYSTICK" key)
+				    (concatenate 'string key mod-string)
+				    (concatenate 'string mod-string key " ")))
+			      (concatenate 'string " " key " "))))
+		    *event-cell-style*))))
+
+(define-method select event-cell ()
+  ;; capture next event
+  (setf <capturing> t))
+
+;;; Comment cell just displays text.
+
+(defparameter *comment-cell-style* '(:foreground ".white" :background ".gray20"))
+
+(defcell comment-cell comment)
+
+(define-method set comment-cell (comment)
+  (setf <comment> comment))
+
+(define-method get comment-cell ()
+  <comment>)
+
+(define-method compute comment-cell () 
+  (setf <label> (list (cons (format nil " ~A " <comment>) *comment-cell-style*))))
+
+;;; Image cell just displays an image.
+
+(defcell image-cell image)
+
+(define-method set image-cell (image) 
+  (setf <image> image))
+
+(define-method get image-cell ()
+  <image>)
+
+(define-method compute image-cell () 
+  (when <image> (setf <label> (list (list nil :image <image>)))))
+
+;;; Button cell executes some lambda
+
+(defparameter *button-cell-style* '(:foreground ".yellow" :background ".red"))
+
+(defparameter *button-cell-highlight-style* '(:foreground ".red" :background ".white"))
+
+(defparameter *button-cell-highlight-time* 15)
+
+(defcell button-cell button clock)
+
+(define-method initialize button-cell (&key closure text)
+  (setf <closure> closure)
+  (setf <clock> 0)
+  (setf <label> (list (cons text *button-cell-style*))))
+  
+(define-method set button-cell (button) nil)
+
+(define-method get button-cell () <closure>)
+
+(define-method compute button-cell () 
+  (with-fields (label clock) self
+    (unless (zerop clock)
+      (decf clock))
+    (setf (cdr (first label))
+	  (if (plusp clock)
+	      *button-cell-highlight-style*
+	      *button-cell-style*))))
+
+(define-method select button-cell ()
+  (funcall <closure>)
+  (setf <clock> *button-cell-highlight-time*))
+
+;;; Command cell executes some prompt command
+
+(defparameter *command-cell-style* '(:foreground ".yellow" :background ".red"))
+
+(defparameter *command-cell-highlight-style* '(:foreground ".red" :background ".white"))
+
+(defparameter *command-cell-highlight-time* 15)
+
+(defvar *form-command-handler-function* nil)
+
+(defcell command-cell command (clock :initform 0))
+  
+(define-method initialize command-cell ()
+  (setf <label> (list (cons "Enter command here..." *command-cell-style*))))
+
+(define-method set command-cell (command)
+  (setf <command> command)
+  (setf <label> (mapcar #'list command)))
+
+(define-method get command-cell () 
+  <command>)
+
+(define-method compute command-cell () 
+  (with-fields (label clock) self
+    (unless (zerop clock)
+      (decf clock))
+    (when label (setf (cdr (first label))
+		      (if (plusp clock)
+			  *command-cell-highlight-style*
+			  *command-cell-style*)))))
+
+(define-method activate command-cell ()
+  (when (and <command> *form-command-handler-function*)
+    (let ((command (apply #'concatenate 'string <command>)))
+      (funcall *form-command-handler-function* command)
+      (setf <clock> *command-cell-highlight-time*))))
+
+(define-method print command-cell ()
+  <command>)
+
+(define-method read command-cell (newdata)
+  (let ((lines (etypecase newdata
+		 (list newdata)
+		 (string (list newdata)))))
+    (setf <command> lines)))
+
+;;; Plain text buffer widget 
+
+(defcell buffer-cell buffer)
+
+(define-method set buffer-cell (buffer) 
+  (setf <buffer> buffer))
+
+(define-method get buffer-cell ()
+  <buffer>)
+
+(define-method print buffer-cell ()
+  <buffer>)
+
+(define-method read buffer-cell (newdata)
+  (let ((lines (etypecase newdata
+		 (list newdata)
+		 (string (list newdata)))))
+    (setf <buffer> lines)))
+     
+;;; The form widget browses workbook pages composed of cells
 
 (defparameter *form-cursor-blink-time* 10)
 
@@ -611,141 +794,16 @@ DIRECTION is one of :up :down :right :left."
   (setf <cursor-row> 0)
   [scroll self])
 
-;;; A var cell stores a value into a variable, and reads it.
+;;; Creating commonly used cells
 
-(defparameter *var-cell-style* '(:foreground ".white" :background ".blue"))
+(define-method drop-at-cursor form (type)
+  [drop-cell <world> (clone type) <cursor-row> <cursor-column>]) 
 
-(defcell var-cell variable)
+(define-method drop-data-cell form ()
+  [drop-at-cursor self =data-cell=])
 
-(define-method initialize var-cell (variable)
-  (setf <variable> variable))
+(define-method drop-command-cell form ()
+  [drop-at-cursor self =command-cell=])
 
-(define-method set var-cell (value)
-  [set-variable *world* <variable> value])
 
-(define-method get var-cell ()
-  [get-variable *world* <variable>])
-
-(define-method compute var-cell ()
-  (setf <label> (list (cons (format nil ">> ~A  " <variable>) *var-cell-style*))))
-
-;;; Event cell picks up next event when clicked
-
-(defparameter *event-cell-style* '(:foreground ".yellow" :background ".forest green"))
-
-(defcell event-cell event capturing)
-
-(define-method set event-cell (event)
-  (setf <event> event))
-
-(define-method get event-cell ()
-  <event>)
-
-(define-method handle-key event-cell (event)
-  (when <capturing> 
-    ;; signal that we handled this event
-    (prog1 t
-      (setf <event> event)
-      (setf <capturing> nil))))
-  
-(define-method compute event-cell () 
-  (setf <label> 
-	(list (cons (if <capturing>
-			" CAPTURING... "
-			(destructuring-bind (key &rest modifiers) <event>
-			  (if modifiers
-			      (let ((mod-string (format nil " ~A" 
-							(apply #'concatenate 'string 
-							       (mapcar #'(lambda (mod)
-									   (format nil "~A " mod))
-								       modifiers)))))
-				(if (string= "JOYSTICK" key)
-				    (concatenate 'string key mod-string)
-				    (concatenate 'string mod-string key " ")))
-			      (concatenate 'string " " key " "))))
-		    *event-cell-style*))))
-
-(define-method select event-cell ()
-  ;; capture next event
-  (setf <capturing> t))
-
-;;; Comment cell just displays text.
-
-(defparameter *comment-cell-style* '(:foreground ".white" :background ".gray20"))
-
-(defcell comment-cell comment)
-
-(define-method set comment-cell (comment)
-  (setf <comment> comment))
-
-(define-method get comment-cell ()
-  <comment>)
-
-(define-method compute comment-cell () 
-  (setf <label> (list (cons (format nil " ~A " <comment>) *comment-cell-style*))))
-
-;;; Image cell just displays an image.
-
-(defcell image-cell image)
-
-(define-method set image-cell (image) 
-  (setf <image> image))
-
-(define-method get image-cell ()
-  <image>)
-
-(define-method compute image-cell () 
-  (when <image> (setf <label> (list (list nil :image <image>)))))
-
-;;; Button cell executes some lambda.
-
-(defparameter *button-cell-style* '(:foreground ".yellow" :background ".red"))
-
-(defparameter *button-cell-highlight-style* '(:foreground ".red" :background ".white"))
-
-(defparameter *button-cell-highlight-time* 15)
-
-(defcell button-cell button clock)
-
-(define-method initialize button-cell (&key closure text)
-  (setf <closure> closure)
-  (setf <clock> 0)
-  (setf <label> (list (cons text *button-cell-style*))))
-  
-(define-method set button-cell (button) nil)
-
-(define-method get button-cell () <closure>)
-
-(define-method compute button-cell () 
-  (with-fields (label clock) self
-    (unless (zerop clock)
-      (decf clock))
-    (setf (cdr (first label))
-	  (if (plusp clock)
-	      *button-cell-highlight-style*
-	      *button-cell-style*))))
-
-(define-method select button-cell ()
-  (funcall <closure>)
-  (setf <clock> *button-cell-highlight-time*))
-
-;;; Plain text buffer widget 
-
-(defcell buffer-cell buffer)
-
-(define-method set buffer-cell (buffer) 
-  (setf <buffer> buffer))
-
-(define-method get buffer-cell ()
-  <buffer>)
-
-(define-method print buffer-cell ()
-  <buffer>)
-
-(define-method read buffer-cell (newdata)
-  (let ((lines (etypecase newdata
-		 (list newdata)
-		 (string (list newdata)))))
-    (setf <buffer> lines)))
-      
 ;;; forms.lisp ends here

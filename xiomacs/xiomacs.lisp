@@ -45,6 +45,13 @@
 (defvar *pager*)
 (defvar *forms*)
 
+(defun handle-xiomacs-command (command)
+  (assert (stringp command))
+  [insert *prompt* command]
+  [execute *prompt*])
+
+(setf xe2:*form-command-handler-function* #'handle-xiomacs-command)
+
 (define-prototype help-prompt (:parent =prompt=)
   (default-keybindings :initform '(("N" nil "page-down .")
 				   ("P" nil "page-up ."))))
@@ -61,7 +68,6 @@
 				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]
 				      (when (string= *module* "xiomacs")
 					[visit *form* "WelcomePage"])))
-
 
 (define-prototype xiomacs-prompt (:parent xe2:=prompt=))
 
@@ -82,27 +88,33 @@
 (define-prototype xiomacs-split (:parent xe2:=split=))
 
 (defparameter *qwerty-keybindings*
-  '(;; cursor movement
+  '(;; arrow key cursor movement
     ("UP" nil :move-cursor-up)
     ("DOWN" nil :move-cursor-down)
     ("LEFT" nil :move-cursor-left)
     ("RIGHT" nil :move-cursor-right)
-    ;; emacs-style 
+    ;; emacs-style cursor movement
     ("A" (:control) :move-beginning-of-line)
     ("E" (:control) :move-end-of-line)
     ("F" (:control) :move-cursor-right)
     ("B" (:control) :move-cursor-left)
+    ;; editing keys
     ("HOME" nil :move-beginning-of-line)
     ("END" nil :move-end-of-line)
     ("PAGEUP" nil :move-beginning-of-column)
     ("PAGEDOWN" nil :move-end-of-column)
-    ;; ("K" (:control) :clear-line)
-    ;;  ("BACKSPACE" nil :backward-delete-char)
-    ("UP" (:control) :apply-right)
-    ("DOWN" (:control) :apply-left)
+    ;; switching windows
+    ("TAB" nil :switch-panes)
+    ("TAB" (:control) :switch-panes)
     ("LEFT" (:control) :left-pane)
     ("RIGHT" (:control) :right-pane)
-    ;;
+    ;; dropping commonly-used cells
+    ("1" (:control) :drop-data-cell)
+    ("2" (:control) :drop-command-cell)
+      ;; performing operations like clone, erase
+    ("UP" (:control) :apply-right)
+    ("DOWN" (:control) :apply-left)
+    ;; numeric keypad
     ("KP8" nil :move-cursor-up)
     ("KP2" nil :move-cursor-down)
     ("KP4" nil :move-cursor-left)
@@ -111,15 +123,14 @@
     ("KP2" (:control) :apply-left)
     ("KP4" (:control) :left-pane)
     ("KP6" (:control) :right-pane)
-    ;; ("LEFTBRACKET" nil :apply-left)
-    ;; ("RIGHTBRACKET" nil :apply-right)
-    ("TAB" nil :switch-panes)
-    ("TAB" (:control) :switch-panes)
+    ;; entering data and confirm/cancel
     ("RETURN" nil :enter)
     ("RETURN" (:control) :exit) ;; see also handle-key
     ("ESCAPE" nil :cancel)
+    ;; view mode
     ("F9" nil :tile-view)
     ("F10" nil :label-view)
+    ;; other
     ("X" (:control) :goto-prompt)
     ("T" (:control) :next-tool)))
 

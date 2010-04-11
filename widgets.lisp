@@ -638,10 +638,12 @@ normally."
   (labels ((print-it (c) 
 	     [print-data self c :comment]))
     (let* ((*read-eval* nil)
+	   (line <line>)
 	   (sexp (handler-case 
-		     (read-from-string (concatenate 'string "(" <line> ")"))
+		     (read-from-string (concatenate 'string "(" line ")"))
 		   (condition (c)
 		     (print-it c)))))
+      [clear-line self]
       (when sexp 
 	[say self "~A" <line>]
 	(handler-case
@@ -656,8 +658,7 @@ normally."
 	      (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp))))
 	  (serious-condition (c)
 	    (print-it c)))
-	(queue <line> <history>))
-      [clear-line self])))
+	(queue line <history>)))))
 
 (define-method history-item prompt (n)
   (assert (integerp n))

@@ -63,7 +63,7 @@
 *frequency* *output-chunksize* *output-channels* halt-sample *dt*
 *physics-function* =equipment= *default-world-axis-size* generic-keybind
 *default-world-z-size* =browser= install-widgets =label= =form=
-*module-package-name* module-package-name
+*module-package-name* module-package-name *form-command-handler-function*
 =data-cell= =var-cell= =option-cell= =toggle-cell= =event-cell=
 =buffer-cell= =comment-cell= install-widget uninstall-widget
 =button-cell= =image-cell= *initialization-hook* initialize-engine
