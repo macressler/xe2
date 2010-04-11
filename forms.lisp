@@ -45,7 +45,6 @@
 	   (make-object-resource new-name page)
 	   (setf (field-value :name page) new-name))))
     (list 
-       (message "CUNT")
        ;; it's an address
        (destructuring-bind (prototype-name &rest parameters) page
 	 (let ((world (clone (symbol-value prototype-name))))
