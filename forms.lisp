@@ -428,7 +428,7 @@ Must be one of (:tile :label)."
 (define-method activate form ()
   (let ((cell [selected-cell self]))
     (when cell
-      [activate cell])))
+      [select cell])))
 
 (define-method eval form (&rest args)
   "Evaluate all the ARGS and print the result."
@@ -570,15 +570,25 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	       [handle-key widget event])
 	      (t [parent>>handle-key self event])))))
 
-;; (define-method hit form (x0 y0) 
-;;   (with-field-values (row-heights column-widths origin-row origin-column rows columns)
-;;       self
-;;     (let* ((x 0)
-;; 	   (y 0)
-;; 	   (selected-column 
-;; 	    (loop for column from origin-column to columns
-;; 		  do (incf x (aref column-widths column))
-;; 		  when (> x x0) return 
+(define-method hit form (x0 y0) 
+  (with-field-values (row-heights column-widths origin-row origin-column rows columns)
+      self
+    (let* ((x <x>)
+	   (y <y>)
+	   (selected-column 
+	    (loop for column from origin-column to columns
+		  do (incf x (aref column-widths column))
+		  when (> x x0) return column))
+	   (selected-row 
+	    (loop for row from origin-row to rows
+		  do (incf y (aref row-heights row))
+		  when (> y y0) return row)))
+      (when (and (integerp selected-column) (integerp selected-row))
+	(when (array-in-bounds-p (field-value :grid <world>)
+				 selected-row selected-column)
+	  (prog1 t
+	    (setf <cursor-row> selected-row
+		  <cursor-column> selected-column)))))))
 
 (define-method compute form ()
   (with-fields (rows columns) self
@@ -673,7 +683,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 				row-height
 				:color ".red"
 				:destination image))))
-	      ;; TODO possibly indicate more cells to right/left/up/down of screen portion
+	      ;; TODO visually indicate more cells to right/left/up/down of screen portion
 	      ;; possibly save cursor drawing info for this cell
 	      (when (and (= row cursor-row) (= column cursor-column))
 		(setf cursor-dimensions (list x y column-width row-height)))
@@ -688,11 +698,8 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	      (list 
 	       (list (format nil " [ ~A ]     " page-name) :foreground (if focused ".yellow" ".white")
 		     :background (if focused ".red" ".blue"))
-	       (list (format nil " | Loc: (~S, ~S) | Data : ~A | Tool: ~S "
-				   cursor-row cursor-column 
-				  (when (field-value :paint <world>)
-				    (get-some-object-name (field-value :paint <world>)))
-				  tool)
+	       (list (format nil "  ~A (~S, ~S) "
+			     tool cursor-row cursor-column )
 			  :foreground ".white"
 			  :background ".gray20")))
 	;; draw status line

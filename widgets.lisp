@@ -1069,6 +1069,9 @@ text INSERTION to be inserted at point."
 	  props))
   (message "Page property set. ~A" (list page-name (gethash page-name <properties>))))
 
+(define-method hit pager (x y)
+  nil)
+
 (define-method select pager (page)
   (let ((newpage (etypecase page
 		   (number (car (nth (- page 1) <pages>)))
