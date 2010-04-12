@@ -77,9 +77,12 @@
 (define-method goto xiomacs-prompt ()
   [unfocus [left-form *forms*]]
   [unfocus [right-form *forms*]]
-  [say self "Enter command below. Press ENTER when finished, or CONTROL-X to cancel."]
-  [say self "Type HELP :COMMANDS to get a list of commands."]
   (setf <mode> :direct))
+
+(define-method execute xiomacs-prompt ()
+  [parent>>execute self]
+  [clear-line self]  
+  (setf <mode> :forward))
 
 (define-method exit xiomacs-prompt ()
   [parent>>exit self]
@@ -127,11 +130,14 @@
     ("RETURN" nil :enter)
     ("RETURN" (:control) :exit) ;; see also handle-key
     ("ESCAPE" nil :cancel)
+    ("G" (:control) :cancel)
     ;; view mode
     ("F9" nil :tile-view)
     ("F10" nil :label-view)
     ;; other
     ("X" (:control) :goto-prompt)
+    ("X" (:alt) :goto-prompt)
+    ("X" (:meta) :goto-prompt)
     ("T" (:control) :next-tool)))
 
 (define-method install-keybindings xiomacs-split ()
@@ -230,7 +236,7 @@ right side tool to the left side data."
 Available commands: HELP EVAL SWITCH-PANES LEFT-PANE RIGHT-PANE
 NEXT-TOOL SET-TOOL APPLY-LEFT APPLY-RIGHT VISIT SELECT SAVE-ALL
 SAVE-MODULE LOAD-MODULE TILE-VIEW LABEL-VIEW QUIT VISIT APPLY-TOOL
-CLONE ERASE CREATE-WORLD QUIT ENTER EXIT"
+CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
  nil)
 
 (defun xiomacs ()

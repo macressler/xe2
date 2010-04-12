@@ -531,6 +531,7 @@ normally."
     ("BACKSPACE" nil :backward-delete-char)
     ("RETURN" nil :execute)
     ("X" (:control) :exit)
+    ("G" (:control) :exit)
     ("ESCAPE" nil :exit)
     ("P" (:alt) :backward-history)
     ("N" (:alt) :forward-history)  

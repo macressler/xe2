@@ -3,7 +3,7 @@
  ((" tab: switch-panes (or) control-left/right         "  :background ".gray14" :foreground ".gray80"))
  ((" control-up: apply-left  control-down: apply-right "  :background ".gray20" :foreground ".gray80"))
  ((" enter: input data in current cell                 "  :background ".gray14" :foreground ".gray80"))
- ((" control-x: go to command prompt                   "  :background ".gray20" :foreground ".gray80"))
- ((" f1: help    escape: cancel                        "  :background ".gray14" :foreground ".gray80")))
+ ((" alt-x: go to command prompt                       "  :background ".gray20" :foreground ".gray80"))
+ ((" f1: help    escape: cancel or control-g           "  :background ".gray14" :foreground ".gray80")))
  
 		     

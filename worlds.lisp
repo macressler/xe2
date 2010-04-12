@@ -176,11 +176,6 @@ At the moment, only 0=off and 1=on are supported.")
 		   do (do-cells (cell [cells-at other-world (+ row source-row) (+ column source-column)])
 			(let ((proto (object-parent cell)))
 			  [drop-cell self (clone proto) (+ row dest-row) (+ column dest-column) :exclusive nil])))))
-  ;; (loop for row from source-row to (+ source-row source-height)
-  ;; 	do (loop for column from source-column to (+ source-column source-width)
-  ;; 		 do (do-cells (cell [cells-at other-world row column])
-  ;; 		      (let ((proto (object-parent cell)))
-  ;; 			[drop-cell self (clone proto) row column :exclusive nil])))))
 
 ;; TODO define-method import-region (does not clone)
 
