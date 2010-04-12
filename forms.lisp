@@ -403,6 +403,7 @@ See also CREATE-WORLD."
     [clear-mark self]
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <cursor-row> (min <rows> <cursor-row>))
+    (setf <tile-size> (field-value :tile-size world))
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <column-widths> (make-array (+ 1 <columns>) :initial-element 0)
 	  <row-heights> (make-array (+ 1 <rows>) :initial-element 0)
