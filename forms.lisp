@@ -34,7 +34,6 @@
   (etypecase page
     (clon:object 
        ;; check for name collision
-       (message "Indexing new page ~S" (field-value :name page))
        (let* ((old-name (or (field-value :name page)
 			    (generate-page-name page)))
 	      (new-name (if (find-resource old-name :noerror)
@@ -683,7 +682,20 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 				row-height
 				:color ".red"
 				:destination image))))
-	      ;; TODO visually indicate more cells to right/left/up/down of screen portion
+	      ;; visually indicate edges of map with a yellow line
+	      (let ((iwid 2))
+		(when (= rightmost-visible-column (- columns 1) column)
+		  (draw-box (+ x column-width) y iwid row-height :stroke-color ".yellow" :color ".yellow"
+			    :destination image))
+		(when (= 0 column)
+		  (draw-box 0 y iwid row-height :stroke-color ".yellow" :color ".yellow"
+			    :destination image))
+		(when (= bottom-visible-row row (- rows 1))
+		  (draw-box x (+ y row-height) column-width iwid :stroke-color ".yellow" :color ".yellow"
+			    :destination image))
+		(when (= 0 row)
+		  (draw-box x 0 column-width iwid :stroke-color ".yellow" :color ".yellow"
+			    :destination image)))
 	      ;; possibly save cursor drawing info for this cell
 	      (when (and (= row cursor-row) (= column cursor-column))
 		(setf cursor-dimensions (list x y column-width row-height)))
@@ -698,8 +710,8 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	      (list 
 	       (list (format nil " [ ~A ]     " page-name) :foreground (if focused ".yellow" ".white")
 		     :background (if focused ".red" ".blue"))
-	       (list (format nil "  ~A (~S, ~S) "
-			     tool cursor-row cursor-column )
+	       (list (format nil "  ~A (~S, ~S) ~Sx~S "
+			     tool cursor-row cursor-column rows columns)
 			  :foreground ".white"
 			  :background ".gray20")))
 	;; draw status line

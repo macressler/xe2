@@ -79,8 +79,7 @@
   [unfocus [right-form *forms*]]
   (setf <mode> :direct))
 
-(define-method execute xiomacs-prompt ()
-  [parent>>execute self]
+(define-method do-after-execute xiomacs-prompt ()
   [clear-line self]  
   (setf <mode> :forward))
 

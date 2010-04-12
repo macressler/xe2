@@ -12,7 +12,6 @@ CLOSED: [2010-04-12 Mon 05:58]
 CLOSED: [2010-04-10 Sat 21:12]
 ** TODO [#B] hotkey for delete at cursor
 ** TODO [#B] comprehensive mouse support
-** TODO [#B] clickable cells
 ** TODO [#B] generic page browser with minimap preview?
 ** TODO [#B] property list editor
 ** TODO [#B] search feature 

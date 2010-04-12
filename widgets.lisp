@@ -635,6 +635,8 @@ normally."
     [say self (if comment ";; ~A"
 		  " ~A") line]))
 
+(defparameter *prompt-debug-on-error* t)
+
 (define-method execute prompt ()
   (labels ((print-it (c) 
 	     [print-data self c :comment]))
@@ -647,20 +649,25 @@ normally."
       [clear-line self]
       (when sexp 
 	[say self "~A" line]
-;;	(apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp)))
-	(handler-case
-	    (handler-bind (((not serious-condition)
-			    (lambda (c) 
-			      (print-it c)
-			      ;; If there's a muffle-warning
-			      ;; restart associated, use it to
-			      ;; avoid double-printing.
-			      (let ((r (find-restart 'muffle-warning c)))
-				(when r (invoke-restart r))))))
-	      (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp))))
-	  (serious-condition (c)
-	    (print-it c)))
-	(queue line <history>)))))
+	(if *prompt-debug-on-error*
+	    (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp)))
+	    (handler-case
+		(handler-bind (((not serious-condition)
+				(lambda (c) 
+				  (print-it c)
+				  ;; If there's a muffle-warning
+				  ;; restart associated, use it to
+				  ;; avoid double-printing.
+				  (let ((r (find-restart 'muffle-warning c)))
+				    (when r (invoke-restart r))))))
+		  (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp))))
+	      (serious-condition (c)
+		(print-it c))))
+	(queue line <history>))))
+  [do-after-execute self])
+
+(define-method do-after-execute prompt ()
+  nil)
 
 (define-method history-item prompt (n)
   (assert (integerp n))
