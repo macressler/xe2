@@ -173,9 +173,13 @@ At the moment, only 0=off and 1=on are supported.")
 (define-method paste-region world (other-world dest-row dest-column source-row source-column source-height source-width)
     (loop for row from 0 to source-height
 	  do (loop for column from 0 to source-width
-		   do (do-cells (cell [cells-at other-world (+ row source-row) (+ column source-column)])
-			(let ((proto (object-parent cell)))
-			  [drop-cell self (clone proto) (+ row dest-row) (+ column dest-column) :exclusive nil])))))
+		   do (let* ((cells [cells-at other-world (+ row source-row) (+ column source-column)])
+			     (n 0))
+			(loop while (< n (fill-pointer cells)) do
+			  (let* ((cell (aref cells n))
+				 (proto (object-parent cell)))
+			    [drop-cell self (clone proto) (+ row dest-row) (+ column dest-column) :exclusive nil])
+			  (incf n))))))
 
 ;; TODO define-method import-region (does not clone)
 

@@ -362,6 +362,24 @@ at the current cursor location. See also APPLY-LEFT and APPLY-RIGHT."
   (let ((grid (field-value :grid <world>)))
     (vector-pop (aref grid <cursor-row> <cursor-column>))))
 
+(define-method set-mark form ()
+  (setf <mark-row> <cursor-row>
+	<mark-column> <cursor-column>)
+  [say self (format nil "Mark set at (~S, ~S)." <mark-row> <mark-column>)])
+   
+(define-method clear-mark form ()
+  (setf <mark-row> nil <mark-column> nil)
+  [say self "Mark cleared."])
+
+(define-method mark-region form ()
+  (with-fields (mark-row mark-column cursor-row cursor-column) self
+    (if (and (integerp mark-row) (integerp mark-column))
+	(values (min mark-row cursor-row)
+		(min mark-column cursor-column)
+		(max mark-row cursor-row)
+		(max mark-column cursor-column))
+	(values nil nil nil nil))))
+
 (define-method visit form (&optional (page *default-page-name*))
   "Visit the page PAGE with the current form. If PAGE is a =world=
 object, visit it and add the page to the page collection. If PAGE is a
@@ -382,6 +400,7 @@ See also CREATE-WORLD."
     (assert (integerp <columns>))
     (setf <cursor-row> 0)
     (setf <cursor-column> 0)
+    [clear-mark self]
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <cursor-row> (min <rows> <cursor-row>))
     (setf <cursor-column> (min <columns> <cursor-column>))
@@ -519,6 +538,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
   (xe2:quit t))
 
 (define-method cancel form ()
+  [clear-mark self]
   [exit self :nosave])
 
 (defparameter *blank-cell-string* '(" ........ "))
@@ -610,6 +630,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
   (when <world>
     (with-field-values (cursor-row cursor-column row-heights world page-name 
 				   origin-row origin-column header-line status-line
+				   mark-row mark-column width height
 				   view-style header-style tool tool-methods entered focused
 				   row-spacing rows columns draw-blanks column-widths) self
       [compute self]
@@ -637,7 +658,8 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		  (return-from searching (- rows 1)))))
 	     (x 0) 
 	     (y 0)
-	     (cursor-dimensions nil))
+	     (cursor-dimensions nil)
+	     (mark-dimensions nil))
 	;; store some geometry
 	(setf <origin-width> (- rightmost-visible-column origin-column))
 	(setf <origin-height> (- bottom-visible-row origin-row))
@@ -646,90 +668,112 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	;;   (when (object-p selected-cell)
 	;;     (setf header-line (field-value :tooltip selected-cell))))
 	;; draw header line with tooltip, if any
-	(when (and header-line header-style)
-	  (render-formatted-line header-line 0 y :destination image)
-	  (incf y (formatted-line-height header-line)))
-	;; TODO column header, if any
-	;; (message "GEOMETRY: ~S" (list :origin-row origin-row
-	;; 			      :origin-column origin-column
-	;; 			      :right rightmost-visible-column
-	;; 			      :bottom bottom-visible-row))
-	(loop for row from origin-row to bottom-visible-row do
-	  (setf x 0)
-	  (loop for column from origin-column to rightmost-visible-column do
-	    (let ((column-width (aref column-widths column))
-		  (row-height (aref row-heights row))
-		  (cell [cell-at self row column]))
-	      ;; render the cell
-	      (if (null cell)
-		  (when draw-blanks
-		    (draw-box x y 
-			      column-width 
-			      row-height  
-			      :stroke-color ".gray30"
-			      :color (if (evenp column) ".gray50" ".gray45")
-			      :destination image))
-		  ;; see also cells.lisp
-		  (progn 
-		    (ecase view-style
-		      (:label [form-render cell image x y column-width])
-		      (:tile (when (field-value :tile cell)
-			       (draw-image (find-resource-object 
-					    (field-value :tile cell)) x y :destination image))))
-		    (when entered
-		      (draw-rectangle x y 
-				column-width 
-				row-height
-				:color ".red"
-				:destination image))))
-	      ;; visually indicate edges of map with a yellow line
-	      (let ((iwid 2))
-		(when (= rightmost-visible-column (- columns 1) column)
-		  (draw-box (+ x column-width) y iwid row-height :stroke-color ".yellow" :color ".yellow"
-			    :destination image))
-		(when (= 0 column)
-		  (draw-box 0 y iwid row-height :stroke-color ".yellow" :color ".yellow"
-			    :destination image))
-		(when (= bottom-visible-row row (- rows 1))
-		  (draw-box x (+ y row-height) column-width iwid :stroke-color ".yellow" :color ".yellow"
-			    :destination image))
-		(when (= 0 row)
-		  (draw-box x 0 column-width iwid :stroke-color ".yellow" :color ".yellow"
-			    :destination image)))
-	      ;; possibly save cursor drawing info for this cell
-	      (when (and (= row cursor-row) (= column cursor-column))
-		(setf cursor-dimensions (list x y column-width row-height)))
-	      ;; move to next column right
-	      (incf x (aref column-widths column))))
-	  ;; move to next row down ;; TODO fix row-spacing
-	  (incf y (+ (if (eq :tile view-style)
-			 0 0) (aref row-heights row))))
-	;; create status line
-	;; TODO break this formatting out into variables
-	(setf status-line
-	      (list 
-	       (list (format nil " [ ~A ]     " page-name) :foreground (if focused ".yellow" ".white")
-		     :background (if focused ".red" ".blue"))
-	       (list (format nil "  ~A (~S, ~S) ~Sx~S "
-			     tool cursor-row cursor-column rows columns)
-			  :foreground ".white"
-			  :background ".gray20")))
-	;; draw status line
-	(when status-line 
-	  (let* ((ht (formatted-line-height status-line))
-		 (sy (- <height> 1 ht)))
-	    (draw-box 0 sy <width> ht :color ".gray20" 
-		      :stroke-color ".gray20" :destination image)
-	    (render-formatted-line status-line 
-				   0 sy 
-				   :destination image)))
-	;; render cursor, if any 
-	(when cursor-dimensions
-	  (destructuring-bind (x y w h) cursor-dimensions
-	    [draw-cursor self x y w h]))))))
-
+	(multiple-value-bind (top left bottom right) [mark-region self]
+	  (let ((x0 0)
+		(y0 0)
+		(x1 width)
+		(y1 height))
+	    (when (and header-line header-style)
+	      (render-formatted-line header-line 0 y :destination image)
+	      (incf y (formatted-line-height header-line)))
+	    ;; TODO column header, if any
+	    ;; (message "GEOMETRY: ~S" (list :origin-row origin-row
+	    ;; 			      :origin-column origin-column
+	    ;; 			      :right rightmost-visible-column
+	    ;; 			      :bottom bottom-visible-row))
+	    (loop for row from origin-row to bottom-visible-row do
+	      (setf x 0)
+	      (loop for column from origin-column to rightmost-visible-column do
+		(let ((column-width (aref column-widths column))
+		      (row-height (aref row-heights row))
+		      (cell [cell-at self row column]))
+		  ;; possibly set up region drawing info
+		  (when (equal row top)
+		    (setf y0 y))
+		  (when (equal row bottom)
+		    (setf y1 (+ y row-height)))
+		  (when (equal column left)
+		    (setf x0 x))
+		  (when (equal column right)
+		    (setf x1 (+ x column-width)))
+		  ;; render the cell
+		  (if (null cell)
+		      (when draw-blanks
+			(draw-box x y 
+				  column-width 
+				  row-height  
+				  :stroke-color ".gray30"
+				  :color (if (evenp column) ".gray50" ".gray45")
+				  :destination image))
+		      ;; see also cells.lisp
+		      (progn 
+			(ecase view-style
+			  (:label [form-render cell image x y column-width])
+			  (:tile (when (field-value :tile cell)
+				   (draw-image (find-resource-object 
+						(field-value :tile cell)) x y :destination image))))
+			(when entered
+			  (draw-rectangle x y 
+					  column-width 
+					  row-height
+					  :color ".red"
+					  :destination image))))
+		  ;; visually indicate edges of map with a yellow line
+		  (let ((iwid 2))
+		    (when (= rightmost-visible-column (- columns 1) column)
+		      (draw-box (+ x column-width) y iwid row-height :stroke-color ".yellow" :color ".yellow"
+				:destination image))
+		    (when (= 0 column)
+		      (draw-box 0 y iwid row-height :stroke-color ".yellow" :color ".yellow"
+				:destination image))
+		    (when (= bottom-visible-row row (- rows 1))
+		      (draw-box x (+ y row-height) column-width iwid :stroke-color ".yellow" :color ".yellow"
+				:destination image))
+		    (when (= 0 row)
+		      (draw-box x 0 column-width iwid :stroke-color ".yellow" :color ".yellow"
+				:destination image)))
+		  ;; possibly save cursor and mark drawing info for this cell
+		  (when (and (= row cursor-row) (= column cursor-column))
+		    (setf cursor-dimensions (list x y column-width row-height)))
+		  (when (and (integerp mark-row) (integerp mark-column) (= row mark-row) (= column mark-column))
+		    (setf mark-dimensions (list x y column-width row-height)))
+		  ;; move to next column right
+		  (incf x (aref column-widths column))))
+	      ;; move to next row down ;; TODO fix row-spacing
+	      (incf y (+ (if (eq :tile view-style)
+			     0 0) (aref row-heights row))))
+	    ;; create status line
+	    ;; TODO break this formatting out into variables
+	    (setf status-line
+		  (list 
+		   (list (format nil " [ ~A ]     " page-name) :foreground (if focused ".yellow" ".white")
+			 :background (if focused ".red" ".blue"))
+		   (list (format nil "  ~A (~S, ~S) ~Sx~S "
+				 tool cursor-row cursor-column rows columns)
+			 :foreground ".white"
+			 :background ".gray20")))
+	    ;; draw status line
+	    (when status-line 
+	      (let* ((ht (formatted-line-height status-line))
+		     (sy (- <height> 1 ht)))
+		(draw-box 0 sy <width> ht :color ".gray20" 
+			  :stroke-color ".gray20" :destination image)
+		(render-formatted-line status-line 
+				       0 sy 
+				       :destination image)))
+	    ;; render cursor and mark, if any 
+	    (when cursor-dimensions
+	      (destructuring-bind (x y w h) cursor-dimensions
+	      [draw-cursor self x y w h]))
+	    (when mark-dimensions
+	      (destructuring-bind (x y w h) mark-dimensions
+		[draw-mark self x y w h]))
+	    (when (and (integerp mark-row) (integerp mark-column)
+		       (notany #'null (list x0 y0 x1 y1)))
+	      [draw-region self x0 y0 (- x1 x0) (- y1 y0)])))))))
+  
 ;;; Cursor
-
+  
 (define-method scroll form ()
   (with-fields (cursor-row cursor-column origin-row origin-column scroll-margin
 			   origin-height origin-width world rows columns) self
@@ -772,6 +816,12 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		     cursor-blink-color)))
       (draw-rectangle x y width height :color color :destination <image>))))
 
+(define-method draw-mark form (x y width height)
+  (draw-rectangle x y width height :color ".white" :destination <image>))
+
+(define-method draw-region form (x y width height)
+  (draw-rectangle x y width height :color ".cyan" :destination <image>))
+  
 (define-method move-cursor form (direction)
   "Move the cursor one step in DIRECTION. 
 DIRECTION is one of :up :down :right :left."

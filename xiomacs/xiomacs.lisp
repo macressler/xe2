@@ -113,9 +113,13 @@
     ;; dropping commonly-used cells
     ("1" (:control) :drop-data-cell)
     ("2" (:control) :drop-command-cell)
-      ;; performing operations like clone, erase
+    ;; performing operations like clone, erase
     ("UP" (:control) :apply-right)
     ("DOWN" (:control) :apply-left)
+    ;; marking and stuff
+    ("SPACE" (:control) :set-mark)
+    ("SPACE" (:alt) :clear-mark)
+    ("SPACE" (:meta) :clear-mark)
     ;; numeric keypad
     ("KP8" nil :move-cursor-up)
     ("KP2" nil :move-cursor-down)
@@ -226,10 +230,25 @@ right side tool to the left side data."
 		    (find-page page)
 		    (field-value :world [other-form self])))
 	(destination (field-value :world [selected-form self])))
-    (with-fields (height width) source 
-      (with-fields (cursor-row cursor-column) [selected-form self]
-	[paste-region destination source cursor-row cursor-column 0 0 height width]))))
-
+    (multiple-value-bind (top left bottom right) [mark-region [selected-form self]]
+      (multiple-value-bind (top0 left0 bottom0 right0) [mark-region [other-form self]]
+	(let ((source-height (field-value :height source))
+	      (source-width (field-value :width source)))
+	  (with-fields (cursor-row cursor-column) [selected-form self]
+	    (let* ((height (or (when top (- bottom top))
+			       (when top0 (- bottom0 top0))
+			       source-height))
+		   (width (or (when left (- right left))
+			      (when left0 (- right0 left0))
+			      source-width))
+		   (r0 (or top cursor-row))
+		   (c0 (or left cursor-column))
+		   (r1 (or bottom (- height 1)))
+		   (c1 (or right (- width 1)))
+		   (sr (or top0 0))
+		   (sc (or left0 0)))
+	      [paste-region destination source r0 c0 sr sc height width])))))))
+  
 (define-method commands xiomacs-split ()
   "Syntax: command-name arg1 arg2 ...
 Available commands: HELP EVAL SWITCH-PANES LEFT-PANE RIGHT-PANE
