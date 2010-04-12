@@ -201,8 +201,8 @@
   (let ((newpos (mod (1+ <focus>) (length <children>))))
     (setf <focus> newpos)
     (ecase newpos
-      (0 [focus-left self])
-      (1 [focus-right self]))))
+      (0 [left-pane self])
+      (1 [right-pane self]))))
 
 (define-method apply-left xiomacs-split ()
   "Move data LEFTWARD from right pane to left pane, applying current
@@ -282,7 +282,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     [show prompt]
     [install-keybindings prompt]
     [install-keybindings split]
-    [say prompt "Welcome to XIOMACS. Press CONTROL-X to enter command mode, or F1 for help."]
+    [say prompt "Welcome to XIOMACS. Press ALT-X to enter command mode, or F1 for help."]
     [set-mode prompt :forward] ;; don't start with prompt on
     [set-receiver prompt split]
     ;; 

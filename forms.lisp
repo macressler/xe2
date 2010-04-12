@@ -601,7 +601,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
   (when <world>
     (with-field-values (cursor-row cursor-column row-heights world page-name 
 				   origin-row origin-column header-line status-line
-				   view-style header-style tool tool-methods
+				   view-style header-style tool tool-methods entered focused
 				   row-spacing rows columns draw-blanks column-widths) self
       [compute self]
       [compute-geometry self]
@@ -667,7 +667,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		      (:tile (when (field-value :tile cell)
 			       (draw-image (find-resource-object 
 					    (field-value :tile cell)) x y :destination image))))
-		    (when <entered>
+		    (when entered
 		      (draw-rectangle x y 
 				column-width 
 				row-height
@@ -683,10 +683,11 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	  (incf y (+ (if (eq :tile view-style)
 			 0 0) (aref row-heights row))))
 	;; create status line
+	;; TODO break this formatting out into variables
 	(setf status-line
 	      (list 
-	       (list (format nil " [ ~A ]     " page-name) :foreground ".yellow"
-		     :background ".red")
+	       (list (format nil " [ ~A ]     " page-name) :foreground (if focused ".yellow" ".white")
+		     :background (if focused ".red" ".blue"))
 	       (list (format nil " | Loc: (~S, ~S) | Data : ~A | Tool: ~S "
 				   cursor-row cursor-column 
 				  (when (field-value :paint <world>)
