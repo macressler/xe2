@@ -301,7 +301,7 @@
   (draw-blanks :initform t :documentation "When non-nil, draw blank cells.")
   (header-style :initform t :documentation "When non-nil, draw row and column headers.")
   (header-line :initform nil :documentation "Formatted line to be displayed at top of window above spreadsheet.")
-  (status-line :initform nil :documentation "Formatted line to be displayed at top of window above spreadsheet.")
+  (status-line :initform nil :documentation "Formatted line to be displayed at bottom of window below spreadsheet.")
   (tool :initform :clone :documentation "Keyword symbol identifying the method to be applied.")
   (tool-methods :initform '(:clone :erase :inspect)))
 
@@ -565,6 +565,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
       (:tile <tile-size>))))
 
 (define-method compute-geometry form ()
+  ;; TODO this could obviously be sped up
   (dotimes (column <columns>)
     (setf (aref <column-widths> column)
 	  [column-width self column]))

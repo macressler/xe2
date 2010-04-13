@@ -259,17 +259,17 @@
 	 (splash (clone =splash=))
 	 (help (clone =cons-formatter=))
 	 (quickhelp (clone =formatter=))
-	 (form (clone =form=))
-	 (form2 (clone =form=))
+	 ;; (form (clone =form=))
+	 ;; (form2 (clone =form=))
 	 (viewport (clone =view=))
 	 (textbox (clone =textbox=))
 	 (status (clone =status=))
-	 (form-prompt (clone =prompt=))
+	 ;; (form-prompt (clone =prompt=))
 	 (splash-prompt (clone =splash-prompt=))
 	 (terminal (clone =narrator=))
 	 (stack (clone =stack=)))
     ;;
-    (setf *form* form)
+;;    (setf *form* form)
     (setf *viewport* viewport)
     (setf *status* status)
     (setf xe2:*workbook* nil)
@@ -289,14 +289,14 @@
     [hide prompt]
     [install-keybindings prompt]
     ;; 
-    [resize form :height 500 :width 800]
-    [move form :x 0 :y 0]
+    ;; [resize form :height 500 :width 800]
+    ;; [move form :x 0 :y 0]
     ;;
-    [resize form-prompt :height 20 :width *cons-window-width*]
-    [move form-prompt :x 0 :y (- *cons-window-height* 20)]
-    [show form-prompt]
-    [install-keybindings form-prompt]
-    [set-receiver form-prompt form]
+    ;; [resize form-prompt :height 20 :width *cons-window-width*]
+    ;; [move form-prompt :x 0 :y (- *cons-window-height* 20)]
+    ;; [show form-prompt]
+    ;; [install-keybindings form-prompt]
+    ;; [set-receiver form-prompt form]
     ;;
     (labels ((spacebar ()
 	       ;;
@@ -314,10 +314,10 @@
 	       	     :narrator terminal
 	       	     :viewport viewport]
 	       [loadout player]
-	       (let ((config-screen (clone =joystick-world=)))
-		 [generate config-screen]
-		 [set-prompt config-screen prompt]
-		 [visit form config-screen])
+	       ;; (let ((config-screen (clone =joystick-world=)))
+	       ;; 	 [generate config-screen]
+	       ;; 	 [set-prompt config-screen prompt]
+	       ;; 	 [visit form config-screen])
 	       ;;
 	       [set-character *status* player]
 	       [resize viewport :height 470 :width *cons-window-width*]
@@ -358,16 +358,13 @@
     [resize textbox :height 200 :width 500]
     [move textbox :x 0 :y 0]
     ;;
-    [resize form2 :height 500 :width 800]
-    [move form2 :x 0 :y 0]
+    ;; [resize form2 :height 500 :width 800]
+    ;; [move form2 :x 0 :y 0]
     ;;
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     (xe2:install-widgets splash-prompt splash)
     ;;
-    [add-page *pager* :notebook (list form2)]
-    [add-page *pager* :dev (list textbox)]
-    [add-page *pager* :config (list form)]
     [add-page *pager* :game (list prompt stack viewport terminal quickhelp *status*)]
     (xe2:enable-classic-key-repeat 100 100)
     ;; [set-page-property *pager* :game :held-keys t]
