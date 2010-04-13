@@ -392,7 +392,7 @@ See also CREATE-WORLD."
     (setf <page-name> (field-value :name world))
     [say self (format nil "Visiting page ~S" <page-name>)]
     (setf <world> world)
-    (setf *world* world)
+    (setf *world* world) ;; TODO suspicious
     [install-keybindings self]
     (setf <rows> (field-value :height world))
     (setf <columns> (field-value :width world))
@@ -535,7 +535,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
   (xe2:load-module name))
 
 (define-method quit form ()
-  "Quit XIODEV."
+  "Quit XIOMACS."
   (xe2:quit t))
 
 (define-method cancel form ()
@@ -592,25 +592,26 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	      (t [parent>>handle-key self event])))))
 
 (define-method hit form (x0 y0) 
-  (with-field-values (row-heights column-widths origin-row origin-column rows columns)
+  (with-field-values (row-heights column-widths origin-row origin-column rows columns x y width height)
       self
-    (let* ((x <x>)
-	   (y <y>)
-	   (selected-column 
-	    (loop for column from origin-column to columns
-		  do (incf x (aref column-widths column))
-		  when (> x x0) return column))
-	   (selected-row 
-	    (loop for row from origin-row to rows
-		  do (incf y (aref row-heights row))
-		  when (> y y0) return row)))
-      (when (and (integerp selected-column) (integerp selected-row))
-	(when (array-in-bounds-p (field-value :grid <world>)
+    (when (within-extents x0 y0 x y (+ x width) (+ y height))
+      (let* ((x <x>)
+	     (y <y>)
+	     (selected-column 
+	      (loop for column from origin-column to columns
+		    do (incf x (aref column-widths column))
+		    when (> x x0) return column))
+	     (selected-row 
+	      (loop for row from origin-row to rows
+		    do (incf y (aref row-heights row))
+		    when (> y y0) return row)))
+	(when (and (integerp selected-column) (integerp selected-row))
+	  (when (array-in-bounds-p (field-value :grid <world>)
 				 selected-row selected-column)
-	  (prog1 t
-	    (setf <cursor-row> selected-row
-		  <cursor-column> selected-column)))))))
-
+	    (prog1 t
+	      (setf <cursor-row> selected-row
+		    <cursor-column> selected-column))))))))
+  
 (define-method compute form ()
   (with-fields (rows columns) self
     (let (data cell)

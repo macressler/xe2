@@ -635,7 +635,7 @@ normally."
     [say self (if comment ";; ~A"
 		  " ~A") line]))
 
-(defparameter *prompt-debug-on-error* t)
+(defparameter *prompt-debug-on-error* nil)
 
 (define-method execute prompt ()
   (labels ((print-it (c) 

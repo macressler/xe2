@@ -247,6 +247,7 @@
 (defparameter *cons-window-height* 600)
 
 (defun cons-game ()
+  (setf xe2:*world* nil)
   (xe2:message "Initializing CONS...")
   (setf xe2:*window-title* "CONS")
   (clon:initialize)
