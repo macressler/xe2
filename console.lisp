@@ -1584,6 +1584,7 @@ and its .startup resource is loaded."
   (format t "~A" *copyright-text*)
   (initialize-resource-table)
   (setf *module-package-name* nil)
+  (setf *physics-function* nil)
   (setf *initialization-hook* nil)
   (setf *play-args* args)
   (setf *random-state* (make-random-state t))

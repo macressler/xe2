@@ -1,5 +1,9 @@
 *** DONE FIX no docs for exit
 CLOSED: [2010-03-29 Mon 11:42]
+*** TODO breakout world
+*** TODO fix windows needing numlock off
+*** TODO document how to pick shit up
+*** TODO escape not listed on quickhelp
 *** TODO fix bad rook behavior
 *** TODO fix no c-q during help mode
 *** TODO mystery sector ! encounter early, but locked

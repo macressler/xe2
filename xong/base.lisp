@@ -9,7 +9,7 @@
 (defparameter *gate-timeout* 70)
 
 (defcell gate
-  (categories :initform '(:actor :obstacle :gate :exclusive))
+  (categories :initform '(:actor :obstacle :gate ))
   (speed :initform (make-stat :base 10))
   (tile :initform "gate-closed")
   (clock :initform 0)
@@ -41,7 +41,7 @@
   (tile :initform "door")
   (name :initform "Level exit")
   (description :initform "Door to the next level of Xong.")
-  (categories :initform '(:gateway :actor :exclusive :obstacle))
+  (categories :initform '(:gateway :actor  :obstacle))
   (address :initform nil))
 
 (define-method level door (lev)
@@ -104,8 +104,8 @@ reach new areas and items. The puck also picks up the color.")
   (tile :initform "plasma-white")
   (color :initform :white)
   (name :initform "Toxic paint plasma")
-  (speed :initform (make-stat :base 10))
-  (movement-cost :initform (make-stat :base 10))
+  (speed :initform (make-stat :base 2))
+  (movement-cost :initform (make-stat :base 20))
   (clock :initform 100)
   (categories :initform '(:actor :paint-source :plasma))
   (description :initform "Spreading toxic paint gas. Avoid at all costs!"))
@@ -447,9 +447,9 @@ reach new areas and items. The puck also picks up the color.")
 
 (defcell karma
   (tile :initform "rezblur1")
-  (speed :initform (make-stat :base 10))
-  (movement-cost :initform (make-stat :base 10))
-  (clock :initform 20)
+  (speed :initform (make-stat :base 2))
+  (movement-cost :initform (make-stat :base 20))
+  (clock :initform 40)
   (samples :initform *karma-samples*)
   (categories :initform '(:actor :paint-source :karma)))
 

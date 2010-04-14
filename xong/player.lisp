@@ -71,7 +71,7 @@
 (defcell diamond 
   (tile :initform "chevron-pickup")
   (name :initform "Chevron pack")
-  (categories :initform '(:exclusive))
+  (categories :initform '())
   (description :initform "Adds five chevrons to your inventory."))
 
 (define-method step diamond (stepper)
@@ -249,8 +249,8 @@
   (tile :initform "puck")
   (description :initform "A frictionless paint-absorbent hockey puck.")
   (categories :initform '(:puck :obstacle :target :actor :paintable :item))
-  (speed :initform (make-stat :base 10))
-  (movement-cost :initform (make-stat :base 10))
+  (speed :initform (make-stat :base 4))
+  (movement-cost :initform (make-stat :base 8))
   (direction :initform :here)
   (stepping :initform t)
   (color :initform :white))
@@ -314,7 +314,7 @@
 (defcell mystery-box
   (name :initform "Mystery box")
   (tile :initform "mystery-box")
-  (categories :initform '(:target :obstacle :breakable :exclusive))
+  (categories :initform '(:target :obstacle :breakable))
   (description :initform  "Break it open to find a surprise inside!"))
 
 (define-method die mystery-box ()

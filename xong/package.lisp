@@ -4,3 +4,6 @@
   (:export xong))
 
 (in-package :xong)
+
+(setf xe2:*dt* 40)
+
