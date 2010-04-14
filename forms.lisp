@@ -360,7 +360,7 @@ at the current cursor location. See also APPLY-LEFT and APPLY-RIGHT."
   "Erase the top cell at the current location."
   [say self "Erasing top cell."]
   (let ((grid (field-value :grid <world>)))
-    (vector-pop (aref grid <cursor-row> <cursor-column>))))
+    (ignore-errors (vector-pop (aref grid <cursor-row> <cursor-column>)))))
 
 (define-method set-mark form ()
   (setf <mark-row> <cursor-row>
