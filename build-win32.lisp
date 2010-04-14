@@ -3,9 +3,9 @@
 
 (require :asdf)
 
-(defvar *dll-pathname* #p"z:/work/git/frameworks/win32/")
+(defvar *dll-pathname* #p"c:/Users/Sandy/xe2/")
 (defvar *game* "xiotank")
-(defvar *executable* #p"z:/src/rlx/xiotank-beta-2-win32/xiotank.exe")
+(defvar *executable* #p"c:/Users/Sandy/xe2/app.exe")
 (defvar *base-pathname* (make-pathname :name nil :type nil :defaults *load-pathname*))
 
 (pushnew (translate-pathname *base-pathname* "**/" "**/site/cffi_0.10.3/") asdf:*central-registry*)
