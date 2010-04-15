@@ -1018,21 +1018,23 @@ Sends a :do-collision message for every detected collision."
 (defun normalize-address (address)
   "Sort the plist ADDRESS so that its keys come in alphabetical order
 by symbol name. This enables them to be used as hash keys."
-  (assert (and (symbolp (first address))
-	       (or (null (rest address))
-		   (keywordp (second address)))))
-  (labels ((all-keys (plist)
-	     (let (keys)
-	       (loop while (not (null plist))
-		     do (progn (push (pop plist) keys)
-			       (pop plist)))
-	       keys)))
-    (let (address2)
-      (dolist (key (sort (all-keys (cdr address)) #'string> :key #'symbol-name))
-	;; build sorted plist
-	(push (getf (cdr address) key) address2)
-	(push key address2))
-	(cons (car address) address2))))
+  (etypecase address
+    (string address)
+    (list (assert (and (symbolp (first address))
+		       (or (null (rest address))
+			   (keywordp (second address)))))
+       (labels ((all-keys (plist)
+		  (let (keys)
+		    (loop while (not (null plist))
+			  do (progn (push (pop plist) keys)
+				    (pop plist)))
+		    keys)))
+	 (let (address2)
+	   (dolist (key (sort (all-keys (cdr address)) #'string> :key #'symbol-name))
+	     ;; build sorted plist
+	     (push (getf (cdr address) key) address2)
+	     (push key address2))
+	   (cons (car address) address2))))))
 
 (defparameter *default-space-size* 10)
 
@@ -1110,7 +1112,9 @@ represents the z-axis of a euclidean 3-D space."))
   (let ((candidate [get-world self address]))
     (if (null candidate)
 	[add-world self (normalize-address address)
-		   [generate-world self address]]
+		   (if (stringp address)
+		       (find-resource-object address)
+		       [generate-world self address]]]
 	candidate)))
 
 (define-method play universe (&key address player prompt narrator viewport)
