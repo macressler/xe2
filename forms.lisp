@@ -21,7 +21,7 @@
 (in-package :xe2)
 
 (defun generate-page-name (world)
-  (concatenate 'string (get-some-object-name world) "::" (format nil "~S" (genseq))))
+  (concatenate 'string (get-some-object-name world) "-" (format nil "~S" (genseq))))
 
 (defun create-blank-page (&key height width name)
   (let ((world (clone =world= :height height :width width)))
