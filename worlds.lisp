@@ -1114,7 +1114,7 @@ represents the z-axis of a euclidean 3-D space."))
 	[add-world self (normalize-address address)
 		   (if (stringp address)
 		       (find-resource-object address)
-		       [generate-world self address]]]
+		       [generate-world self address])]
 	candidate)))
 
 (define-method play universe (&key address player prompt narrator viewport)
