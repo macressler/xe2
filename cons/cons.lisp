@@ -328,7 +328,7 @@
 			   :width (truncate (/ *cons-window-width* 16))]
 	       [adjust viewport]))
       (setf *space-bar-function* #'spacebar))
-    
+    ;;
     [resize help :height 540 :width 800] 
     [move help :x 0 :y 0]
     (let ((text	(find-resource-object "help-message")))

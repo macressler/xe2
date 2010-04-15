@@ -178,8 +178,11 @@
 	   (y0 (- y <y>))
 	   (r (truncate (/ y0 <tile-size>)))
 	   (c (truncate (/ x0 <tile-size>)))
-	   (cells (aref (field-value :grid (or <world> *world*))
-			(+ <origin-y> r) (+ <origin-x> c))))
+	   (r0 (+ <origin-y> r))
+	   (c0 (+ <origin-x> c))
+	   (grid (field-value :grid (or <world> *world*)))
+	   (cells (when (array-in-bounds-p grid r0 c0)
+		    (aref grid r0 c0))))
       (labels ((hit (sprite)
 		 (multiple-value-bind (sx sy) [xy-coordinates sprite]
 		   (let* ((im (field-value :image sprite))
@@ -190,7 +193,7 @@
 		       sprite)))))
 	(assert *world*)
 	(or (some #'hit (field-value :sprites *world*))
-	    (aref cells (1- (fill-pointer cells))))))))
+	    (when cells (aref cells (1- (fill-pointer cells)))))))))
 
 (define-method set-origin viewport (&key x y height width)
   (setf <origin-x> x
