@@ -1270,11 +1270,13 @@ world, and collision detection is performed between sprites and cells.")
     (when sprite-name
       (draw-resource-image (field-value :image (symbol-value sprite-name)) x y :destination image))))
 
-(define-method loadout sprite-special ()
-  (when <sprite-name> [drop-sprite self (clone <sprite-name>)]))
-		     
 (define-method run sprite-special ()
-  [die self])
+  (when <sprite-name> 
+    [drop-sprite self (clone <sprite-name>)]
+    [die self]))
+		     
+;; (define-method run sprite-special ()
+;;   [die self])
 
 
 ;;; cells.lisp ends here

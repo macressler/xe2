@@ -32,7 +32,7 @@
     (message "colliding reactor damage")
     [play-sample self "ouch"]
     (dotimes (i 10)
-      [drop self (clone =plasma=)])
+      [drop self (clone =chi=)])
     [die other]))
 
 (define-method hit reactor-core ()
@@ -40,6 +40,7 @@
   [play-sound self "ouch"])
 
 (define-method die reactor-core ()
+  [play-sample self "buzzfan"]
   (dotimes (i 15)
     [drop self (clone =explosion=)])
   (dotimes (i 20) 
