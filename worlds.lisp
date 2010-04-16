@@ -170,7 +170,8 @@ At the moment, only 0=off and 1=on are supported.")
 	(setf <sprite-grid> sprite-grid)
 	(setf <sprite-table> (make-hash-table :test 'equal))))))
 
-(define-method paste-region world (other-world dest-row dest-column source-row source-column source-height source-width)
+(define-method paste-region world (other-world dest-row dest-column source-row source-column source-height source-width 
+					       &optional deepcopy)
     (loop for row from 0 to source-height
 	  do (loop for column from 0 to source-width
 		   do (let* ((cells [cells-at other-world (+ row source-row) (+ column source-column)])
@@ -178,11 +179,16 @@ At the moment, only 0=off and 1=on are supported.")
 			(when (vectorp cells)
 			  (loop while (< n (fill-pointer cells)) do
 			    (let* ((cell (aref cells n))
-				   (proto (object-parent cell)))
-			      [drop-cell self (clone proto) (+ row dest-row) (+ column dest-column) :exclusive nil])
+				   (proto (object-parent cell))
+				   (new-cell (if deepcopy 
+						 ;; create a distinct object with the same local field values.
+						 (deserialize (serialize cell))
+						 ;; create a similar object
+						 (clone proto))))
+			      [drop-cell self new-cell (+ row dest-row) (+ column dest-column) :exclusive nil])
 			    (incf n)))))))
 
-(define-method clone-onto world (other-world)
+(define-method clone-onto world (other-world &optional deepcopy)
   (let ((other (etypecase other-world
 		 (string (find-resource-object other-world))
 		 (clon:object other-world))))
@@ -190,7 +196,7 @@ At the moment, only 0=off and 1=on are supported.")
       (message "creating grid")
       [create-grid self :height height :width width]
       (message "pasting region")
-      [paste-region self other 0 0 0 0 height width])))
+      [paste-region self other 0 0 0 0 height width deepcopy])))
 
 ;; TODO define-method import-region (does not clone)
 
