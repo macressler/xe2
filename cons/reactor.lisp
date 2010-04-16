@@ -25,12 +25,15 @@
 	(decf <clock>))))
 
 (define-method do-collision reactor-core (other)
+  (message "colliding reactor")
   (unless (same-team self other)
-    (when [in-category other :particle]
-      [damage self 1]
-      [play-sound self "ouch"]
-      (dotimes (i 10)
-	[drop self (clone =sparkle=)]))))
+    (if [in-category other :particle]
+	(progn [damage self 1]
+	       [play-sound self "ouch"]
+	       (dotimes (i 10)
+		 [drop self (clone =sparkle=)])
+	       [die other])
+	[damage self 1])))
 
 (define-method hit reactor-core ()
   [damage self 1]
