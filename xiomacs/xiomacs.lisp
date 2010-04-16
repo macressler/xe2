@@ -67,7 +67,7 @@
 (add-hook '*after-load-module-hook* (lambda ()
 				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]
 				      (when (string= *module* "xiomacs")
-					[visit *form* "WelcomePage"])))
+					[visit *form* "FrontPage"])))
 
 (define-prototype xiomacs-prompt (:parent xe2:=prompt=))
 

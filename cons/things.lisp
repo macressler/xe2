@@ -63,7 +63,7 @@
   (movement-cost :initform (make-stat :base 10))
   (speed :initform (make-stat :base 5 :min 0 :max 10))
   (team :initform :player)
-  (categories :initform '(:actor :particle))
+  (categories :initform '(:actor :particle :target))
   (direction :initform :north))
 
 (define-method initialize buster-particle (direction)

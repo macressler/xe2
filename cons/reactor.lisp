@@ -10,9 +10,10 @@
 (defsprite reactor-core
   (image :initform "reactor1")
   (clock :initform 0)
+  (team :initform :enemy)
   (frame :initform (random 5))
   (categories :initform '(:obstacle :actor))
-  (hit-points :initform (make-stat :base 40 :min 0 :max 15))
+  (hit-points :initform (make-stat :base 2 :min 0 :max 15))
   (speed :initform (make-stat :base 10 :min 0 :max 15)))
 
 (define-method run reactor-core ()
@@ -25,15 +26,14 @@
 	(decf <clock>))))
 
 (define-method do-collision reactor-core (other)
-  (message "colliding reactor")
   (unless (same-team self other)
-    (if [in-category other :particle]
-	(progn [damage self 1]
-	       [play-sound self "ouch"]
-	       (dotimes (i 10)
-		 [drop self (clone =sparkle=)])
-	       [die other])
-	[damage self 1])))
+    (message "colliding reactor 2 teams")
+    [damage self 1]
+    (message "colliding reactor damage")
+    [play-sample self "ouch"]
+    (dotimes (i 10)
+      [drop self (clone =sparkle=)])
+    [die other]))
 
 (define-method hit reactor-core ()
   [damage self 1]
@@ -43,7 +43,7 @@
   (dotimes (i 10)
     [drop self (clone =explosion=)])
   (dotimes (i 20) 
-    [drop self (clone =karma=)])
+    [drop self (clone =sparkle=)])
   [parent>>die self])
 
 (defcell reactor-special
