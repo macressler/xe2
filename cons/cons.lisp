@@ -310,7 +310,9 @@
 						      )))
 	       [set-player universe player]
 	       [play universe
-	       	     :address '(=alien-base=)
+	       	     :address
+		     		     "reactor1138"
+		     ;; '(=reactor=)
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]

@@ -157,66 +157,71 @@
   [category-at-head self :obstacle])
   
 (define-method push agent () 
-  ;; TODO verify enough segments
-  (let ((item [item-at-head self]))
-    (if item
-	(progn (push item <items>)
-	       [play-sample self "doorbell"]
-	       [delete-from-world item])
-	[say self "Nothing to push."])))
+  (unless <dead>
+    ;; TODO verify enough segments
+    (let ((item [item-at-head self]))
+      (if item
+	  (progn (push item <items>)
+		 [play-sample self "doorbell"]
+		 [delete-from-world item])
+	  [say self "Nothing to push."]))))
 	
 (define-method pop agent ()
-  (clon:with-fields (items) self
-    (multiple-value-bind (row column)
-	[space-at-head self]
-      (if [category-at-head self :obstacle]
-	  [say self "Cannot drop item."]
-	  (progn
-	    (let ((item (car items)))
-	      (if (clon:object-p item)
-		  (progn (setf items (delete item items))
-			 [play-sample self "doorbell2"]
-			 [drop-cell *world* item row column])
-		  [say self "Nothing to drop."])))))))
-
+  (unless <dead>
+    (clon:with-fields (items) self
+      (multiple-value-bind (row column)
+	  [space-at-head self]
+	(if [category-at-head self :obstacle]
+	    [say self "Cannot drop item."]
+	    (progn
+	      (let ((item (car items)))
+		(if (clon:object-p item)
+		    (progn (setf items (delete item items))
+			   [play-sample self "doorbell2"]
+			   [drop-cell *world* item row column])
+		    [say self "Nothing to drop."]))))))))
+  
 (define-method do-action agent ()
-  (if [in-overworld self]
-      (let ((gateway [category-at-p *world* <row> <column> :gateway]))
-	(if (clon:object-p gateway)
-	    [activate gateway]
-	    (error "No gateway.")))
-      (cond ([category-at-head self :action]
-	     [do-action [category-at-head self :action]])
-	    ([category-at-head self :item]
-	     [push self])
-	    (t 
-	     (if (car <items>)
-		 [pop self]
-		 (progn 
-		   [play-sample self "error"]
-		   [say self "Nothing to do here."]))))))
-	   
+  (unless <dead>
+    (if [in-overworld self]
+	(let ((gateway [category-at-p *world* <row> <column> :gateway]))
+	  (if (clon:object-p gateway)
+	      [activate gateway]
+	      (error "No gateway.")))
+	(cond ([category-at-head self :action]
+	       [do-action [category-at-head self :action]])
+	      ([category-at-head self :item]
+	       [push self])
+	      (t 
+	       (if (car <items>)
+		   [pop self]
+		   (progn 
+		     [play-sample self "error"]
+		     [say self "Nothing to do here."])))))))
+
 (define-method expend-item agent ()
   (pop <items>))
 
 (define-method rotate agent () 
-  (clon:with-fields (items) self
-    (if items
-	(let ((tail (pop items)))
-	  [play-sample self "doorbell3"]
-	  (setf items (append items (list tail))))
-	(progn 
-	  [play-sample self "error"]
-	  [say self "Cannot rotate empty list."]))))
+  (unless <dead>
+    (clon:with-fields (items) self
+      (if items
+	  (let ((tail (pop items)))
+	    [play-sample self "doorbell3"]
+	    (setf items (append items (list tail))))
+	  (progn 
+	    [play-sample self "error"]
+	    [say self "Cannot rotate empty list."])))))
 
 (define-method call agent (&optional direction)
-  (when direction
-    [aim self direction])
-  (let ((item (car <items>)))
-    (if (and item [in-category item :item]
-	     (clon:has-method :call item))
-	[call item self]
-	[say self "Cannot call."])))
+  (unless <dead>
+    (when direction
+      [aim self direction])
+    (let ((item (car <items>)))
+      (if (and item [in-category item :item]
+	       (clon:has-method :call item))
+	  [call item self]
+	  [say self "Cannot call."]))))
 
 (define-method run agent () 
   [update-tiles self])
@@ -245,5 +250,5 @@
 ;;    [set-prompt *form* agent]
     [set-character *status* agent]
     [play *universe*
-	  :address (list '=alien-base= :sequence-number (genseq))]
+	  :address (list '=reactor= :sequence-number (genseq))]
     [loadout agent]))

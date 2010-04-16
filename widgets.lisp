@@ -162,6 +162,8 @@ possibly return one of them."
     (let ((y <y>)
           (x <x>))
       (dolist (widget <children>)
+	(assert (integerp x))
+	(assert (integerp y))
         [move widget :x x :y y]
         (incf y (field-value :height widget))))))
 

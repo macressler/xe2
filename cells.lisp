@@ -79,7 +79,7 @@ Sprites are also based on cells. See `defsprite'.")
   (team :initform nil :documentation "Keyword symbol of team, if any.")
   (weight :documentation "Weight of the cell, in kilograms.")
   (widget :initform nil :documentation "XE2 widget object, if any.")
-  (tile :initform nil :documentation "Resource name of image. 
+  (tile :initform ".asterisk" :documentation "Resource name of image. 
 When nil, the method DRAW is invoked instead of using a tile.")
   (render-cell :initform nil :documentation "Subcell to render. See load-sprite-sheet-resource.")
   (row :documentation "When non-nil, the current row location of the cell.")
@@ -569,10 +569,15 @@ EXCLUSIVE is nil; this allows one to drop objects on top of oneself.
 When LOADOUT is non-nil, call the :loadout method."
   [drop-cell *world* cell <row> <column> :loadout loadout :exclusive exclusive])
 
-(define-method drop-sprite cell (sprite x y)
+(define-method drop-sprite cell (sprite &optional x y)
   "Add SPRITE to the world at location X,Y."
-  [add-sprite *world* sprite]
-  [update-position sprite x y])
+  (multiple-value-bind (x0 y0)
+      [xy-coordinates self]
+    (let ((x1 (or x x0))
+	  (y1 (or y y0)))
+      [add-sprite *world* sprite]
+      (assert (and x1 y1))
+      [update-position sprite x1 y1])))
 
 (define-method step cell (stepper)
   "Respond to being stepped on by the STEPPER."
@@ -1235,5 +1240,14 @@ world, and collision detection is performed between sprites and cells.")
     (when (minusp (decf <timeout>))
       [die self])))
 
+(define-method deserialize cell ()
+  (with-field-values (equipment) self
+    (when (listp equipment)
+      (loop while equipment do
+	(pop equipment) ;; get rid of keyword
+	(let ((item (pop equipment)))
+	  (when item
+	    (setf (field-value :equipper item)
+		  self)))))))
 
 ;;; cells.lisp ends here

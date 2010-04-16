@@ -211,21 +211,23 @@ Then it fires and gives chase.")
 (define-method do-collision drone (other)
   (if [is-player other]
       [die other]
-      (when [in-category other :obstacle]
-	;; don't get hung up on the enemies we drop.
-	(unless (and (has-field :team other)
-		     (eq :enemy (field-value :team other)))
-	  (unless (percent-of-time 10 (setf <direction> (opposite-direction <direction>)))
-	    (setf <direction> (ecase <direction>
-				(:here :west)
-				(:northwest :west)
-				(:northeast :east)
-				(:north :west)
-				(:west :south)
-				(:southeast :east)
-				(:southwest :south)
-				(:south :east)
-				(:east :north))))))))
+      (if [in-category other :obstacle]
+	  ;; don't get hung up on the enemies we drop.
+	  (unless (and (has-field :team other)
+		       (eq :enemy (field-value :team other)))
+	    (unless (percent-of-time 10 (setf <direction> (opposite-direction <direction>)))
+	      (setf <direction> (ecase <direction>
+				  (:here :west)
+				  (:northwest :west)
+				  (:northeast :east)
+				  (:north :west)
+				  (:west :south)
+				  (:southeast :east)
+				  (:southwest :south)
+				  (:south :east)
+				  (:east :north)))))
+	  (when (eq :player (field-value :team other))
+	    [damage self 2]))))
 
 ;;; The radar-equipped Biclops is more dangerous.  
 

@@ -335,8 +335,6 @@ is the integer on the top of the stack."
 	  (setf <row> r <column> c <direction> dir))
 	(error "Invalid location argument for POPLOC. Must be a list of two integers plus a keyword."))))
 
-
-
 (define-method right world ()
   "Turn N degrees clockwise, where N is 0, 45, or 90."
   (with-fields (direction stack) self
@@ -513,6 +511,14 @@ cell is placed; nil otherwise."
 
 (define-method get-player world ()
   <player>)
+
+(define-method loadout-all world ()
+  (with-field-values (height width grid) self
+    (dotimes (i height)
+      (dotimes (j width) 
+	(do-cells (cell (aref grid i j))
+	  (when (has-method :loadout cell)
+	    [loadout cell]))))))
 
 (define-method player-row world ()
   "Return the grid row the player is on."

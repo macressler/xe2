@@ -10,9 +10,9 @@
 (defsprite reactor-core
   (image :initform "reactor1")
   (clock :initform 0)
-  (frame :initform 0)
+  (frame :initform (random 5))
   (categories :initform '(:obstacle :actor))
-  (hit-points :initform (make-stat :base 10 :min 0 :max 15))
+  (hit-points :initform (make-stat :base 40 :min 0 :max 15))
   (speed :initform (make-stat :base 10 :min 0 :max 15)))
 
 (define-method run reactor-core ()
@@ -24,6 +24,33 @@
       (progn 
 	(decf <clock>))))
 
+(define-method do-collision reactor-core (other)
+  (unless (same-team self other)
+    (when [in-category other :particle]
+      [damage self 1]
+      [play-sound self "ouch"]
+      (dotimes (i 10)
+	[drop self (clone =sparkle=)]))))
+
+(define-method hit reactor-core ()
+  [damage self 1]
+  [play-sound self "ouch"])
+
+(define-method die reactor-core ()
+  (dotimes (i 10)
+    [drop self (clone =explosion=)])
+  (dotimes (i 20) 
+    [drop self (clone =karma=)])
+  [parent>>die self])
+
+(defcell reactor-special
+  (auto-loadout :initform t)
+  (categories :initform '(:actor)))
+
+(define-method run reactor-special ()
+  [drop-sprite self (clone =reactor-core=)]
+  [die self])
+
 ;;; Reactor core sector
 
 (defcell orange-barrier
@@ -33,7 +60,7 @@
 
 (defcell blue-brick
   (description :initform "Breakable brick.")
-  (hit-points :initform (make-stat :base 20 :min 0))
+  (hit-points :initform (make-stat :base 8 :min 0))
   (tile :initform "darkorangeworld2")
   (categories :initform '(:obstacle)))
 
@@ -47,7 +74,7 @@
 
 (defcell purple-brick
   (description :initform "Impenetrable barrier.")
-  (hit-points :initform (make-stat :base 10 :min 0))
+  (hit-points :initform (make-stat :base 12 :min 0))
   ;; (tile :initform "darkorangeworld3")
   (tile :initform "darkorangeworld3")
   (categories :initform '(:obstacle)))
@@ -175,7 +202,7 @@ the enemy's power.")
   (clon:with-field-values (row column tile-size) self
     (let ((x (* column tile-size))
 	  (y (* row tile-size)))
-      [drop-sprite self (clone =reactor-core=) x y])))
+      [drop-cell self (clone =reactor-special=) x y])))
 
 (define-method drop-drones reactor ()
   (dotimes (n 3)
@@ -185,3 +212,8 @@ the enemy's power.")
 
 (define-method begin-ambient-loop reactor ()
   (play-music "neo-eof" :loop t))
+
+;; (define-method start reactor ()
+;;   [loadout-all self]
+;;   [parent>>start self])
+
