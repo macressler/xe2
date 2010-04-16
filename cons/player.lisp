@@ -250,5 +250,5 @@
 ;;    [set-prompt *form* agent]
     [set-character *status* agent]
     [play *universe*
-	  :address (list '=reactor= :bsequence-number (genseq))]
+	  :address (list '=reactor= :sequence-number (genseq))]
     [loadout agent]))

@@ -356,6 +356,9 @@ at the current cursor location. See also APPLY-LEFT and APPLY-RIGHT."
       [drop-cell <world> (clone (symbol-value data)) <cursor-row> <cursor-column>]
       [say self "Cannot clone."]))
 
+(define-method inspect form ()
+  nil)
+
 (define-method erase form (&optional data)
   "Erase the top cell at the current location."
   [say self "Erasing top cell."]
@@ -712,9 +715,11 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		      (progn 
 			(ecase view-style
 			  (:label [form-render cell image x y column-width])
-			  (:tile (when (field-value :tile cell)
-				   (draw-image (find-resource-object 
-						(field-value :tile cell)) x y :destination image))))
+			  (:tile (if [in-category cell :drawn]
+				     [draw cell x y image]
+				     (when (field-value :tile cell)
+				       (draw-image (find-resource-object 
+						    (field-value :tile cell)) x y :destination image)))))
 			(when entered
 			  (draw-rectangle x y 
 					  column-width 

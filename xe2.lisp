@@ -119,7 +119,7 @@ find-all-modules *next-module* transform-tree stat-value draw-line
 set-message-verbosities operation-symbol message-symbol play-sample
 set-music-volume add-message-verbosities with-message-queue =minimap=
 draw-pixel *user-keyboard-layout* *fullscreen* draw-circle
-set-field-option-value =pager= =pager-prompt= load-module
+set-field-option-value =pager= =pager-prompt= load-module =sprite-special=
 field-options world set-frame-rate *frame-rate* =stack= *workbook*
 *pak-file-extension* *window-title* *window-position* =split=
 set-timer-interval *message-logging* overlay poll-joystick-axis

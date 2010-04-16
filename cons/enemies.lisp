@@ -62,7 +62,7 @@ Then it fires and gives chase.")
   (tile :initform "corruption-east")
   (description :initform "Deadly digital audio data corruption.")
   (direction :initform :east)
-  (clock :initform 200)
+  (clock :initform 100)
   (categories :initform '(:actor)))
  
 (define-method step corruption (stepper)
@@ -129,8 +129,6 @@ Then it fires and gives chase.")
     (when cannon [recharge cannon]))
   (let ((dir [direction-to-player self])
 	(dist [distance-to-player self]))
-    (when (> 9 dist)
-      [fire self dir])
     (when [obstacle-in-direction-p *world* <row> <column> <direction>]
       (setf <direction> (if (= 0 (random 4))
 			    (ecase <direction>

@@ -165,8 +165,8 @@ When nil, the method DRAW is invoked instead of using a tile.")
 (define-method print cell ()
   "")
 
-(define-method read cell ()
-  nil)
+(define-method read cell (text)
+  (read-from-string text))
 
 (define-method form-render cell (image x y width)
   (let ((widget <widget>))
@@ -1249,5 +1249,32 @@ world, and collision detection is performed between sprites and cells.")
 	  (when item
 	    (setf (field-value :equipper item)
 		  self)))))))
+
+;;; Sprite specials; editor placeholders for sprites.
+
+;; This is a substitute for drop-sprite, mainly used in the editor.
+;; These special objects replace themselves with a sprite upon
+;; activation.
+
+(defcell sprite-special
+  (auto-loadout :initform t)
+  (sprite-name :initform nil)
+  (categories :initform '(:actor :drawn)))
+
+(define-method set sprite-special (value)
+  (assert (symbolp value))
+  (setf <sprite-name> value))
+
+(define-method draw sprite-special (x y image)
+  (with-fields (sprite-name) self
+    (when sprite-name
+      (draw-resource-image (field-value :image (symbol-value sprite-name)) x y :destination image))))
+
+(define-method loadout sprite-special ()
+  (when <sprite-name> [drop-sprite self (clone <sprite-name>)]))
+		     
+(define-method run sprite-special ()
+  [die self])
+
 
 ;;; cells.lisp ends here

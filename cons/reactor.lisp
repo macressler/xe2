@@ -64,7 +64,7 @@
   (categories :initform '(:obstacle)))
 
 (defcell blue-brick
-  (description :initform "Breakable brick.")
+  (description :initform "Plexium brick.")
   (hit-points :initform (make-stat :base 8 :min 0))
   (tile :initform "darkorangeworld2")
   (categories :initform '(:obstacle)))
@@ -78,7 +78,7 @@
   [parent>>die self])
 
 (defcell purple-brick
-  (description :initform "Impenetrable barrier.")
+  (description :initform "Plasteel barrier.")
   (hit-points :initform (make-stat :base 12 :min 0))
   ;; (tile :initform "darkorangeworld3")
   (tile :initform "darkorangeworld3")

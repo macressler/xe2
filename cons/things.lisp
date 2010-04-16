@@ -490,7 +490,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 (defcell gas
   (tile :initform "rad")
   (name :initform "Radioactive Gas")
-  (clock :initform 8)
+  (clock :initform 100)
   (categories :initform '(:actor))
   (description :initform "Spreading toxic radioactive gas. Avoid at all costs!"))
 
