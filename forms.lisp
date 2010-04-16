@@ -271,7 +271,7 @@
 
 (define-prototype form 
     (:parent =widget= :documentation  "An interactive graphical spreadsheet.")
-  prompt narrator
+  prompt narrator computing
   (page-name :initform nil)
   (world :documentation "The xe2:=world= of objects to be displayed.")
   rows columns
@@ -640,7 +640,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 				   mark-row mark-column width height
 				   view-style header-style tool tool-methods entered focused
 				   row-spacing rows columns draw-blanks column-widths) self
-      [compute self]
+      (when <computing> [compute self])
       [compute-geometry self]
       (let* ((image <image>)
 	     (widget-width <width>)

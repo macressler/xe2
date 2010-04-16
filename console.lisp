@@ -996,6 +996,7 @@ OBJECT as the data."
 					      *pak-file-extension*))
 	       (list resource))
     (message "Saving resource ~S... Done." name)
+    (setf (resource-modified-p resource) nil)
     (setf (resource-data resource) nil)))
 
 (defun is-special-resource (resource)

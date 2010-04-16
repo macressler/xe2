@@ -133,6 +133,8 @@ When nil, the method DRAW is invoked instead of using a tile.")
 
 (define-method compute cell () nil)
 
+;;; Forms compatibility
+
 (defvar *default-cell-label* '((" DEF ")))
 
 (define-method form-label cell ()
@@ -1275,7 +1277,7 @@ world, and collision detection is performed between sprites and cells.")
 (define-method run sprite-special ()
   (with-fields (sprite-name) self
     (when sprite-name
-      [drop-sprite self (clone sprite-name)]
+      [drop-sprite self (clone (symbol-value sprite-name))]
       [die self])))
 		     
 ;; (define-method run sprite-special ()
