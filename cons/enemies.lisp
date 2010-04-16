@@ -441,3 +441,64 @@ Hard to kill because of their evasive manuevers."))
 (define-method fire rook (direction)
   [play-sample self "drill-bit"]
   [parent>>fire self direction])
+
+;;; The Xiocond
+
+(defcell xiocond 
+  (tile :initform "xiocond")
+  (categories :initform '(:actor :obstacle :target :enemy :opaque :xiocond :puck))
+  (speed :initform (make-stat :base 3))
+  (movement-cost :initform (make-stat :base 20))
+  (default-cost :initform (make-stat :base 20))
+  (direction :initform (car (one-of '(:south :west))))
+  (hit-points :initform (make-stat :min 0 :base 25))
+  (stepping :initform t)
+  (dead :initform nil)
+  (name :initform "Xiocond")
+  (description :initform 
+"These bounce back and forth very quickly, firing muon particles if
+the player gets too close."))
+
+(define-method get-nasty xiocond ()
+  [damage [get-player *world*] 1])
+
+;; (define-method loadout xiocond ()
+;;   (incf *enemies*))
+  
+;; (define-method cancel xiocond ()
+;;   (decf *enemies*))
+
+(define-method run xiocond ()
+  (if [obstacle-in-direction-p *world* <row> <column> <direction>]
+      (setf <direction> (opposite-direction <direction>))
+      (progn [move self <direction>]
+	     (if (and (> 8 [distance-to-player self])
+		      [line-of-sight *world* <row> <column> 
+				     [player-row *world*]
+				     [player-column *world*]])
+		 [fire self [direction-to-player self]]))))
+
+(define-method fire xiocond (direction)
+  (let ((muon (clone =muon-particle=)))
+    [drop self muon]
+    [play-sample self "serve"]
+    [expend-action-points self 160]
+    [impel muon direction] ))
+
+(define-method hit xiocond (&optional other)
+  (when other
+    (unless (same-team self other)
+      [damage self 2]
+      [die other])))
+
+;; (define-method damage xiocond (points)
+;;   [get-nasty self])
+
+(define-method die xiocond ()
+  [play-sample self "death-alien"]
+  [parent>>die self])
+    
+;; (define-method kick xiocond (direction)
+;;   (setf <direction> direction)
+;;   [move self direction])
+

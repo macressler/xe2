@@ -199,7 +199,9 @@ the enemy's power.")
 
 (define-method generate reactor (&rest params)
   (message "generating reactor")
-  [clone-onto self "reactor1138"])
+  [clone-onto self "reactor1138"]
+  (dotimes (i 4) 
+    [drop-cell self (clone =xiocond=) (random <height>) (random <width>)]))
 
 (define-method drop-reactor reactor ()
   (clon:with-field-values (row column tile-size) self

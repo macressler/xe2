@@ -325,7 +325,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 	  [>>move self <direction>]
 	  [>>expend-default-action-points self]
 	  [>>drop target (clone =flash=)]
-	  [>>push target <direction>]
+	  ;;[>>push target <direction>]
 	  [>>damage target <attack-power>]
 	  [>>die self])
 	(multiple-value-bind (r c) 

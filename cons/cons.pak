@@ -750,6 +750,7 @@
  (:name "doorbell3" :type :sample :file "doorbell3.wav" :properties (:volume 80))
  (:name "fanfare" :type :sample :file "fanfare.wav" :properties (:volume 40))
  (:name "buzzfan" :type :sample :file "buzzfan.wav" :properties (:volume 40))
+ (:name "xiocond" :type :image :file "xiocond.png")
 
  (:name "quickhelp-message" :type :formatted-text :file "quickhelp.text")
  (:name "help-message" :type :formatted-text :file "README")
