@@ -462,12 +462,6 @@ the player gets too close."))
 (define-method get-nasty xiocond ()
   [damage [get-player *world*] 1])
 
-;; (define-method loadout xiocond ()
-;;   (incf *enemies*))
-  
-;; (define-method cancel xiocond ()
-;;   (decf *enemies*))
-
 (define-method run xiocond ()
   (if [obstacle-in-direction-p *world* <row> <column> <direction>]
       (setf <direction> (opposite-direction <direction>))
@@ -491,14 +485,7 @@ the player gets too close."))
       [damage self 2]
       [die other])))
 
-;; (define-method damage xiocond (points)
-;;   [get-nasty self])
-
 (define-method die xiocond ()
   [play-sample self "death-alien"]
   [parent>>die self])
-    
-;; (define-method kick xiocond (direction)
-;;   (setf <direction> direction)
-;;   [move self direction])
 

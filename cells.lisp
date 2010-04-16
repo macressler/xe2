@@ -1267,13 +1267,16 @@ world, and collision detection is performed between sprites and cells.")
 
 (define-method draw sprite-special (x y image)
   (with-fields (sprite-name) self
-    (when sprite-name
-      (draw-resource-image (field-value :image (symbol-value sprite-name)) x y :destination image))))
+    (let ((im (if (and sprite-name (has-field :image (symbol-value sprite-name)))
+		  (field-value :image (symbol-value sprite-name))
+		  ".asterisk")))
+      (draw-resource-image im x y :destination image))))
 
 (define-method run sprite-special ()
-  (when <sprite-name> 
-    [drop-sprite self (clone <sprite-name>)]
-    [die self]))
+  (with-fields (sprite-name) self
+    (when sprite-name
+      [drop-sprite self (clone sprite-name)]
+      [die self])))
 		     
 ;; (define-method run sprite-special ()
 ;;   [die self])

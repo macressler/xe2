@@ -394,6 +394,7 @@ See also CREATE-WORLD."
     (assert (object-p world))
     (setf <page-name> (field-value :name world))
     [say self (format nil "Visiting page ~S" <page-name>)]
+    (set-resource-modified-p <page-name> t)
     (setf <world> world)
     (setf *world* world) ;; TODO suspicious
     [install-keybindings self]
