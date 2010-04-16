@@ -13,7 +13,7 @@
   (team :initform :enemy)
   (frame :initform (random 5))
   (categories :initform '(:obstacle :actor))
-  (hit-points :initform (make-stat :base 2 :min 0 :max 15))
+  (hit-points :initform (make-stat :base 40 :min 0 :max 15))
   (speed :initform (make-stat :base 10 :min 0 :max 15)))
 
 (define-method run reactor-core ()
@@ -32,7 +32,7 @@
     (message "colliding reactor damage")
     [play-sample self "ouch"]
     (dotimes (i 10)
-      [drop self (clone =sparkle=)])
+      [drop self (clone =plasma=)])
     [die other]))
 
 (define-method hit reactor-core ()
@@ -40,18 +40,20 @@
   [play-sound self "ouch"])
 
 (define-method die reactor-core ()
-  (dotimes (i 10)
+  (dotimes (i 15)
     [drop self (clone =explosion=)])
   (dotimes (i 20) 
-    [drop self (clone =sparkle=)])
+    [drop self (clone =gas=)])
   [parent>>die self])
 
 (defcell reactor-special
   (auto-loadout :initform t)
   (categories :initform '(:actor)))
 
+(define-method loadout reactor-special ()
+  [drop-sprite self (clone =reactor-core=)])
+
 (define-method run reactor-special ()
-  [drop-sprite self (clone =reactor-core=)]
   [die self])
 
 ;;; Reactor core sector
@@ -195,11 +197,8 @@ the enemy's power.")
 		        6 :draw)))))
 
 (define-method generate reactor (&rest params)
-  [create-default-grid self]
-  (dotimes (row <height>)
-    (dotimes (column <width>)
-      [drop-cell self (clone =orange-road=) row column]))
-  [parent>>generate self])
+  (message "generating reactor")
+  [clone-onto self "reactor1138"])
 
 (define-method drop-reactor reactor ()
   (clon:with-field-values (row column tile-size) self
@@ -214,7 +213,7 @@ the enemy's power.")
     [drop-sprite self (clone =drone=) (+ 40 (random (* 13 <height>))) (+ 40 (* 13 (random <width>)))]))
 
 (define-method begin-ambient-loop reactor ()
-  (play-music "neo-eof" :loop t))
+  (play-music "beatup" :loop t))
 
 ;; (define-method start reactor ()
 ;;   [loadout-all self]

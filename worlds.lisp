@@ -175,11 +175,22 @@ At the moment, only 0=off and 1=on are supported.")
 	  do (loop for column from 0 to source-width
 		   do (let* ((cells [cells-at other-world (+ row source-row) (+ column source-column)])
 			     (n 0))
-			(loop while (< n (fill-pointer cells)) do
-			  (let* ((cell (aref cells n))
-				 (proto (object-parent cell)))
-			    [drop-cell self (clone proto) (+ row dest-row) (+ column dest-column) :exclusive nil])
-			  (incf n))))))
+			(when (vectorp cells)
+			  (loop while (< n (fill-pointer cells)) do
+			    (let* ((cell (aref cells n))
+				   (proto (object-parent cell)))
+			      [drop-cell self (clone proto) (+ row dest-row) (+ column dest-column) :exclusive nil])
+			    (incf n)))))))
+
+(define-method clone-onto world (other-world)
+  (let ((other (etypecase other-world
+		 (string (find-resource-object other-world))
+		 (clon:object other-world))))
+    (with-fields (height width) other
+      (message "creating grid")
+      [create-grid self :height height :width width]
+      (message "pasting region")
+      [paste-region self other 0 0 0 0 height width])))
 
 ;; TODO define-method import-region (does not clone)
 

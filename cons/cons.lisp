@@ -311,8 +311,8 @@
 	       [set-player universe player]
 	       [play universe
 	       	     :address
-		     		     "reactor1138"
-		     ;; '(=reactor=)
+
+		     (list '=reactor= :sequence-number (genseq))
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]
