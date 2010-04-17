@@ -12,6 +12,7 @@
   (clock :initform 0)
   (team :initform :enemy)
   (frame :initform (random 5))
+  (dead :initform nil)
   (categories :initform '(:obstacle :actor))
   (hit-points :initform (make-stat :base 40 :min 0 :max 15))
   (speed :initform (make-stat :base 10 :min 0 :max 15)))
@@ -27,9 +28,7 @@
 
 (define-method do-collision reactor-core (other)
   (unless (same-team self other)
-    (message "colliding reactor 2 teams")
     [damage self 1]
-    (message "colliding reactor damage")
     [play-sample self "ouch"]
     (dotimes (i 10)
       [drop self (clone =chi=)])
@@ -40,12 +39,15 @@
   [play-sound self "ouch"])
 
 (define-method die reactor-core ()
-  [play-sample self "buzzfan"]
-  (dotimes (i 15)
-    [drop self (clone =explosion=)])
-  (dotimes (i 20) 
-    [drop self (clone =gas=)])
-  [parent>>die self])
+  (unless <dead>
+    (setf <dead> t)
+    (message "DYING REACTOR")
+    [play-sample self "buzzfan"]
+    (dotimes (i 15)
+      [drop self (clone =explosion=)])
+    (dotimes (i 10) 
+      [drop self (clone =gas=)])
+    [parent>>die self]))
 
 (defcell reactor-special
   (auto-loadout :initform t)
