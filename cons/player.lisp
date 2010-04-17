@@ -193,11 +193,8 @@
 	      ([category-at-head self :item]
 	       [push self])
 	      (t 
-	       (if (car <items>)
-		   [pop self]
-		   (progn 
-		     [play-sample self "error"]
-		     [say self "Nothing to do here."])))))))
+	       [play-sample self "error"]
+	       [say self "Nothing to do here."])))))
 
 (define-method expend-item agent ()
   (pop <items>))

@@ -79,6 +79,7 @@
 	    ;;
 	    ("Z" nil "do-action .")
 	    ("X" nil "rotate .")
+	    ("C" nil "pop .")
 	    ;;
 	    ("P" (:control) "pause .")
 	    ("PAUSE" nil "pause .")
