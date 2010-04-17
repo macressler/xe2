@@ -173,27 +173,30 @@
         [draw-overlays self]))))
 
 (define-method hit viewport (x y)
-  (when [parent>>hit self x y]
-    (let* ((x0 (- x <x>))
-	   (y0 (- y <y>))
-	   (r (truncate (/ y0 <tile-size>)))
-	   (c (truncate (/ x0 <tile-size>)))
-	   (r0 (+ <origin-y> r))
-	   (c0 (+ <origin-x> c))
-	   (grid (field-value :grid (or <world> *world*)))
-	   (cells (when (array-in-bounds-p grid r0 c0)
-		    (aref grid r0 c0))))
+  (with-fields (origin-x origin-y tile-size) self
+    (when [parent>>hit self x y]
+      (let* ((x0 (- x <x>))
+	     (y0 (- y <y>))
+	     (r (truncate (/ y0 tile-size)))
+	     (c (truncate (/ x0 tile-size)))
+	     (r0 (+ origin-y r))
+	     (c0 (+ origin-x c))
+	     (y1 (* tile-size origin-y))
+	     (x1 (* tile-size origin-x))
+	     (grid (field-value :grid (or <world> *world*)))
+	     (cells (when (array-in-bounds-p grid r0 c0)
+		      (aref grid r0 c0))))
       (labels ((hit (sprite)
 		 (multiple-value-bind (sx sy) [xy-coordinates sprite]
 		   (let* ((im (field-value :image sprite))
 			  (h (image-height im))
 			  (w (image-width im)))
-		     (when (and (<= (- sx <origin-x>) x0 (+ sx w))
-				(<= (- sy <origin-y>) y0 (+ sy h)))
+		     (when (and (<= (- sx x1) x0 (+ sx w))
+				(<= (- sy y1) y0 (+ sy h)))
 		       sprite)))))
 	(assert *world*)
 	(or (some #'hit (field-value :sprites *world*))
-	    (when cells (aref cells (1- (fill-pointer cells)))))))))
+	    (when cells (aref cells (1- (fill-pointer cells))))))))))
 
 (define-method set-origin viewport (&key x y height width)
   (setf <origin-x> x
