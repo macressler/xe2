@@ -1,5 +1,7 @@
 ** DONE [#A] move "drop" to C key
 CLOSED: [2010-04-16 Fri 20:30]
+** TODO drone should make hit sound and die bullet when hit
+** TODO more powerful bombs
 ** TODO [#A] scaled display of current inventory with labels
 ** TODO [#A] create "defeat all enemies" goal
 ** TODO [#A] killable xioconds
