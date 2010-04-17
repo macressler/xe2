@@ -14,7 +14,7 @@
   (frame :initform (random 5))
   (dead :initform nil)
   (categories :initform '(:obstacle :actor))
-  (hit-points :initform (make-stat :base 40 :min 0 :max 15))
+  (hit-points :initform (make-stat :base 70 :min 0 :max 15))
   (speed :initform (make-stat :base 10 :min 0 :max 15)))
 
 (define-method run reactor-core ()
@@ -200,7 +200,6 @@ the enemy's power.")
 		        6 :draw)))))
 
 (define-method generate reactor (&rest params)
-  (message "generating reactor")
   [clone-onto self "reactor1138" :deepcopy])
 
 (define-method drop-reactor reactor ()

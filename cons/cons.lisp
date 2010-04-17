@@ -370,7 +370,7 @@
     (xe2:install-widgets splash-prompt splash)
     ;;
     [add-page *pager* :game (list prompt stack viewport terminal quickhelp *status*)]
-    (xe2:enable-classic-key-repeat 100 100)
+    (xe2:enable-classic-key-repeat 100 60)
     ;; [set-page-property *pager* :game :held-keys t]
     [add-page *pager* :help (list help)]
 ))

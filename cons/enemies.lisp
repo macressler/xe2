@@ -225,7 +225,9 @@ Then it fires and gives chase.")
 				  (:south :east)
 				  (:east :north)))))
 	  (when (eq :player (field-value :team other))
-	    [damage self 2]))))
+	    [damage self 2]
+	    [play-sample self "blaagh"]
+	    [die other]))))
 
 ;;; The radar-equipped Biclops is more dangerous.  
 

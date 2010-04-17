@@ -119,8 +119,11 @@ However, ammunition is unlimited, making BUSTER an old standby.")
     (if (zerop clock) 
 	[explode self]
 	(progn 
-	  [expend-action-points self 30]		    
+	  [expend-action-points self 40]		    
 	  (setf <tile> (bomb-tile clock))
+	  [play-sample self "countdown"]
+	  (dotimes (n 10)
+	    [drop self (clone =particle=)])
 	  (decf clock)))))
 
 (define-method explode bomb ()  
@@ -134,9 +137,8 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 	       (when (and (< (random 100) probability)
 			  [in-bounds-p *world* r c])
 		 (do-cells (cell [cells-at *world* r c])
-		   (if [is-player cell]
-		       [damage cell 4]
-		       [hit cell self]))))))
+		   (when (clon:has-method :damage cell)
+		     [damage cell 8]))))))
     (dolist (dir xe2:*compass-directions*)
       (multiple-value-bind (r c)
 	  (step-in-direction <row> <column> dir)
