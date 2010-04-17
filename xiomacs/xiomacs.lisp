@@ -116,6 +116,8 @@
     ;; performing operations like clone, erase
     ("UP" (:control) :apply-right)
     ("DOWN" (:control) :apply-left)
+    ("LEFTBRACKET" nil :apply-left)
+    ("RIGHTBRACKET" nil :apply-right)
     ;; marking and stuff
     ("SPACE" (:control) :set-mark)
     ("SPACE" (:alt) :clear-mark)
