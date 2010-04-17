@@ -86,7 +86,7 @@ draw-image play define-prototype has-field defcell
 index-resource find-module-path index-module load-image-resource
 load-lisp-resource *executable* *resource-handlers* load-resource
 find-resource find-resource-object *colors* *world*
-load-user-init-file *module-directories* resource-to-plist
+load-user-init-file *module-directories* resource-to-plist *osx* *linux*
 make-resource make-object-resource make-event =widget=
 *active-widgets* bind-key-to-prompt-insertion make-field-initializer
 clone make-field-initializer-body make-key-modifier-symbol

@@ -937,7 +937,6 @@ along grid squares between R1,C1 and R2,C2."
 		(when (array-in-bounds-p grid r2 c2)
 		  (incf num-points)
 		  (vector-push-extend (list c2 r2) line)))
-	    (message "~S" line)
 	    (let ((retval (block tracing
 			    (let ((i 0))
 			      (loop while (< i num-points) do

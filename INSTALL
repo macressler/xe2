@@ -76,13 +76,10 @@ a trailing slash.
    then at the REPL:
 
     (require :xe2)
-    (xe2:play "blast")
+    (xe2:play "xong")
 
   If you get an error about TRIVIAL-FEATURES-TESTS, try this:
   (require :trivial-features-tests)
-  
-See the separate file $INSTALLDIR/invader/manual.org for playing
-instructions.
 
 8. Here is my example .xe2rc:
 

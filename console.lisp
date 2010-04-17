@@ -38,6 +38,8 @@
 ;;; Platforms
 
 (defvar *windows* nil)
+(defvar *linux* nil)
+(defvar *osx* nil)
 
 ;;; Message logging
 
