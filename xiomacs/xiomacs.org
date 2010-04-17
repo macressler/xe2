@@ -1,8 +1,11 @@
 ** DONE [#A] move "drop" to C key
 CLOSED: [2010-04-16 Fri 20:30]
-** TODO drone should make hit sound and die bullet when hit
-** TODO more powerful bombs
-** TODO bomb should make countdown sound
+** DONE drone should make hit sound and die bullet when hit
+CLOSED: [2010-04-17 Sat 17:12]
+** DONE more powerful bombs
+CLOSED: [2010-04-17 Sat 17:12]
+** DONE bomb should make countdown sound
+CLOSED: [2010-04-17 Sat 17:12]
 ** TODO key repeat delay is too long
 ** TODO switch to polling input every timestep for cons
 ** TODO picked up item goes to end (not replacing gun!)

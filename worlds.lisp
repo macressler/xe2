@@ -196,7 +196,8 @@ At the moment, only 0=off and 1=on are supported.")
       (message "creating grid")
       [create-grid self :height height :width width]
       (message "pasting region")
-      [paste-region self other 0 0 0 0 height width deepcopy])))
+      (let ((*world* other))
+	[paste-region self other 0 0 0 0 height width deepcopy]))))
 
 ;; TODO define-method import-region (does not clone)
 
