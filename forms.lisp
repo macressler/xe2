@@ -342,8 +342,14 @@
 		      tool-methods))
       [say self (format nil "Changing tool operation to ~S" tool)])))
 
+(define-method set-modified form (&optional (value t))
+  (with-fields (world) self
+    (with-fields (name) world
+      (set-resource-modified-p name value))))
+  
 (define-method apply-tool form (data)
   "Apply the current form's tool to the DATA."
+  [set-modified self]
   (with-fields (tool tool-methods) self
     (send nil tool self data)))
 

@@ -31,7 +31,7 @@
     [damage self 1]
     [play-sample self "ouch"]
     (dotimes (i 10)
-      [drop self (clone =chi=)])
+      [drop self (clone =spark=)])
     [die other]))
 
 (define-method hit reactor-core ()

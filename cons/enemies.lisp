@@ -365,7 +365,7 @@ They fire powerful heat-seeking bullets, but these can be shot down."))
 Hard to kill because of their evasive manuevers.")) 
 
 (define-method run rook ()
-  [expend-action-points self 1]
+  [expend-action-points self 2]
   (ecase <behavior>
     (:seeking [seek self])
     (:fleeing [flee self])))
@@ -386,7 +386,7 @@ Hard to kill because of their evasive manuevers."))
 	(if [adjacent-to-player world row column]
 	    (progn
 	      [>>fire self direction]
-	      (setf <clock> 6
+	      (setf <clock> 10
 		    <behavior> :fleeing))
 	    (if [obstacle-in-direction-p world row column direction]
 		(let ((target [target-in-direction-p world row column direction]))

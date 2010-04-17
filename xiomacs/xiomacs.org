@@ -2,10 +2,10 @@
 CLOSED: [2010-04-16 Fri 20:30]
 ** TODO [#A] scaled display of current inventory with labels
 ** TODO [#A] create "defeat all enemies" goal
-** TODO killable xioconds
+** TODO [#A] killable xioconds
 ** TODO [#B] 800x600 TUTORIAL HOW TO PLAY SCREEN
-** TODO 3 different levels
-** TODO review mission.lisp 
+** TODO [#B] 3 different levels
+** TODO [#B] review mission.lisp 
 
 ** TODO print object name and inspect clicked object in plist on right side
 ** TODO plist world would be pretty easy

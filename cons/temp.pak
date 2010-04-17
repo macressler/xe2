@@ -1,0 +1,355 @@
+((:NAME "temp" :TYPE :OBJECT :PROPERTIES COMMON-LISP:NIL :FILE COMMON-LISP:NIL
+  :DATA COMMON-LISP:NIL :OBJECT COMMON-LISP:NIL))2:=WORLD= :FIELDS
+   (:DESCRIPTION "Unknown area." :TILE-SIZE 16 :GRAMMAR COMMON-LISP:NIL :ROW 0
+    :COLUMN 0 :DIRECTION :EAST :SCALE (1 XIOMACS-ENGINE-2::M) :WIDTH 8 :HEIGHT
+    8 :AMBIENT-LIGHT :TOTAL :PHASE-NUMBER 1 :TURN-NUMBER 1 :EDGE-CONDITION
+    :EXIT :PLAYER-EXIT-ROW 0 :PLAYER-EXIT-COLUMN 0 :EXCLUDED-FIELDS
+    (:STACK :PAINT :SPRITE-GRID :SPRITE-TABLE :NARRATOR :BROWSER :VIEWPORT
+     :GRID :MESSAGE-QUEUE :PLAYER)
+    :VARIABLES (:%CLON%HASH-TABLE% COMMON-LISP:EQUAL) :LIGHT-GRID
+    #2A((0 0 0 0 0 0 0 0)
+        (0 0 0 0 0 0 0 0)
+        (0 0 0 0 0 0 0 0)
+        (0 0 0 0 0 0 0 0)
+        (0 0 0 0 0 0 0 0)
+        (0 0 0 0 0 0 0 0)
+        (0 0 0 0 0 0 0 0)
+        (0 0 0 0 0 0 0 0))
+    :NAME "temp" :SERIALIZED-GRID
+    #2A((COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
+         COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL)
+        (COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 1 :COLUMN
+            1)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=PURPLE-BRICK= :FIELDS
+           (:DESCRIPTION "Impenetrable barrier." :HIT-POINTS
+            (:BASE 10 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld3" :CATEGORIES (:OBSTACLE) :ROW 1 :COLUMN
+            2)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 1 :COLUMN
+            3)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 1 :COLUMN
+            4)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 1 :COLUMN
+            5)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 1 :COLUMN
+            6)))
+         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 2 :COLUMN
+            1)))
+         COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 2 :COLUMN
+            3)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BOMB-DEFUN= :FIELDS
+           (:NAME "BOMB" :DESCRIPTION
+            "This single-use BOMB program drops a timed explosive device."
+            :TILE "bomb-ammo" :CATEGORIES (:ITEM :TARGET :DEFUN) :ROW 2 :COLUMN
+            4)))
+         COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 2 :COLUMN
+            6)))
+         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 3 :COLUMN
+            1)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SHOCKER= :FIELDS
+           (:TILE "shocker" :AUTO-LOADOUT COMMON-LISP:T :DESCRIPTION
+            "Creeps about until catching sight of the player;
+Then it fires and gives chase."
+            :TEAM :ENEMY :COLOR :CYAN :WAVEFORM :SQUARE :HIT-POINTS
+            (:BASE 2 :MIN 0 :MAX 45 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :MOVEMENT-COST
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 5 :MIN 0 :MAX 25 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :HEARING-RANGE 15 :ENERGY
+            (:BASE 40 :MIN 0 :MAX 40 :DELTA COMMON-LISP:NIL :UNIT :GJ)
+            :STEPPING COMMON-LISP:T :DIRECTION :NORTH :FIRING-WITH :CENTER-BAY
+            :CATEGORIES
+            (:ACTOR :OBSTACLE :TARGET :CONTAINER :LIGHT-SOURCE :VEHICLE
+             :REPAIRABLE)
+            :EQUIPMENT-SLOTS (:LEFT-BAY :RIGHT-BAY :CENTER-BAY :EXTENSION) :ROW
+            3 :COLUMN 2 :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL)
+            :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=WAVE-CANNON= :FIELDS
+              (:TILE "gun" :RELOAD-CLOCK 0 :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :EQUIP-FOR (:CENTER-BAY)
+               :WEIGHT 7000 :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 12 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :CONTAINER COMMON-LISP:NIL))
+             (:LEFT-BAY :RIGHT-BAY :CENTER-BAY :EXTENSION) COMMON-LISP:NIL
+             (:RIGHT-BAY :CENTER-BAY :EXTENSION) COMMON-LISP:NIL
+             (:CENTER-BAY :EXTENSION) COMMON-LISP:NIL (:EXTENSION)
+             COMMON-LISP:NIL)
+            :ACTION-POINTS -5)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 3 :COLUMN
+            3)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 3 :COLUMN
+            4)))
+         COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 3 :COLUMN
+            6)))
+         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 4 :COLUMN
+            1)))
+         COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 4 :COLUMN
+            3)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BOMB-DEFUN= :FIELDS
+           (:NAME "BOMB" :DESCRIPTION
+            "This single-use BOMB program drops a timed explosive device."
+            :TILE "bomb-ammo" :CATEGORIES (:ITEM :TARGET :DEFUN) :ROW 4 :COLUMN
+            4)))
+         COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 4 :COLUMN
+            6)))
+         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 5 :COLUMN
+            1)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SHOCKER= :FIELDS
+           (:TILE "shocker" :AUTO-LOADOUT COMMON-LISP:T :DESCRIPTION
+            "Creeps about until catching sight of the player;
+Then it fires and gives chase."
+            :TEAM :ENEMY :COLOR :CYAN :WAVEFORM :SQUARE :HIT-POINTS
+            (:BASE 2 :MIN 0 :MAX 45 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :MOVEMENT-COST
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 5 :MIN 0 :MAX 25 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :HEARING-RANGE 15 :ENERGY
+            (:BASE 40 :MIN 0 :MAX 40 :DELTA COMMON-LISP:NIL :UNIT :GJ)
+            :STEPPING COMMON-LISP:T :DIRECTION :NORTH :FIRING-WITH :CENTER-BAY
+            :CATEGORIES
+            (:ACTOR :OBSTACLE :TARGET :CONTAINER :LIGHT-SOURCE :VEHICLE
+             :REPAIRABLE)
+            :EQUIPMENT-SLOTS (:LEFT-BAY :RIGHT-BAY :CENTER-BAY :EXTENSION) :ROW
+            5 :COLUMN 2 :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL)
+            :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=WAVE-CANNON= :FIELDS
+              (:TILE "gun" :RELOAD-CLOCK 0 :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :EQUIP-FOR (:CENTER-BAY)
+               :WEIGHT 7000 :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 12 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :CONTAINER COMMON-LISP:NIL))
+             (:LEFT-BAY :RIGHT-BAY :CENTER-BAY :EXTENSION) COMMON-LISP:NIL
+             (:RIGHT-BAY :CENTER-BAY :EXTENSION) COMMON-LISP:NIL
+             (:CENTER-BAY :EXTENSION) COMMON-LISP:NIL (:EXTENSION)
+             COMMON-LISP:NIL)
+            :ACTION-POINTS -5)))
+         COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SHOCKER= :FIELDS
+           (:TILE "shocker" :AUTO-LOADOUT COMMON-LISP:T :DESCRIPTION
+            "Creeps about until catching sight of the player;
+Then it fires and gives chase."
+            :TEAM :ENEMY :COLOR :CYAN :WAVEFORM :SQUARE :HIT-POINTS
+            (:BASE 2 :MIN 0 :MAX 45 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :MOVEMENT-COST
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 5 :MIN 0 :MAX 25 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :HEARING-RANGE 15 :ENERGY
+            (:BASE 40 :MIN 0 :MAX 40 :DELTA COMMON-LISP:NIL :UNIT :GJ)
+            :STEPPING COMMON-LISP:T :DIRECTION :NORTH :FIRING-WITH :CENTER-BAY
+            :CATEGORIES
+            (:ACTOR :OBSTACLE :TARGET :CONTAINER :LIGHT-SOURCE :VEHICLE
+             :REPAIRABLE)
+            :EQUIPMENT-SLOTS (:LEFT-BAY :RIGHT-BAY :CENTER-BAY :EXTENSION) :ROW
+            5 :COLUMN 4 :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL)
+            :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=WAVE-CANNON= :FIELDS
+              (:TILE "gun" :RELOAD-CLOCK 0 :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :EQUIP-FOR (:CENTER-BAY)
+               :WEIGHT 7000 :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 12 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :CONTAINER COMMON-LISP:NIL))
+             (:LEFT-BAY :RIGHT-BAY :CENTER-BAY :EXTENSION) COMMON-LISP:NIL
+             (:RIGHT-BAY :CENTER-BAY :EXTENSION) COMMON-LISP:NIL
+             (:CENTER-BAY :EXTENSION) COMMON-LISP:NIL (:EXTENSION)
+             COMMON-LISP:NIL)
+            :ACTION-POINTS -5)))
+         COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 5 :COLUMN
+            6)))
+         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 6 :COLUMN
+            1)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 6 :COLUMN
+            2)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 6 :COLUMN
+            3)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 6 :COLUMN
+            4)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 6 :COLUMN
+            5)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BLUE-BRICK= :FIELDS
+           (:DESCRIPTION "Breakable brick." :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX COMMON-LISP:NIL :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :TILE "darkorangeworld2" :CATEGORIES (:OBSTACLE) :ROW 6 :COLUMN
+            6)))
+         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
+         COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL))))
+  :OBJECT COMMON-LISP:NIL))
