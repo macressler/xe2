@@ -6,7 +6,9 @@ CLOSED: [2010-04-17 Sat 17:12]
 CLOSED: [2010-04-17 Sat 17:12]
 ** DONE bomb should make countdown sound
 CLOSED: [2010-04-17 Sat 17:12]
+** TODO recenter form view when entering data... also enter cell view
 ** TODO key repeat delay is too long
+** TODO fix drone movement
 ** TODO switch to polling input every timestep for cons
 ** TODO picked up item goes to end (not replacing gun!)
 ** TODO fix being able to pick up more items than segments

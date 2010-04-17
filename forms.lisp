@@ -684,6 +684,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	(multiple-value-bind (top left bottom right) [mark-region self]
 	  (let ((x0 0)
 		(y0 0)
+		pending-draws
 		(x1 width)
 		(y1 height))
 	    (when (and header-line header-style)
@@ -723,7 +724,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 			(ecase view-style
 			  (:label [form-render cell image x y column-width])
 			  (:tile (if [in-category cell :drawn]
-				     [draw cell x y image]
+				     (push (list cell x y) pending-draws)
 				     (when (field-value :tile cell)
 				       (draw-image (find-resource-object 
 						    (field-value :tile cell)) x y :destination image)))))
@@ -757,6 +758,10 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	      ;; move to next row down ;; TODO fix row-spacing
 	      (incf y (+ (if (eq :tile view-style)
 			     0 0) (aref row-heights row))))
+	    ;; draw any pending drawn cells
+	    (dolist (args pending-draws)
+	      (destructuring-bind (cell x y) args
+		[draw cell x y image]))
 	    ;; create status line
 	    ;; TODO break this formatting out into variables
 	    (setf status-line
