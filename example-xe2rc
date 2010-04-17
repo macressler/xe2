@@ -1,6 +1,6 @@
 ;; -*- Mode: lisp -*-
 
-;; You can copy this file to ~/.rlxrc and edit it to get rlx working 
+;; You can copy this file to ~/.xe2 and edit it to get XE2 working 
 
 ;; Edit the following line to reflect the path where you installed XE2
 (setf xe2:*module-directories* '(#P"/home/dto/xe2/"))
