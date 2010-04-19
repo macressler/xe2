@@ -311,9 +311,7 @@
 						      )))
 	       [set-player universe player]
 	       [play universe
-	       	     :address
-
-		     (list '=reactor= :sequence-number (genseq))
+	       	     :address (list '=zeta-x= :sequence-number (genseq))
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]

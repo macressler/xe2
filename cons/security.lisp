@@ -90,10 +90,10 @@ new abilities.")
   		       4 :draw drop-rook)))))
 
 (define-method begin-ambient-loop security ()
-  (play-music "purity" :loop t))
-    
-;; (define-method generate security (&rest params)
-;;   [clone-onto self "security727"]
-;;     (dotimes (i 4) 
-;;     [drop-cell self (clone =xiocond=) (random <height>) (random <width>)]))
+  (play-music "xioforms" :loop t))
+
+(define-prototype security774 (:parent =security=))
+  
+(define-method generate security774 (&rest params)
+  [clone-onto self "security774"])
 

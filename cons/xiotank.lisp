@@ -289,7 +289,7 @@
   (tile :initform "fence-east-on")
   (description :initform "This object creates a deadly wire fence. 
 Only opens when the right tone is heard.")
-  (note :initform "C-1")
+  (note :initform "A-2")
   (free :initform nil)
   (fence-length :initform 8)
   (clock2 :initform 0)

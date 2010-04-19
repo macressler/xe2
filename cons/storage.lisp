@@ -210,5 +210,5 @@ supplies, ammunition, and sometimes special items may be found here.")
     [drop-cell self (clone =scanner=) (random <height>) (random <width>)]))
 
 (define-method begin-ambient-loop storage ()
-  (play-music "beatup" :loop t))
+  (play-music "xiomacs" :loop t))
     

@@ -76,15 +76,28 @@
   (name :initform "Sector gateway")
   (tile :initform "unknown-gateway")
   (categories :initform '(:gateway :actor))
-  (world :initformp nil))
+  (world :initform nil)
+  (excluded-fields :initform (union (field-value :excluded-fields =cell=)
+				    (list :world))))
 
-(define-method initialize sector-gateway (address)
+(define-method initialize sector-gateway (&optional address)
+  (when address
+    [configure self address]))
+
+(define-method configure sector-gateway (address)
   (setf <address> address)
-  (let ((world (symbol-value (car <address>))))
+  (let ((world (etypecase address
+		 (list (symbol-value (car address)))
+		 (string (find-resource-object address)))))
+    (setf <world> world)
     (assert (clon:object-p world))
     (clon:with-field-values (description name) world
       (setf <description> description <name> name))
     [update-tile self]))
+
+(define-method set sector-gateway (address)
+  (when address 
+    [configure self address]))
 
 (define-method run sector-gateway ()
   [update-tile self])
@@ -92,8 +105,15 @@
 (define-method step sector-gateway (stepper)
   [describe self])
 
+(define-method deserialize sector-gateway ()
+  (clon:with-fields (address) self 
+    (when address
+      [configure self address])))
+
 (define-method update-tile sector-gateway ()
-  (setf <tile> (getf *sector-tiles* (car <address>))))
+  (setf <tile> (or (getf *sector-tiles* (or (object-name <world>)
+					    (object-parent <world>)))
+		   "unknown-gateway")))
 
 ;;; Alien base consists of a grid of sectors
 
@@ -126,4 +146,12 @@ select a sector; press Z to enter. Press F1 for help.")
 
 (define-method begin-ambient-loop alien-base ()
   (play-music "mello"))
+
+
+;;; Zeta
+
+(define-prototype zeta-x (:parent =alien-base=))
+
+(define-method generate zeta-x (&rest ignore)
+  [clone-onto self "zeta-x" :deepcopy])
 

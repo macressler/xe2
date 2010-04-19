@@ -247,5 +247,5 @@
 ;;    [set-prompt *form* agent]
     [set-character *status* agent]
     [play *universe*
-	  :address (list '=reactor= :sequence-number (genseq))]
+	  :address (list '=zeta-x= :sequence-number (genseq))]
     [loadout agent]))

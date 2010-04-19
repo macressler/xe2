@@ -204,8 +204,8 @@ the enemy's power.")
 			90 :right
 		        6 :draw)))))
 
-(define-method generate reactor (&rest params)
-  [clone-onto self "reactor1138" :deepcopy])
+;; (define-method generate reactor (&rest params)
+;;   [clone-onto self "reactor1138" :deepcopy])
 
 (define-method drop-reactor reactor ()
   (clon:with-field-values (row column tile-size) self
@@ -221,6 +221,13 @@ the enemy's power.")
 
 (define-method begin-ambient-loop reactor ()
   (play-music "beatup" :loop t))
+
+;; 
+
+(define-prototype reactor1138 (:parent =reactor=))
+
+(define-method generate reactor1138 (&rest params)
+  [clone-onto self "reactor1138" :deepcopy])
 
 ;; (define-method start reactor ()
 ;;   [loadout-all self]

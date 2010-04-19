@@ -1,5 +1,8 @@
+** TODO implement xe2 key polling http://code.google.com/p/lispbuilder/wiki/UsingLispbuilderSDL#Input_State
 ** TODO Simple mission structure with 2 missions
+** TODO fix bug with security being generated 
 ** TODO separate delete key
+** TODO bombs should blow up other bombs.
 ** TODO low HP warning light/sound
 ** TODO recenter form view when entering data... also enter cell view
 ** TODO key repeat delay is too long

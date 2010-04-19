@@ -2523,7 +2523,11 @@ Only opens when the right tone is heard."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "security-background" :ROW 12 :COLUMN
             14)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=OSCILLATOR= :FIELDS
+           (:CATEGORIES (:ACTOR :OBSTACLE :EXCLUSIVE :TARGET) :DESCRIPTION
+            "This object emits a tone when struck. Shoot to toggle." :TEAM
+            :NEUTRAL :WAVEFORM :SINE :NOTE "A-2" :ROW 12 :COLUMN 15))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "security-background" :ROW 12 :COLUMN
             15)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS

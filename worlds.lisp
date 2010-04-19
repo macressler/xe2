@@ -866,6 +866,8 @@ sources and ray casting."
       (dotimes (j <width>)
 	(do-cells (cell (aref grid i j))
 	  (setf (field-value :phase-number cell) phase-number)))))
+  (dolist (sprite <sprites>)
+    (setf (field-value :phase-number sprite) <phase-number>))
   ;; mark the world as entered
   (setf <exited> nil)
   ;; light up the world
@@ -1120,7 +1122,7 @@ represents the z-axis of a euclidean 3-D space."))
 
 (define-method destroy universe ()
   (setf <worlds> (make-hash-table :test 'equal))
-;;  (setf <stack> nil)
+  (setf <stack> nil)
   (setf <current-address> nil))
 
 (define-method generate-world universe (address)
