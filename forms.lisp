@@ -487,6 +487,11 @@ Type HELP :COMMANDS for a list of available commands."
   (xe2:save-modified-objects t)
   [say self "Saving objects... Done."])
 
+(define-method save-modified form ()
+  [say self "Saving objects..."]
+  (xe2:save-modified-objects)
+  [say self "Saving objects... Done."])
+  
 (define-method create-world form (&key height width name object)
   "Create and visit a blank world of height HEIGHT, width WIDTH, and name NAME.
 If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."

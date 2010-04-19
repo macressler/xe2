@@ -1,23 +1,14 @@
-** DONE [#A] move "drop" to C key
-CLOSED: [2010-04-16 Fri 20:30]
-** DONE drone should make hit sound and die bullet when hit
-CLOSED: [2010-04-17 Sat 17:12]
-** DONE more powerful bombs
-CLOSED: [2010-04-17 Sat 17:12]
-** DONE bomb should make countdown sound
-CLOSED: [2010-04-17 Sat 17:12]
+** TODO Simple mission structure with 2 missions
+** TODO separate delete key
+** TODO low HP warning light/sound
 ** TODO recenter form view when entering data... also enter cell view
 ** TODO key repeat delay is too long
-** TODO fix drone movement
+** TODO fix drone collisions
 ** TODO switch to polling input every timestep for cons
 ** TODO picked up item goes to end (not replacing gun!)
 ** TODO fix being able to pick up more items than segments
 ** TODO [#A] scaled display of current inventory with labels
-** TODO [#A] create "defeat all enemies" goal
-** TODO [#A] killable xioconds
 ** TODO [#B] 800x600 TUTORIAL HOW TO PLAY SCREEN, document ZX
-** TODO [#B] 3 different levels
-** TODO [#B] review mission.lisp 
 
 ** TODO print object name and inspect clicked object in plist on right side
 ** TODO plist world would be pretty easy

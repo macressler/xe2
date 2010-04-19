@@ -6469,9 +6469,11 @@ Then it fires and gives chase."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:COLUMN 33 :ROW 28 :TILE "reactor-background" :CATEGORIES
             (:FLOOR))))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
-           (:COLUMN 34 :ROW 28 :TILE "reactor-background" :CATEGORIES
-            (:FLOOR))))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SECURITY-GATEWAY= :FIELDS
+           (:COLUMN 34 :ROW 28 :ADDRESS "security774"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:WIDGET COMMON-LISP:NIL :COLUMN 34 :ROW 28 :TILE
+            "reactor-background" :CATEGORIES (:FLOOR))))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
            (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
             (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 28
@@ -12322,74 +12324,130 @@ Then it fires and gives chase."
     "The reactor cores contained in these chambers are the main source of
 the enemy's power."
     :NAME "reactor1138"))
-  :OBJECT COMMON-LISP:NIL))0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-        (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0))
-    :VARIABLES (:%CLON%HASH-TABLE% COMMON-LISP:EQUAL) :GRAMMAR
-    ((XIOMACS-ENGINE-2:WORLD CONS-GAME::>>
-                             (CONS-GAME::ROD-SQUARE :ORIGIN :PUSHLOC 45 :RIGHT
-                              5 :JUMP CONS-GAME::=EXIT= :COLOR :DROP :POPLOC 90
-                              :RIGHT 20 :JUMP 90 :LEFT 25 :JUMP 90 :LEFT
-                              :PUSHLOC CONS-GAME::SECURITY-STRUCTURE :POPLOC
-                              :DROP-DRONES))
-     (CONS-GAME::ROD-ANGLE CONS-GAME::>> 90 45)
-     (CONS-GAME::ROD CONS-GAME::>>
-      (9 :JUMP :PUSHLOC CONS-GAME::=BARRIER= :COLOR CONS-GAME::ROD-ANGLE :RIGHT
-       7 :DRAW :POPLOC))
-     (CONS-GAME::ROD-ROW CONS-GAME::>>
-      (CONS-GAME::ROD CONS-GAME::ROD CONS-GAME::ROD CONS-GAME::ROD
-       CONS-GAME::ROD 10 :JUMP 90 :RIGHT))
-     (CONS-GAME::ROD-SQUARE CONS-GAME::>>
-      (CONS-GAME::ROD-ROW CONS-GAME::ROD-ROW CONS-GAME::ROD-ROW
-       CONS-GAME::ROD-ROW))
-     (CONS-GAME::SIDE-CHAMBER CONS-GAME::>>
-      (:PUSHLOC CONS-GAME::ROOM3 90 CONS-GAME::RANDOM-TURN CONS-GAME::ROOM3 90
-       :LEFT 1 :JUMP CONS-GAME::GUN-MAYBE :PUSHLOC 90 :RIGHT 3 :JUMP
-       :DROP-REACTOR :POPLOC :POPLOC))
-     (CONS-GAME::GUN-MAYBE CONS-GAME::>> :NOOP :NOOP
-      (CONS-GAME::=SHOCKER= :COLOR :DROP))
-     (CONS-GAME::SECURITY-STRUCTURE CONS-GAME::>>
-      (COMMON-LISP:ROOM 90 :LEFT COMMON-LISP:ROOM 90 :LEFT COMMON-LISP:ROOM 90
-                        :LEFT COMMON-LISP:ROOM 90 :RIGHT 6 :JUMP :PUSHLOC
-                        CONS-GAME::ROOM2 90 CONS-GAME::RANDOM-TURN
-                        CONS-GAME::ROOM2 :POPLOC CONS-GAME::SIDE-CHAMBER))
-     (CONS-GAME::RANDOM-TURN CONS-GAME::>> :RIGHT :LEFT)
-     (CONS-GAME::RANDOM-BRICK CONS-GAME::>> CONS-GAME::=PURPLE-BRICK=
-      CONS-GAME::=BLUE-BRICK=)
-     (CONS-GAME::BOMBS CONS-GAME::>>
-      (:PUSH-COLOR :PUSHLOC 90 :LEFT CONS-GAME::=BOMB-DEFUN= :COLOR 1 :JUMP 2
-       :DRAW :POPLOC :COLOR))
-     (COMMON-LISP:ROOM CONS-GAME::>>
-                       (CONS-GAME::=BARRIER= :COLOR 5 :DRAW CONS-GAME::BOMBS 5
-                        :DRAW 90 :RIGHT 4 :DRAW 2 :JUMP 4 :DRAW 90 :RIGHT 10
-                        :DRAW))
-     (CONS-GAME::ROOM2 CONS-GAME::>>
-      (CONS-GAME::RANDOM-BRICK :COLOR 5 :DRAW 90 :RIGHT 5 :DRAW 90 :RIGHT 2
-       :DRAW 1 :JUMP 2 :DRAW 90 :RIGHT 10 :DRAW))
-     (CONS-GAME::ROOM3 CONS-GAME::>>
-      (CONS-GAME::=BLUE-BRICK= :COLOR 5 :DRAW 90 :RIGHT 6 :DRAW 90 :RIGHT 5
-       :DRAW 90 :RIGHT 6 :DRAW)))
-    :EDGE-CONDITION :BLOCK :SCALE (1 CONS-GAME::XM) :AMBIENT-LIGHT :TOTAL
-    :LEVEL 1 :WIDTH 55 :HEIGHT 55 :ACCENT "reactor-accent" :BARRIER
-    "reactor-foreground" :FLOOR "reactor-background" :DESCRIPTION
-    "The reactor cores contained in these chambers are the main source of
-the enemy's power."
-    :NAME "reactor1138"))
+  :OBJECT COMMON-LISP:NIL))CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            37)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 38))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            38)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 39))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            39)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 40))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            40)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 41))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            41)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 42))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            42)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 43))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            43)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 44))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            44)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 45))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 45))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            45)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 46))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            46)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 47))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            47)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 48))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            48)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 49))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            49)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 50))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            50)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 51))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            51)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 52))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            52)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 53))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            53)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
+           (:AUTO-LOADOUT COMMON-LISP:T :CATEGORIES
+            (:OBSTACLE :BARRIER :TARGET) :TILE "reactor-foreground" :ROW 54
+            :COLUMN 54))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "reactor-background" :ROW 54 :COLUMN
+            54)))))))
   :OBJECT COMMON-LISP:NIL))

@@ -1010,14 +1010,15 @@ OBJECT as the data."
 	       (when (not (stringp resource))
 		 (when (eq :object (resource-type resource))
 		   (unless (is-special-resource resource)
+		     ;; we want to index them all, whether or not we save them all.
+		     ;; make a link resource (i.e. of type :pak) to pull this in later
+		     (let ((link-resource (make-resource :type :pak 
+							 :file (concatenate 'string
+									    (resource-name resource)
+									    *pak-file-extension*))))
+		       (push link-resource index))
 		     (when (or force (resource-modified-p resource))
-		       (save-object-resource resource)
-		       ;; make a link resource (i.e. of type :pak) to pull this in later
-		       (let ((link-resource (make-resource :type :pak 
-							   :file (concatenate 'string
-									      (resource-name resource)
-									      *pak-file-extension*))))
-			 (push link-resource index))))))))
+		       (save-object-resource resource)))))))
       (maphash #'save *resource-table*))
     ;; write auto-generated index
     (write-pak (find-module-file *module* *object-index-filename*) index)))

@@ -59,6 +59,11 @@
 (define-method run reactor-special ()
   [die self])
 
+;;; Gateway to security area
+
+(define-prototype security-gateway (:parent xe2:=gateway=)
+  (address :initform "security774"))
+
 ;;; Reactor core sector
 
 (defcell orange-barrier

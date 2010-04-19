@@ -92,8 +92,8 @@ new abilities.")
 (define-method begin-ambient-loop security ()
   (play-music "purity" :loop t))
     
-(define-method generate security (&rest params)
-  [clone-onto self "security727"]
-    (dotimes (i 4) 
-    [drop-cell self (clone =xiocond=) (random <height>) (random <width>)]))
+;; (define-method generate security (&rest params)
+;;   [clone-onto self "security727"]
+;;     (dotimes (i 4) 
+;;     [drop-cell self (clone =xiocond=) (random <height>) (random <width>)]))
 
