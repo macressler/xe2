@@ -81,7 +81,17 @@
   [damage self 1])
 
 (define-method damage agent (points)
-  (message "DAMAGE OF ~S" points)
+  (labels ((do-circle (image)
+	     (prog1 t
+	       (multiple-value-bind (x y) 
+		   [image-coordinates self]
+		 (let ((x0 (+ x 8))
+		       (y0 (+ y 8)))
+		   (draw-circle x0 y0 25 :destination image)
+		   (draw-circle x0 y0 30 :destination image)
+		   (draw-circle x0 y0 35 :destination image)
+		   (draw-circle x0 y0 40 :destination image))))))
+    [>>add-overlay :viewport #'do-circle])
   [parent>>damage self points])
   
 (define-method pause agent ()
@@ -143,7 +153,7 @@
 	(push segment segments)))))
 
 (define-method space-at-head agent ()
-  (step-in-direction <row> <column> <direction>))
+  (values <row> <column>))
 
 (define-method category-at-head agent (category)
   (multiple-value-bind (row column) 
@@ -158,43 +168,41 @@
   
 (define-method push agent () 
   (unless <dead>
-    ;; TODO verify enough segments
-    (let ((item [item-at-head self]))
-      (if item
-	  (progn (push item <items>)
-		 [play-sample self "doorbell"]
-		 [delete-from-world item])
-	  [say self "Nothing to push."]))))
+    (if (= (length <items>) <tail-length>)
+	(progn 
+	  [say self "Maximum capacity reached."]
+	  [play-sample self "error"])
+	(let ((item [item-at-head self]))
+	  (if item
+	      (progn (push item <items>)
+		     [play-sample self "doorbell"]
+		     [delete-from-world item])
+	      [say self "Nothing to push."])))))
 	
 (define-method pop agent ()
   (unless <dead>
     (clon:with-fields (items) self
       (multiple-value-bind (row column)
 	  [space-at-head self]
-	(if [category-at-head self :obstacle]
-	    [say self "Cannot drop item."]
-	    (progn
-	      (let ((item (car items)))
-		(if (clon:object-p item)
-		    (progn (setf items (delete item items))
-			   [play-sample self "doorbell2"]
-			   [drop-cell *world* item row column])
-		    [say self "Nothing to drop."]))))))))
+	(let ((item (car items)))
+	  (if (clon:object-p item)
+	      (progn (setf items (delete item items))
+		     [play-sample self "doorbell2"]
+		     [drop-cell *world* item row column])
+	      [say self "Nothing to drop."]))))))
   
 (define-method do-action agent ()
   (unless <dead>
-    (if [in-overworld self]
-	(let ((gateway [category-at-p *world* <row> <column> :gateway]))
-	  (if (clon:object-p gateway)
-	      [activate gateway]
-	      (error "No gateway.")))
-	(cond ([category-at-head self :action]
-	       [do-action [category-at-head self :action]])
-	      ([category-at-head self :item]
-	       [push self])
-	      (t 
-	       [play-sample self "error"]
-	       [say self "Nothing to do here."])))))
+    (let ((gateway [category-at-p *world* <row> <column> :gateway]))
+      (if (clon:object-p gateway)
+	  [activate gateway]
+	  (cond ([category-at-head self :action]
+		 [do-action [category-at-head self :action]])
+		([category-at-head self :item]
+		 [push self])
+		(t 
+		 [play-sample self "error"]
+		 [say self "Nothing to do here."]))))))
 
 (define-method expend-item agent ()
   (pop <items>))

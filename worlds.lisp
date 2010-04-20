@@ -1134,6 +1134,7 @@ represents the z-axis of a euclidean 3-D space."))
 	  [generate-with world parameters])))))
 
 (define-method find-world universe (address)
+  (assert address)
   (let ((candidate [get-world self address]))
     (if (null candidate)
 	[add-world self (normalize-address address)

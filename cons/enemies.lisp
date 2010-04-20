@@ -454,7 +454,7 @@ Hard to kill because of their evasive manuevers."))
   (movement-cost :initform (make-stat :base 20))
   (default-cost :initform (make-stat :base 20))
   (direction :initform (car (one-of '(:south :west))))
-  (hit-points :initform (make-stat :min 0 :base 13))
+  (hit-points :initform (make-stat :min 0 :base 18))
   (stepping :initform t)
   (dead :initform nil)
   (name :initform "Xiocond")
@@ -463,13 +463,13 @@ Hard to kill because of their evasive manuevers."))
 the player gets too close."))
 
 (define-method get-nasty xiocond ()
-  [damage [get-player *world*] 1])
+  [damage [get-player *world*] 4])
 
 (define-method run xiocond ()
   (if [obstacle-in-direction-p *world* <row> <column> <direction>]
       (setf <direction> (opposite-direction <direction>))
       (progn [move self <direction>]
-	     (if (and (> 8 [distance-to-player self])
+	     (if (and (> 12 [distance-to-player self])
 		      [line-of-sight *world* <row> <column> 
 				     [player-row *world*]
 				     [player-column *world*]])
@@ -483,10 +483,8 @@ the player gets too close."))
     [impel muon direction] ))
 
 (define-method hit xiocond (&optional other)
-  (when other
-    (unless (same-team self other)
-      [damage self 2]
-      [die other])))
+  [damage self 2]
+  [play-sample self "blop"])
 
 (define-method die xiocond ()
   [play-sample self "death-alien"]

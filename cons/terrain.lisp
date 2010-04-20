@@ -111,9 +111,11 @@
       [configure self address])))
 
 (define-method update-tile sector-gateway ()
-  (setf <tile> (or (getf *sector-tiles* (or (object-name <world>)
+  (setf <tile> (if (null (field-value :overworld *world*))
+		   "vomac-gateway"
+		   (or (getf *sector-tiles* (or (object-name <world>)
 					    (object-parent <world>)))
-		   "unknown-gateway")))
+		   "unknown-gateway"))))
 
 ;;; Alien base consists of a grid of sectors
 

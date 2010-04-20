@@ -96,6 +96,8 @@
 	     (has-field :team object)
 	     (not (eq <team> (field-value :team object))))
     [hit object self]
+    (when [in-category object :particle]
+      [die object])
     [die self]))
 
 ;;; Pulsators 
@@ -464,7 +466,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
 
 (defcell oscillator 
   (categories :initform '(:actor :obstacle :exclusive :target))
-  channel
+  channel (tile :initform "osc-sine-off")
   (description :initform "This object emits a tone when struck. Shoot to toggle.")
   (team :initform :neutral)
   (waveform :initform :sine)

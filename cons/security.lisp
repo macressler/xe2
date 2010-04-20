@@ -89,11 +89,16 @@ new abilities.")
   		       90 :right
   		       4 :draw drop-rook)))))
 
+(define-method start security ()
+  [parent>>start self]
+  (setf *notes* nil))
+
 (define-method begin-ambient-loop security ()
   (play-music "xioforms" :loop t))
 
 (define-prototype security774 (:parent =security=))
   
 (define-method generate security774 (&rest params)
-  [clone-onto self "security774"])
+  [clone-onto self "security774" :deepcopy])
+
 

@@ -85,7 +85,7 @@ around."))
 	       (0 (clone =health=))
 	       (1 (clone =bomb-defun=))
 	       (2 (clone =shocker=))
-	       (3 (clone =blue-key=)))]
+	       (3 (clone =bomb=)))]
   [parent>>die self])
 
 (define-method hit crate-special (&optional hitter)
@@ -203,11 +203,11 @@ supplies, ammunition, and sometimes special items may be found here.")
   (dotimes (n 17)
     [drop-cell self (clone =shocker=) (random <height>) (random <width>)])
   (dotimes (n 4)
-    [drop-cell self (clone =scanner=) (random <height>) (random <width>)]))
+    [drop-cell self (clone =xiocond=) (random <height>) (random <width>)]))
 
-(define-method drop-scanners storage ()
-  (dotimes (n 4)
-    [drop-cell self (clone =scanner=) (random <height>) (random <width>)]))
+;; (define-method drop-scanners storage ()
+;;   (dotimes (n 4)
+;;     [drop-cell self (clone =scanner=) (random <height>) (random <width>)]))
 
 (define-method begin-ambient-loop storage ()
   (play-music "xiomacs" :loop t))
