@@ -112,7 +112,7 @@
 
 (define-method update-tile sector-gateway ()
   (setf <tile> (if (null (field-value :overworld *world*))
-		   "vomac-gateway"
+		   "gateway"
 		   (or (getf *sector-tiles* (or (object-name <world>)
 					    (object-parent <world>)))
 		   "unknown-gateway"))))
