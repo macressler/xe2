@@ -22,6 +22,7 @@
   :components ((:file "xe2")
 	       (:file "math")
 	       (:file "rgb")
+	       (:file "keys")
 	       (:file "console")
 	       (:file "widgets")
 	       (:file "viewport")

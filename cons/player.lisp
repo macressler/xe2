@@ -49,6 +49,7 @@
   (dead :initform nil)
   (last-turn-moved :initform 0)
   (team :initform :player)
+  (input-phase :initform 0)
   (hit-points :initform (make-stat :base 20 :min 0 :max 20))
   (movement-cost :initform (make-stat :base 10))
   (speed :initform (make-stat :base 10 :min 0 :max 25))
@@ -242,10 +243,9 @@
 	  [say self "Cannot call."]))))
 
 (define-method run agent () 
-  (message "~S" (list :RUNNING <phase-number>))
   [update-tiles self]
   [do-keys self])
-  
+
 (define-method quit agent ()
   (xe2:quit :shutdown))
 
@@ -255,35 +255,32 @@
   (setf <segments> nil))
 
 (define-method do-keys agent ()
-  (let ((keys (xe2:keyboard-keys-down))
-	(mods (xe2:keyboard-modifiers))
-	(firing nil))
-    (message "~S" (list :DO-KEYS keys mods))
-    (message "~S" (list :KEYS (sdl::keys-down-p)))
-    (labels ((move (dir)
-	       [move self dir]
-	       (when firing [call self dir])))
-      (dolist (mod mods)
-	(case mod
-	  (:LSHIFT (setf firing t))
-	  (:RSHIFT (setf firing t))
-	  (otherwise nil)))
-      (dolist (key keys)
-	(case key
-	  (:KP8 (move :north))
-	  (:KP4 (move :west))
-	  (:KP6 (move :east))
-	  (:KP2 (move :south))
-	  (:UP (move :north))
-	  (:LEFT (move :west))
-	  (:RIGHT (move :east))
-	  (:DOWN (move :south))
-	  (:Z [act self])
-	  (:X [rotate self])
-	  (:C [pop self]))))))
-
+  (let (firing)
+    (multiple-value-bind (keys mods) (xe2:get-keys)
+      (labels ((move (dir)
+		 [move self dir]
+		 (when firing [call self dir])))
+	(dolist (mod mods)
+	  (case mod
+	    (:LSHIFT (setf firing t))
+	    (:RSHIFT (setf firing t))
+	    (otherwise nil)))
+	(dolist (key keys)
+	  (case key
+	    (:KP8 (move :north))
+	    (:KP4 (move :west))
+	    (:KP6 (move :east))
+	    (:KP2 (move :south))
+	    (:UP (move :north))
+	    (:LEFT (move :west))
+	    (:RIGHT (move :east))
+	    (:DOWN (move :south))
+	    (:Z [act self])
+	    (:X [rotate self])
+	    (:C [pop self])))))))
+    
 (define-method die agent ()
-  (unless <dead>
+      (unless <dead>
     (setf <tile> "agent-disabled")
     (dolist (segment <segments>)
       [die segment])

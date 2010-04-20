@@ -714,7 +714,7 @@ realtime mode."
 	    (grid <grid>)
 	    (categories nil))
 	(declare (type (simple-array vector (* *)) grid))
-;;	[run player]
+	[run player] 
 	[clear-light-grid self]
 	[clear-sprite-grid self]
 	(dotimes (i <height>)
@@ -730,7 +730,7 @@ realtime mode."
 		  [render-lighting self cell])
 		;; (when (member :player categories)
 		;;   [do-phase cell])
-		(when (and ;;(not (eq player cell))
+		(when (and (not (eq player cell))
 			   (member :actor categories)
 			   (not (member :dead categories)))
 		  [begin-phase cell]

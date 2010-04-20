@@ -66,7 +66,7 @@ generic-keybind *default-world-z-size* =browser= install-widgets
 =label= =form= keyboard-held-p keyboard-pressed-p keyboard-released-p
 keyboard-time-in-current-state keyboard-time-in-previous-state
 keyboard-down-p keyboard-keys-down keyboard-modifier-down-p
-keyboard-modifiers *module-package-name* module-package-name
+keyboard-modifiers get-keys *module-package-name* module-package-name
 *form-command-handler-function* =data-cell= =var-cell= =option-cell=
 =toggle-cell= =event-cell= =buffer-cell= =comment-cell= install-widget
 uninstall-widget =button-cell= =image-cell= *initialization-hook*
