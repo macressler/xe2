@@ -66,15 +66,27 @@
 
 (define-method start agent ()
   (clon:with-fields (segments) self
-    (setf segments nil)
     (setf <direction> :north)
     (setf <last-direction> :north)
     (if (field-value :overworld *world*)
 	(setf <tile> "player32")
 	(clon:with-field-values (row column) self
 	  (setf <tile> "agent-north")
-	    (dotimes (n <tail-length>)
-	      [add-segment self (- (+ row <tail-length>) n) column])))))
+	  [make-segments self]))))
+
+(define-method make-segments agent ()
+  (setf <direction> :north)
+  (setf <last-direction> :north)
+  (clon:with-field-values (tail-length row column segments) self
+    (dolist (segment segments)
+      [die segment])
+    (setf segments nil)
+    (dotimes (n tail-length)
+      [add-segment self (- (+ row tail-length) n) column])))
+
+(define-method upgrade agent ()
+  (incf <tail-length>)
+  [make-segments self])
 
 (define-method hit agent (&optional object)
   [play-sample self "ouch"]
@@ -242,6 +254,11 @@
 (define-method die agent ()
   (unless <dead>
     (setf <tile> "agent-disabled")
+    (dolist (segment <segments>)
+      [die segment])
+    (setf <segments> nil)
+    (dotimes (n 30)
+      [drop self (clone =explosion=)])
     [play-sample self "gameover"]
     [say self "You died. Press escape to reset."]
     (setf <dead> t)))
@@ -257,3 +274,14 @@
     [play *universe*
 	  :address (list '=zeta-x= :sequence-number (genseq))]
     [loadout agent]))
+
+;;; Player upgrade
+
+(defcell tail-defun 
+  (name :initform "TAIL")
+  (tile :initform "tail-defun")
+  (categories :initform '(:item :target :defun)))
+
+(define-method call tail-defun (caller)
+  [upgrade caller]
+  [expend-item caller])

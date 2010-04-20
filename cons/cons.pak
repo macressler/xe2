@@ -353,8 +353,10 @@
  (:name "blast-box-debris" :type :image :file "blast-box-debris.png")
 
  (:name "scanner" :type :image :file "scanner.png")
+ (:name "tail-defun" :type :image :file "tail-defun.png")
 
  (:name "lepton" :type :image :file "lepton.png")
+ (:name "lepton-defun" :type :image :file "lepton-defun.png")
  (:name "lepton-cannon" :type :image :file "gun.png")
 
  (:name "lepton-north" :type :image :file "lepton-north.png")

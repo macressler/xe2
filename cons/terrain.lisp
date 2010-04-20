@@ -100,6 +100,7 @@
     [configure self address]))
 
 (define-method run sector-gateway ()
+  [expend-default-action-points self]
   [update-tile self])
 
 (define-method step sector-gateway (stepper)
@@ -148,7 +149,6 @@ select a sector; press Z to enter. Press F1 for help.")
 
 (define-method begin-ambient-loop alien-base ()
   (play-music "mello"))
-
 
 ;;; Zeta
 

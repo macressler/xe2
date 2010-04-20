@@ -586,6 +586,9 @@ CATEGORY may be a list of keyword symbols or one keyword symbol."
 		     cell))
 	       (aref grid row column)))))
 
+(define-method enemy-at-p world (row column)
+  [category-at-p self row column :enemy])
+
 ;; (define-method category-at-xy-p world (x y category)
 ;;   (let ((
 

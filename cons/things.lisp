@@ -584,8 +584,10 @@ However, ammunition is unlimited, making BUSTER an old standby.")
     [die self]))
 
 (define-prototype lepton-particle (:parent xe2:=cell=)
-  (categories :initform '(:actor :target))
+  (categories :initform '(:actor :target :lepton))
   (speed :initform (make-stat :base 8))
+  (seeking :initform :player)
+  (team :initform :player)
   (stepping :initform t)
   (hit-damage :initform (make-stat :base 7))
   (default-cost :initform (make-stat :base 2))
@@ -621,17 +623,35 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 (define-method update-tile lepton-particle ()
   (setf <tile> (getf *lepton-tiles* <direction>)))
   
+(define-method seek-direction lepton-particle ()
+  (ecase <seeking>
+    (:player [direction-to-player *world* row column])
+    (:enemy (let (enemies)
+	      (labels ((find-enemies (r c)
+			 (let ((enemy [enemy-at-p *world* r c]))
+			   (prog1 nil
+			     (when enemy
+			       (push enemy enemies))))))
+		(trace-rectangle #'find-enemies (- <row> 3) (- <column> 3) 7 7 :fill))
+	      (if enemies
+		  (multiple-value-bind (row column) [grid-coordinates (car enemies)]
+		    (direction-to <row> <column> row column))
+		  <direction>)))))
+		
 (define-method run lepton-particle ()
   [update-tile self]
   (clon:with-field-values (row column) self
     (let* ((world *world*)
-	   (direction [direction-to-player *world* row column]))
+	   (direction [seek-direction self]))
       (setf <direction> direction)
       [find-target self])
     (decf <clock>)
     (when (and (zerop <clock>) 
 	       (not [in-category self :dead]))
       [>>die self])))
+
+(define-method seek lepton-particle (key)
+  (setf <seeking> key))
 
 (define-method damage lepton-particle (points)
   (declare (ignore points))
@@ -659,10 +679,27 @@ However, ammunition is unlimited, making BUSTER an old standby.")
   (if [expend-energy <equipper> [stat-value self :energy-cost]]
       (let ((lepton (clone =lepton-particle=)))
 	[play-sample <equipper> "bloup"]
-	[>>drop <equipper> lepton]
-	[>>impel lepton direction]
+	[drop <equipper> lepton]
+	[impel lepton direction]
 	[expend-action-points <equipper> [stat-value self :attack-cost]]
       (message "Not enough energy to fire."))))
+
+;;; Lepton weapon for player
+
+(defcell lepton-defun
+  (name :initform "LEPTON")
+  (description :initform 
+"The LEPTON program fires a strong homing missile.")
+  (tile :initform "lepton-defun")
+  (categories :initform '(:item :target :defun)))
+
+(define-method call lepton-defun (caller)
+  (clon:with-field-values (direction row column) caller
+    (let ((lepton (clone =lepton-particle=)))
+      [play-sample caller "bloup"]
+      [drop caller lepton]
+      [seek lepton :enemy]
+      [impel lepton direction])))
 
 ;;; An exploding missile.
 

@@ -24,7 +24,7 @@ Then it fires and gives chase.")
   (direction :initform :north)
   (attacking-with :initform nil)
   (firing-with :initform :center-bay)
-  (categories :initform '(:actor :obstacle  :target :container :light-source :vehicle :repairable))
+  (categories :initform '(:actor :obstacle  :target :container :light-source :vehicle :repairable :enemy))
   (equipment-slots :initform '(:left-bay :right-bay :center-bay :extension)))
 
 (define-method loadout shocker ()
