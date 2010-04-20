@@ -89,8 +89,9 @@
 (define-prototype cons-prompt (:parent xe2:=prompt=))
 
 (define-method install-keybindings cons-prompt ()
-  (dolist (k *qwerty-keybindings*)
-      (apply #'bind-key-to-prompt-insertion self k)))
+  nil)
+  ;; (dolist (k *qwerty-keybindings*)
+  ;;     (apply #'bind-key-to-prompt-insertion self k)))
 
 ;; (define-method install-keybindings cons-prompt ()
 ;;   (let ((keys (ecase xe2:*user-keyboard-layout* 
@@ -304,12 +305,9 @@
 	       ;;
 	       (xe2:halt-music 1000)
 	       (setf xe2:*physics-function* #'(lambda (&rest ignore)
-						(when *world* [run-cpu-phase *world* :timer]
-						      ;; (maphash #'(lambda (&rest args)
-						      ;; 		   (message "VAR: ~S" args))
-						      ;; 	       (field-value :variables *world*))
-						      )))
+						(when *world* [run-cpu-phase *world* :timer])))
 	       [set-player universe player]
+	       (setf *player* player)
 	       [play universe
 	       	     :address (list '=zeta-x= :sequence-number (genseq))
 	       	     :prompt prompt

@@ -342,6 +342,11 @@ interpretation:
   "Remove this cell from the specified CATEGORY."
   (setf <categories> (remove category <categories>)))
 
+;;; Run method
+
+(define-method run cell ()
+  nil)
+
 ;;; Action Points
 
 (define-method get-actions cell ()
@@ -365,11 +370,13 @@ message every frame."
   "Give the cell its allotment of action points to begin a phase.
 If the last action of the previous turn brought the AP score into the
 negative, then you'll come up that much short."
-  (incf <action-points> [stat-value self :speed])
-  [phase-hook self])
+  (incf <action-points> [stat-value self :speed]))
 
-(define-method phase-hook cell ()
+(define-method do-phase cell ()
   "Invoked once at the beginning of each phase.")
+
+(define-method poll-keys cell ()
+  nil)
 
 (define-method can-act cell (phase)
   "Determine whether the cell has enough action points to take some

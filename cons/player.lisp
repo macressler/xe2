@@ -203,7 +203,8 @@
 		     [drop-cell *world* item row column])
 	      [say self "Nothing to drop."]))))))
   
-(define-method do-action agent ()
+(define-method act agent ()
+  (message "ACT")
   (unless <dead>
     (let ((gateway [category-at-p *world* <row> <column> :gateway]))
       (if (clon:object-p gateway)
@@ -241,7 +242,9 @@
 	  [say self "Cannot call."]))))
 
 (define-method run agent () 
-  [update-tiles self])
+  (message "~S" (list :RUNNING <phase-number>))
+  [update-tiles self]
+  [do-keys self])
   
 (define-method quit agent ()
   (xe2:quit :shutdown))
@@ -250,6 +253,34 @@
   (dolist (segment <segments>)
     [die segment])
   (setf <segments> nil))
+
+(define-method do-keys agent ()
+  (let ((keys (xe2:keyboard-keys-down))
+	(mods (xe2:keyboard-modifiers))
+	(firing nil))
+    (message "~S" (list :DO-KEYS keys mods))
+    (message "~S" (list :KEYS (sdl::keys-down-p)))
+    (labels ((move (dir)
+	       [move self dir]
+	       (when firing [call self dir])))
+      (dolist (mod mods)
+	(case mod
+	  (:LSHIFT (setf firing t))
+	  (:RSHIFT (setf firing t))
+	  (otherwise nil)))
+      (dolist (key keys)
+	(case key
+	  (:KP8 (move :north))
+	  (:KP4 (move :west))
+	  (:KP6 (move :east))
+	  (:KP2 (move :south))
+	  (:UP (move :north))
+	  (:LEFT (move :west))
+	  (:RIGHT (move :east))
+	  (:DOWN (move :south))
+	  (:Z [act self])
+	  (:X [rotate self])
+	  (:C [pop self]))))))
 
 (define-method die agent ()
   (unless <dead>
@@ -267,6 +298,7 @@
   (let ((agent (clone =agent=)))
     [say self "Restarting CONS..."]
     (halt-sample t)
+    (setf *player* agent)
     [destroy *universe*]
     [set-player *universe* agent]
 ;;    [set-prompt *form* agent]

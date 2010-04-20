@@ -6,3 +6,5 @@
 (in-package :cons-game)
 
 (setf xe2:*module-package-name* :cons-game)
+
+(defvar *player*)

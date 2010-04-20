@@ -701,11 +701,11 @@ realtime mode."
 	  [run-cpu-phase self])
 	[begin-phase <player>])))
 
-(define-method run-cpu-phase world (&optional timer-p)
+(define-method run-cpu-phase world (&optional phase-p)
   "Run all non-player actor cells."
   (declare (optimize (speed 3)))
   (when (not <paused>)
-    (when timer-p
+    (when phase-p
       (incf <phase-number>))
     (with-message-queue <message-queue> 
       (let ((cell nil)
@@ -714,7 +714,7 @@ realtime mode."
 	    (grid <grid>)
 	    (categories nil))
 	(declare (type (simple-array vector (* *)) grid))
-	[run player]
+;;	[run player]
 	[clear-light-grid self]
 	[clear-sprite-grid self]
 	(dotimes (i <height>)
@@ -728,7 +728,9 @@ realtime mode."
 		(when (or (member :player categories)
 			  (member :light-source categories))
 		  [render-lighting self cell])
-		(when (and (not (eq player cell))
+		;; (when (member :player categories)
+		;;   [do-phase cell])
+		(when (and ;;(not (eq player cell))
 			   (member :actor categories)
 			   (not (member :dead categories)))
 		  [begin-phase cell]

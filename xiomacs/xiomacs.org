@@ -1,18 +1,15 @@
-** TODO implement xe2 key polling http://code.google.com/p/lispbuilder/wiki/UsingLispbuilderSDL#Input_State
-** TODO Simple mission structure with 2 missions
-** DONE fix sprite clicking no worky when origin-x not zero
-CLOSED: [2010-04-19 Mon 20:14]
-** TODO separate delete key
-** TODO homing missiles
-** TODO bombs should blow up other bombs.
-** TODO low HP warning light/sound
-** TODO recenter form view when entering data... also enter cell view
-** TODO key repeat delay is too long
-** TODO fix drone collisions
-** TODO switch to polling input every timestep for cons
-** TODO picked up item goes to end (not replacing gun!)
-** TODO fix being able to pick up more items than segments
+** TODO [#B] implement xe2 key polling http://code.google.com/p/lispbuilder/wiki/UsingLispbuilderSDL#Input_State
+** TODO [#A] switch to polling input every timestep for cons http://code.google.com/p/lispbuilder/source/browse/trunk/lispbuilder-sdl/cffi/keysym.lisp
 ** TODO [#A] scaled display of current inventory with labels
+** TODO [#B] picked up item goes to end (not replacing gun!)
+** TODO [#B] Simple mission structure with 2 missions
+** TODO [#C] bombs should blow up other bombs. more powerful BOMBS!
+** TODO [#B] low HP warning light/sound
+** TODO [#A] fix lepton gun hitting tail
+** TODO [#C] recenter form view when entering data... also enter cell view
+** TODO [#B] fix drone collisions
+** DONE fix being able to pick up more items than segments
+CLOSED: [2010-04-19 Mon 20:59]
 ** TODO [#B] 800x600 TUTORIAL HOW TO PLAY SCREEN, document ZX
 
 ** TODO print object name and inspect clicked object in plist on right side

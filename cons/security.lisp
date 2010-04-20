@@ -93,6 +93,11 @@ new abilities.")
   [parent>>start self]
   (setf *notes* nil))
 
+(define-method exit security ()
+  [parent>>exit self]
+  (setf *notes* nil)
+  (halt-sample t))
+
 (define-method begin-ambient-loop security ()
   (play-music "xioforms" :loop t))
 

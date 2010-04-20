@@ -61,33 +61,36 @@
   (:use :common-lisp :clon) 
   (:export *default-frame-width* *default-frame-height* =viewport=
 *frequency* *output-chunksize* *output-channels* halt-sample *dt*
-*physics-function* =equipment= *default-world-axis-size* generic-keybind
-*default-world-z-size* =browser= install-widgets =label= =form=
-*module-package-name* module-package-name *form-command-handler-function*
-=data-cell= =var-cell= =option-cell= =toggle-cell= =event-cell=
-=buffer-cell= =comment-cell= install-widget uninstall-widget
-=button-cell= =image-cell= *initialization-hook* initialize-engine
-split-string-on-lines message *prompt-sweden-keybindings*
-*prompt-qwerty-keybindings* *screen-width* transform-method-body
-roll-under make-stat =formatter= initialize-colors
-*standard-categories* *left-turn* *right-turn* *default-action-points*
-=world= roll bind-key-to-method *colors* enable-classic-key-repeat
-disable-classic-key-repeat get-color =prompt= =menu-item=
-=direction-chooser= define-method *default-font* *startup* field-value
-set-field-value object-fields dispatch-event run *user-init-file-name*
-distance icon-resource icon-image *compass-directions*
-*compass-opposites* find-resource-property compose-blank-fields
-font-width font-height *browser* browser set-browser find-page *windows*
-transform-field-reference *screen-height* =inventory=
-formatted-line-width *last-event* formatted-line-height
-formatted-string-height formatted-string-width get-color create-image
-draw-image play define-prototype has-field defcell
-*choose-direction-menu* set-field-options field-option-value
+*physics-function* =equipment= *default-world-axis-size*
+generic-keybind *default-world-z-size* =browser= install-widgets
+=label= =form= keyboard-held-p keyboard-pressed-p keyboard-released-p
+keyboard-time-in-current-state keyboard-time-in-previous-state
+keyboard-down-p keyboard-keys-down keyboard-modifier-down-p
+keyboard-modifiers *module-package-name* module-package-name
+*form-command-handler-function* =data-cell= =var-cell= =option-cell=
+=toggle-cell= =event-cell= =buffer-cell= =comment-cell= install-widget
+uninstall-widget =button-cell= =image-cell= *initialization-hook*
+initialize-engine split-string-on-lines message
+*prompt-sweden-keybindings* *prompt-qwerty-keybindings* *screen-width*
+transform-method-body roll-under make-stat =formatter=
+initialize-colors *standard-categories* *left-turn* *right-turn*
+*default-action-points* =world= roll bind-key-to-method *colors*
+enable-classic-key-repeat disable-classic-key-repeat get-color
+=prompt= =menu-item= =direction-chooser= define-method *default-font*
+*startup* field-value set-field-value object-fields dispatch-event run
+*user-init-file-name* distance icon-resource icon-image
+*compass-directions* *compass-opposites* find-resource-property
+compose-blank-fields font-width font-height *browser* browser
+set-browser find-page *windows* transform-field-reference
+*screen-height* =inventory= formatted-line-width *last-event*
+formatted-line-height formatted-string-height formatted-string-width
+get-color create-image draw-image play define-prototype has-field
+defcell *choose-direction-menu* set-field-options field-option-value
 index-resource find-module-path index-module load-image-resource
 load-lisp-resource *executable* *resource-handlers* load-resource
 find-resource find-resource-object *colors* *world*
-load-user-init-file *module-directories* resource-to-plist *osx* *linux*
-make-resource make-object-resource make-event =widget=
+load-user-init-file *module-directories* resource-to-plist *osx*
+*linux* make-resource make-object-resource make-event =widget=
 *active-widgets* bind-key-to-prompt-insertion make-field-initializer
 clone make-field-initializer-body make-key-modifier-symbol
 make-key-string normalize-event make-keyword make-object queue-head
@@ -119,14 +122,15 @@ find-all-modules *next-module* transform-tree stat-value draw-line
 set-message-verbosities operation-symbol message-symbol play-sample
 set-music-volume add-message-verbosities with-message-queue =minimap=
 draw-pixel *user-keyboard-layout* *fullscreen* draw-circle
-set-field-option-value =pager= =pager-prompt= load-module =sprite-special=
-field-options world set-frame-rate *frame-rate* =stack= *workbook* set-resource-modified-p
-*pak-file-extension* *window-title* *window-position* =split=
-set-timer-interval *message-logging* overlay poll-joystick-axis
-reset-joystick set-screen-width =universe= *universe* *play-args*
-set-screen-height genseq *zoom-factor* zoom-image is-zoomed-resource
-*timer-interval* save-modified-objects enable-timer disable-timer
-while enable-held-keys disable-held-keys do-cells draw-box *resizable*
+set-field-option-value =pager= =pager-prompt= load-module
+=sprite-special= field-options world set-frame-rate *frame-rate*
+=stack= *workbook* set-resource-modified-p *pak-file-extension*
+*window-title* *window-position* =split= set-timer-interval
+*message-logging* overlay poll-joystick-axis reset-joystick
+set-screen-width =universe= *universe* *play-args* set-screen-height
+genseq *zoom-factor* zoom-image is-zoomed-resource *timer-interval*
+save-modified-objects enable-timer disable-timer while
+enable-held-keys disable-held-keys do-cells draw-box *resizable*
 *resize-hook* draw-rectangle *quitting* *after-load-module-hook*
 *module* quit reset))
 
