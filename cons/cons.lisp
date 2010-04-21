@@ -77,7 +77,7 @@
 	    ("L" (:shift) "call :east .")
 	    ("J" (:shift) "call :south .")
 	    ;;
-	    ("Z" nil "do-action .")
+	    ("Z" nil "act .")
 	    ("X" nil "rotate .")
 	    ("C" nil "pop .")
 	    ;;
@@ -89,9 +89,8 @@
 (define-prototype cons-prompt (:parent xe2:=prompt=))
 
 (define-method install-keybindings cons-prompt ()
-  nil)
-  ;; (dolist (k *qwerty-keybindings*)
-  ;;     (apply #'bind-key-to-prompt-insertion self k)))
+  (dolist (k *qwerty-keybindings*)
+    (apply #'bind-key-to-prompt-insertion self k)))
 
 ;; (define-method install-keybindings cons-prompt ()
 ;;   (let ((keys (ecase xe2:*user-keyboard-layout* 
@@ -309,7 +308,8 @@
 	       [set-player universe player]
 	       (setf *player* player)
 	       [play universe
-	       	     :address (list '=zeta-x= :sequence-number (genseq))
+;;	       	     :address (list '=zeta-x= :sequence-number (genseq))
+	       	     :address (list '=biome= :sequence-number (genseq))
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]

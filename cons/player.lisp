@@ -243,8 +243,8 @@
 	  [say self "Cannot call."]))))
 
 (define-method run agent () 
-  [update-tiles self]
-  [do-keys self])
+  [update-tiles self])
+;;  [do-keys self])
 
 (define-method quit agent ()
   (xe2:quit :shutdown))

@@ -83,6 +83,8 @@
   "Returns t if the modifier key is depressed."
   (sdl:mod-down-p (keyboard-mod mod)))
 
+;; see also keys.lisp 
+
 (defun keyboard-keys-down ()
   "Returns a list of the keys that are depressed."
   (labels ((translate (key)

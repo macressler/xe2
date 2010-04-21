@@ -1,4 +1,4 @@
-(in-package :xe2)
+(in-package :cons-game)
 
 (defcell hive-floor 
   (name :initform "Hive floor")
@@ -37,11 +37,11 @@
   (tile :initform "sprout")
   (generation :initform 0)
   (hit-points :initform (make-stat :base 4 :max 7 :min 0))
-  (speed :initform (make-stat :base 3))
+  (speed :initform (make-stat :base 1))
   (strength :initform (make-stat :base 10))
   (defense :initform (make-stat :base 10))
   (stepping :initform t)
-  (movement-cost :initform (make-stat :base 10))
+  (movement-cost :initform (make-stat :base 20))
   (direction :initform (random-direction))
   (categories :initform '(:actor :obstacle :enemy :target))
   (description :initform 
@@ -60,15 +60,12 @@ biosilicate materials."))
 (define-method damage sprout (points)
   (let ((r <row>)
 	(c <column>))
-    [parent>>damage self points]
-    (when [in-category self :dead]
-      (percent-of-time 33
-	[drop-cell *world*
-		   (case (random 3)
-		     (0 (clone =energy=))
-		     (1 (clone =biosilicate=))
-		     (2 (clone =repair-module=)))
-		   r c]))))
+    [parent>>damage self points]))
+
+(define-method hit sprout (&optional other)
+  (when (and other [in-category other :particle])
+    [die other])
+  [damage self 1])
 
 (define-method die sprout ()
   [play-sample self "biodeath"]
@@ -76,6 +73,7 @@ biosilicate materials."))
   [parent>>die self])
 
 (define-method grow sprout ()
+  [expend-action-points self 100]
   (incf <generation>)
   (when (= 3 <generation>)
     [divide self])
@@ -112,14 +110,14 @@ biosilicate materials."))
 (define-method attack sprout (direction)
   (let ((player [get-player *world*]))
     [play-sample self "munch2"]
-    [damage player 4]
+    [damage player 1]
     [say self "The sprout hits you."]))
 
 ;;; Poison cells that harm the player
 
 (defcell toxic-hazard
   (name :initform "Toxic hazard")
-  (clock :initform 20)
+  (clock :initform 180)
   (tile :initform "toxic-hazard")
   (categories :initform '(:target :actor :item :opaque))
   (hit-points :initform (make-stat :base 6 :min 0))
@@ -143,17 +141,18 @@ biosilicate materials."))
   (tile :initform "excretor")
   (generation :initform 0)
   (hit-points :initform (make-stat :base 18 :max 12 :min 0))
-  (speed :initform (make-stat :base 2))
+  (speed :initform (make-stat :base 1))
   (strength :initform (make-stat :base 10))
   (defense :initform (make-stat :base 10))
   (stepping :initform t)
-  (movement-cost :initform (make-stat :base 10))
+  (movement-cost :initform (make-stat :base 20))
   (direction :initform (random-direction))
   (categories :initform '(:actor :obstacle :enemy :target))
   (description :initform "This Lovecraftian abomination excretes toxic waste pods."))
 
 (define-method run excretor ()
-  (when (< [distance-to-player self] 12)
+  [expend-action-points self 1]
+  (when (< [distance-to-player self] 25)
     [drop self (clone =toxic-hazard=)]
     (setf <direction> [direction-to-player self])
     (when [obstacle-in-direction-p *world* <row> <column> <direction>]
@@ -167,9 +166,17 @@ biosilicate materials."))
 	   (3 =bomb-ammo=)
 	   (2 =energy=))))
 	      
+(define-method hit excretor (&optional other)
+  (when (and other [in-category other :particle])
+    [die other])
+  [damage self 1]
+  [play-sample self "blaagh"])
+
 (define-method die excretor ()
   [play-sample self "blaagh4"]
-  [drop self (hive-random-powerup)]
+  (dotimes (n 10)
+    [drop self (clone =gas=)])
+;;  [drop self (hive-random-powerup)]
   [parent>>die self])
 
 ;;; The Biome
@@ -187,7 +194,7 @@ biosilicate materials."))
   (edge-condition :initform :block))
 
 (define-method begin-ambient-loop biome ()
-  (play-music "hive-music" :loop t)) 
+  (play-music "neo-eof" :loop t)) 
 
 (define-method drop-cluster biome (row column)
   (labels ((drop-pollen (r c &optional (type 1))
@@ -208,7 +215,7 @@ biosilicate materials."))
 		 (+ (- column 3)
 		    (random 5))])))
 
-(define-method generate biome (&key height width clusters
+(define-method generate biome (&key (height 80) (width 80) clusters
 				    (sequence-number (random 32768))
 				    (size 10)
 				    (pollen3a 30)

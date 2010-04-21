@@ -5,6 +5,8 @@
 		     :character-map "0123456789"
                      :color-key (:r 0 :g 0 :b 0)))
 
+ (:name "talk" :type :sample :file "talk.wav" :properties (:volume 20))
+
  (:name "brick-purple" :type :image :file "brick-purple.png")
  (:name "brick-black" :type :image :file "brick-black.png")
  (:name "brick-red" :type :image :file "brick-red.png")
@@ -17,6 +19,12 @@
  (:name "sparkblur" :type :image :file "sparkblur.png")
  (:name "sparkblur2" :type :image :file "sparkblur2.png")
  (:name "sparkblur3" :type :image :file "sparkblur3.png")
+
+ (:name "greenspace1" :type :image :file "greenspace1.png")
+ (:name "greenspace2" :type :image :file "greenspace2.png")
+ (:name "greenspace3" :type :image :file "greenspace3.png")
+ (:name "greenspace4" :type :image :file "greenspace4.png")
+ (:name "greenspace5" :type :image :file "greenspace5.png")
 
  (:name "rezblur1" :type :image :file "rezblur1.png")
  (:name "rezblur2" :type :image :file "rezblur2.png")
@@ -844,5 +852,6 @@
  (:name "security-lisp" :type :lisp :file "security.lisp" :properties (:autoload t))
  (:name "player-lisp" :type :lisp :file "player.lisp" :properties (:autoload t))
  (:name "enemies-lisp" :type :lisp :file "enemies.lisp" :properties (:autoload t))
+ (:name "hive-lisp" :type :lisp :file "hive.lisp" :properties (:autoload t))
  (:name ".startup" :type :lisp :file "cons.lisp")
 ) 

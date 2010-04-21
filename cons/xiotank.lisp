@@ -489,7 +489,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
     [intone self waveform note]
     (setf <state> t)
     [update-tile self]
-    (let ((label (clone =label= 
+    (let ((label (clone =balloon= 
 			:name "Oscillator" 
 			:description (concatenate 'string "Currently playing tone " <note>)
 			:tile "osc-sine-on"

@@ -378,6 +378,8 @@ Hard to kill because of their evasive manuevers."))
 
 (define-method die rook ()
   [play-sample self "blaagh2"]
+  (percent-of-time 50
+    [drop self (clone =bomb-defun=)])
   [parent>>die self])
 
 (define-method seek rook ()

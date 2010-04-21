@@ -63,7 +63,7 @@
 *frequency* *output-chunksize* *output-channels* halt-sample *dt*
 *physics-function* =equipment= *default-world-axis-size*
 generic-keybind *default-world-z-size* =browser= install-widgets
-=label= =form= keyboard-held-p keyboard-pressed-p keyboard-released-p
+=balloon= =form= keyboard-held-p keyboard-pressed-p keyboard-released-p
 keyboard-time-in-current-state keyboard-time-in-previous-state
 keyboard-down-p keyboard-keys-down keyboard-modifier-down-p
 keyboard-modifiers get-keys *module-package-name* module-package-name

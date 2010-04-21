@@ -1198,14 +1198,14 @@ world, and collision detection is performed between sprites and cells.")
   
 (define-method hit cell (&optional other) nil)
 
-;;; Popup text labels
+;;; Popup text balloons
 
-(defcell label 
-  (categories :initform '(:drawn :actor :label))
+(defcell balloon 
+  (categories :initform '(:drawn :actor :balloon))
   text stroke-color background-color timeout)
 
-(define-method initialize label (&key text (stroke-color ".white") (background-color ".gray30")
-					(style :label) (timeout nil) name tile description)
+(define-method initialize balloon (&key text (stroke-color ".white") (background-color ".gray30")
+					(style :balloon) (timeout nil) name tile description)
   (setf <text> text) 
   (when tile (setf <tile> tile))
   (when name (setf <name> name))
@@ -1219,10 +1219,10 @@ world, and collision detection is performed between sprites and cells.")
 		      ;; leave as frames if integer
 		      timeout)))
   
-(define-method draw label (x y image)
+(define-method draw balloon (x y image)
   (clon:with-field-values (text style) self
     (let* ((offset (ecase style
-		     (:label 16)
+		     (:balloon (field-value :tile-size *world*))
 		     (:flat 0)))
 	   (x0 x)
 	   (y0 y)
@@ -1235,20 +1235,21 @@ world, and collision detection is performed between sprites and cells.")
 		:stroke-color <stroke-color>
 		:color <background-color>
 		:destination image)
-      ;; (when (eq style :label)
-      ;; 	(draw-line x0 y0 x1 y1 :destination image))
+      (when (eq style :balloon)
+      	(draw-line x0 y0 x1 y1 :destination image))
       (let ((x2 (+ margin x1))
 	    (y2 (+ margin y1)))
 	(dolist (line text)
 	  (render-formatted-line line x2 y2 :destination image)
 	  (incf y2 (formatted-line-height line)))))))
 
-(define-method run label ()
+(define-method run balloon ()
   [expend-default-action-points self]
   (when (integerp <timeout>)
     (when (minusp (decf <timeout>))
       [die self])))
 
+;; TODO is this needed?
 (define-method deserialize cell ()
   (with-field-values (equipment) self
     (when (listp equipment)
