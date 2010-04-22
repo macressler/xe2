@@ -38,14 +38,14 @@
 
 ;;; The dancefloor tiles
 
-(defparameter *light-tiles* '("floor"
+(defparameter *light-tiles* '("rezlight4"
 			      "rezlight5"
 			      "rezlight4"
 			      "rezlight3"
 			      "rezlight2"
 			      "rezlight1"))
 
-(defparameter *light-clock* 12)
+(defparameter *light-clock* 8)
 
 (defcell dancefloor 
   (tile :initform nil)
@@ -54,8 +54,7 @@
 
 (define-method update-tile dancefloor ()
   (when [is-located self]
-    (unless [category-at-p *world* <row> <column> '(:brick :wall)]
-      (setf <tile> (nth (truncate (/ <clock> 2)) *light-tiles*)))))
+    (setf <tile> (car (one-of *light-tiles*)))))
 
 (define-method light dancefloor (&optional (time *light-clock*))
   (setf <clock> (max 0 time))
@@ -69,10 +68,15 @@
 	[light dancefloor (max 0 (- <clock> 1))]))))
       
 (define-method light-plus dancefloor ()
-  (dolist (dir '(:north :south :east :west))
-    [light-toward self dir]))
+  (dolist (dir '(:northeast :southeast :southwest :northwest))
+    [light-toward self (ecase (random 3)
+			 (0 dir)
+			 (1 dir)
+			 (2 (random-direction)))]))
 		
 (define-method run dancefloor ()
+  [move self (random-direction)]
+  [expend-action-points self 20]
   (setf <clock> (max 0 (- <clock> 1)))
   (if (plusp <clock>)
       (progn
@@ -386,8 +390,9 @@
 (defcell brick 
   (name :initform "Brick")
   (tile :initform "brick-purple")
+  (hit-points :initform (make-stat :min 0 :base 1))
   (orientation :initform :horizontal)
-  (categories :initform '(:exclusive :actor :obstacle :brick :horizontal :oriented))
+  (categories :initform '(:actor :obstacle :brick :horizontal :oriented))
   (color :initform :purple))
 
 (define-method run brick ()

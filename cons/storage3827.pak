@@ -6,7 +6,7 @@
 supplies, ammunition, and sometimes special items may be found here."
     :NAME "storage3827" :FLOOR "storage-background" :BARRIER
     "storage-foreground" :ACCENT "storage-accent" :HEIGHT 45 :WIDTH 60
-    :AMBIENT-LIGHT :TOTAL :SCALE (1 CONS-GAME::XM) :EDGE-CONDITION :BLOCK
+    :AMBIENT-LIGHT :TOTAL :SCALE (1 CONS-GAME::XM) :EDGE-CONDITION :EXIT
     :GRAMMAR
     ((XIOMACS-ENGINE-2:WORLD CONS-GAME::>>
                              (:PUSHLOC 5 :JUMP 90 :RIGHT 4 :JUMP

@@ -68,6 +68,12 @@ around."))
 
 (define-method die crate ()
   [drop self (clone =crate-debris=)]
+  (percent-of-time 3 
+    [drop self (ecase (random 4)
+		 (0 (clone =health=))
+		 (1 (clone =bomb-defun=))
+		 (2 (clone =shocker=))
+		 (3 (clone =bomb=)))])
   [parent>>die self])
 
 (define-method hit crate (&optional hitter)

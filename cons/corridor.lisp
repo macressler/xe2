@@ -105,8 +105,8 @@
   (weight :initform 7000)
   (accuracy :initform (make-stat :base 100))
   (attack-power :initform (make-stat :base 18))
-  (attack-cost :initform (make-stat :base 40))
-  (energy-cost :initform (make-stat :base 1)))
+  (attack-cost :initform (make-stat :base 5))
+  (energy-cost :initform (make-stat :base 0)))
 
 (define-method fire rail-cannon (row column)
   [expend-action-points <equipper> [stat-value self :attack-cost]]
@@ -120,21 +120,21 @@
 
 ;;; the eyeboss
 
-(defparameter *guardic-eye-open-time* 10)
-(defparameter *guardic-eye-closed-time* 30)
+(defparameter *guardic-eye-open-time* 50)
+(defparameter *guardic-eye-closed-time* 20)
 
 (defcell guardic-eye
   (name :initform "Guardic eye")
   (tile :initform "guardic")
   (team :initform :enemy)
   (auto-loadout :initform t)
-  (hit-points :initform (make-stat :base 4 :max 4 :min 0))
+  (hit-points :initform (make-stat :base 20 :max 4 :min 0))
   (open :initform nil)
   (clock :initform (random *guardic-eye-closed-time*))
-  (speed :initform (make-stat :base 1))
+  (speed :initform (make-stat :base 4))
   (strength :initform (make-stat :base 10))
   (defense :initform (make-stat :base 10))
-  (energy :initform (make-stat :base 100 :min 0 :max 100))
+  (energy :initform (make-stat :base 1000 :min 0 :max 1000))
   (stepping :initform t)
   (movement-cost :initform (make-stat :base 6))
   (equipment-slots :initform '(:center-bay))
@@ -178,9 +178,8 @@
     [say self "Cannot damage closed eye."]))
 
 (define-method hit guardic-eye (&optional object)
-  (when object
-    [play-sample self (if <open> "munch1" "ice")]
-    [damage self 1]))
+  [play-sample self (if <open> "munch1" "ice")]
+  [damage self 1])
 
 (defcell guardic 
   (name :initform "Electric eye")

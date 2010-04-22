@@ -177,6 +177,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 
 (define-method call bomb-defun (caller)
   (clon:with-field-values (direction row column) caller
+    (message "BOMB-DEFUN DIR ~S" direction)
     (multiple-value-bind (r c) (step-in-direction row column direction)
       [play-sample caller "fire"]
       [drop-cell *world* (clone =bomb=) r c]
@@ -199,7 +200,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
   (clon:with-field-values (last-direction row column) <equipper>
     (multiple-value-bind (r c) 
 	(step-in-direction row column direction)
-      [drop-cell *world* (clone =bomb=) r c])))
+      [drop-cell *world* (clone =bomb=) r c :no-collisions t])))
 
 ;;; The exploding mine
 
