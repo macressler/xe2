@@ -581,21 +581,14 @@ Allocates a new image."
 				    :surface image
 				    :smooth nil))
 
-;;; Timing (OBSOLETE)
+;;; Timing
 
-;; TODO remove this section, it's deprecated. 
+(defvar *frame-rate* 30
+"The intended frame rate of the game. Recommended value is 30.")
 
-(defvar *frame-rate* 30 
-"The intended frame rate of the game. Recommended value is 30.
-Don't set this variable directly; use `set-frame-rate' instead.")
-
-(defun set-frame-rate (rate)
-  "Set the frame rate for the game. The recommended default is 30.
-You only need to set the frame rate if you are using the timer; see
-`enable-timer'."
+(defun set-frame-rate (&optional (rate *frame-rate*))
+  "Set the SDL frame rate for the game."
   (message "Setting frame rate to ~S" rate)
-  (message "WARNING: SET-FRAME-RATE is deprecated and does nothing.")
-  (setf *frame-rate* rate)
   (setf (sdl:frame-rate) rate))
 
 (defvar *clock* 0 "Number of frames until next timer event.")
@@ -657,7 +650,9 @@ window. Set this in the game startup file.")
   "Initialize the console, open a window, and play.
 We want to process all inputs, update the game state, then update the
 display."
-  (let ((fps (make-instance 'sdl:fps-unlocked :dt *dt* :ps-fn #'do-physics)))
+  (let ((fps (make-instance 'sdl:fps-mixed)))
+    (set-frame-rate *frame-rate*)
+    (setf (sdl:dt) *dt*)
     (cond (*fullscreen*
 	   (sdl:window *screen-width* *screen-height*
 		       :fps fps 
@@ -766,6 +761,8 @@ display."
 		       (decf *clock*))
 		   ;; clean this up. these two cases aren't that different.
 		   (progn 
+		     (sdl:with-timestep ()
+		       (do-physics))
 		     (sdl:clear-display sdl:*black*)
 		     (when *held-keys* (send-held-events)) ;; TODO move this to do-physics?
 		     (show-widgets) 

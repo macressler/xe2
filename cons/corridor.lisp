@@ -168,9 +168,9 @@
       (let ((cannon [equipment-slot self :center-bay]))
 	(when <open> 
 	    (progn (when [can-see-player self]
-		     [expend-action-points self 150]
 		     [fire cannon [player-row *world*]
-			   [player-column *world*]]))))))
+			   [player-column *world*]]
+		     [expend-action-points self 100]))))))
 					  
 (define-method damage guardic-eye (points)
   ;; only damage when open
