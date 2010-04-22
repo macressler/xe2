@@ -1659,6 +1659,54 @@ also the file LIBSDL-LICENSE for details.
 
 (defvar *play-args* nil)
 
+(defparameter *do-cffi-loading* t)
+
+(defun do-cffi-loading ()
+  (unless *windows*
+    (cffi:define-foreign-library sdl
+      (:darwin (:or (:framework "SDL")
+		    (:default "libSDL")))
+      (:unix (:or "libSDL-1.2.so.0.7.2"
+		  "libSDL-1.2.so.0"
+		  "libSDL-1.2.so"
+		  "libSDL.so"
+		  "libSDL")))
+    (cffi:use-foreign-library sdl)
+    ;;
+    (cffi:define-foreign-library sdl-mixer
+      (:darwin (:or (:framework "SDL_mixer")
+		    (:default "libSDL_mixer")))
+      (:unix (:or "libSDL_mixer-1.2.so.0.7.2"
+		  "libSDL_mixer-1.2.so.0"
+		  "libSDL_mixer-1.2.so"
+		  "libsdl_mixer-1.2.so.0.2.6" ;; eeebuntu?
+		  "libSDL_mixer.so"
+		  "libSDL_mixer")))
+    (cffi:use-foreign-library sdl-mixer)
+    ;;
+    (cffi:define-foreign-library sdl-gfx
+      (:darwin (:or (:framework "SDL_gfx")
+		    (:default "libSDL_gfx")))
+      (:unix (:or "libSDL_gfx-1.2.so.0.7.2"
+		  "libSDL_gfx-1.2.so.0"
+		  "libSDL_gfx-1.2.so"
+		  "libSDL_gfx.so.4"
+		  "libSDL_gfx.so.13"
+		  "libSDL_gfx.so"
+		  "libSDL_gfx")))
+    (cffi:use-foreign-library sdl-gfx)
+    ;;
+    (cffi:define-foreign-library sdl-image
+      (:darwin (:or (:framework "SDL_image")
+		    (:default "libSDL_image")))
+      (:unix (:or "libSDL_image-1.2.so.0.7.2"
+		  "libSDL_image-1.2.so.0"
+		  "libSDL_image-1.2.so.0.1.5" ;; eeebuntu?
+		  "libSDL_image-1.2.so"
+		  "libSDL_image.so"
+		  "libSDL_image")))
+    (cffi:use-foreign-library sdl-image)))
+
 (defun play (&optional (module-name "standard") &rest args)
   "This is the main entry point to XE2. MODULE-NAME is loaded 
 and its .startup resource is loaded."
@@ -1679,52 +1727,9 @@ and its .startup resource is loaded."
   (loop while (and (not *quitting*)
 		   *next-module*)
      do (unwind-protect
-	     ;; dynamically load libs (needed for GNU/Linux but bad on windows)
 	       (progn 
-		 (unless *windows*
-		   (cffi:define-foreign-library sdl
-		     (:darwin (:or (:framework "SDL")
-				   (:default "libSDL")))
-		     (:unix (:or "libSDL-1.2.so.0.7.2"
-				 "libSDL-1.2.so.0"
-				 "libSDL-1.2.so"
-				 "libSDL.so"
-				 "libSDL")))
-		   (cffi:use-foreign-library sdl)
-		   ;;
-		   (cffi:define-foreign-library sdl-mixer
-		     (:darwin (:or (:framework "SDL_mixer")
-				   (:default "libSDL_mixer")))
-		     (:unix (:or "libSDL_mixer-1.2.so.0.7.2"
-				 "libSDL_mixer-1.2.so.0"
-				 "libSDL_mixer-1.2.so"
-				 "libsdl_mixer-1.2.so.0.2.6" ;; eeebuntu?
-				 "libSDL_mixer.so"
-				 "libSDL_mixer")))
-		   (cffi:use-foreign-library sdl-mixer)
-		   ;;
-		   (cffi:define-foreign-library sdl-gfx
-		     (:darwin (:or (:framework "SDL_gfx")
-				   (:default "libSDL_gfx")))
-		     (:unix (:or "libSDL_gfx-1.2.so.0.7.2"
-				 "libSDL_gfx-1.2.so.0"
-				 "libSDL_gfx-1.2.so"
-				 "libSDL_gfx.so.4"
-				 "libSDL_gfx.so.13"
-				 "libSDL_gfx.so"
-				 "libSDL_gfx")))
-		   (cffi:use-foreign-library sdl-gfx)
-		   ;;
-		   (cffi:define-foreign-library sdl-image
-			(:darwin (:or (:framework "SDL_image")
-				      (:default "libSDL_image")))
-			(:unix (:or "libSDL_image-1.2.so.0.7.2"
-				    "libSDL_image-1.2.so.0"
-				    "libSDL_image-1.2.so.0.1.5" ;; eeebuntu?
-				    "libSDL_image-1.2.so"
-				    "libSDL_image.so"
-				    "libSDL_image")))
-		   (cffi:use-foreign-library sdl-image))
+		 (when *do-cffi-loading*
+		   (do-cffi-loading))
 		 ;;
 		 (sdl:with-init (sdl:SDL-INIT-VIDEO sdl:SDL-INIT-AUDIO sdl:SDL-INIT-JOYSTICK)
 		   (load-user-init-file)	

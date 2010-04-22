@@ -60,7 +60,7 @@
     [die self]))
 
 (defsprite rail-particle ()
-  (clock :initform 60)
+  (clock :initform 80)
   (team :initform :enemy)
   (speed :initform (make-stat :base 1))
   (categories :initform '(:actor :rail))
@@ -90,6 +90,7 @@
 (define-method do-collision rail-particle (&optional object)
   (cond ([in-category object :obstacle]
 	 (unless (same-team object self)
+	   [damage object 5]
 	   [hit object] [die self]))
 	((and (not [in-category object :rail])
 	       (has-field :team object)
