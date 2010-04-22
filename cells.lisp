@@ -860,7 +860,7 @@ world or have a location."
 ;;;; Starting
 
 (define-method start cell ()
-  "This method is invoked on the player whenever entering a new world map."
+  "This method is invoked on cells whenever a new world map is visited."
   nil)
 
 ;;; Combat
@@ -996,6 +996,12 @@ are as with `format'."
 
 (define-method can-see-player cell ()
   [line-of-sight *world* <row> <column> [player-row *world*] [player-column *world*]])
+
+(define-method can-see cell (cell &optional category)
+  [line-of-sight *world* <row> <column> (field-value :row cell) (field-value :column cell) category])
+
+(define-method can-see-* cell (r c &optional category)
+  [line-of-sight *world* <row> <column> r c category])
 
 ;;; User Interaction with keyboard and mouse
 

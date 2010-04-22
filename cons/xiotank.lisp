@@ -444,16 +444,18 @@ An ANTI-fence only opens when an offending tone is silenced.")
 
 (defparameter *example-cluster* '("C-2" "E-2" "G-2"))
 
-(defvar *notes* nil)
+;;(defvar *notes* nil)
 
 (defun add-note (note)
-  (pushnew note *notes* :test 'equal))
+  (let ((notes [get-variable *world* :oscillator-notes]))
+    [set-variable *world* :oscillator-notes (adjoin note notes :test 'equal)]))
 
 (defun remove-note (note)
-  (setf *notes* (delete note *notes* :test 'equal)))
+  (let ((notes [get-variable *world* :oscillator-notes]))
+    [set-variable *world* :oscillator-notes (delete note notes :test 'equal)]))
 
 (defun note-playing-p (note)
-  (member note *notes* :test 'equal))
+  (member note [get-variable *world* :oscillator-notes] :test 'equal))
 
 (defparameter *oscillator-tiles* '((:sine "osc-sine-off" "osc-sine-on")
 				   (:square "osc-square-off" "osc-square-on")
@@ -482,9 +484,13 @@ An ANTI-fence only opens when an offending tone is silenced.")
 (define-method update-tile oscillator ()
   (setf <tile> (oscillator-tile <waveform> <state>)))
 
-(define-method start oscillator (waveform &optional (note "A-2"))
+(define-method start oscillator ()
+  (setf <channel> nil)
+  (if <state> [start-playing self <waveform> <note>] [stop-playing-self]))
+
+(define-method start-playing oscillator (waveform &optional (note "A-2"))
   (unless <channel>
-    [say self (format nil "The note ~A has begun playing." note)]
+    [say self (format nil "The tone ~A has begun playing." note)]
     (add-note note)
     [intone self waveform note]
     (setf <state> t)
@@ -497,9 +503,9 @@ An ANTI-fence only opens when an offending tone is silenced.")
       [drop-cell *world* label <row> <column> :exclusive nil]))
     (setf <channel> (xe2:play-sample (wave-sample waveform note) :loop t)))
 
-(define-method stop oscillator ()
+(define-method stop-playing oscillator ()
   (unless (null <channel>)
-    [say self (format nil "The note ~A has stopped." <note>)]
+    [say self (format nil "The tone ~A has stopped." <note>)]
     (remove-note <note>)
     (setf <state> nil)
     [update-tile self]
@@ -512,7 +518,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
 (define-method run oscillator () nil)
 
 (define-method hit oscillator (&optional object)
-  (if <state> [stop self] [start self <waveform> <note>]))
+  (if <state> [stop-playing self] [start-playing self <waveform> <note>]))
 				
 ;;; Resonators
 
@@ -742,7 +748,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
 (define-method generate blue-world (&key (height 50)
 					    (width 50)
 					    (level 1))
-  (setf *notes* nil)
+;;  (setf *notes* nil)
   (setf <level> level)
   (setf <height> height <width> width)
   [create-default-grid self]

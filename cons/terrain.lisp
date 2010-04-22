@@ -5,7 +5,7 @@
 (define-prototype exit (:parent xe2:=launchpad=)
   (tile :initform "launchpad")
   (categories :initform '(:gateway :player-entry-point :action))
-  (description :initform "Exit the area by activating this object with the Z key."))
+  (description :initform "Exit the area by activating this object with the X key."))
 
 (define-method do-action exit ()
   [exit *universe* :player [get-player *world*]])
@@ -134,7 +134,7 @@
 ultimately destroy a high-security enemy starbase of unknown purpose.
 The colored squares above represent the sectors of the base you can
 currently visit. Use the movement keys (see sidebar at right) to
-select a sector; press Z to enter. Press F1 for help.")
+select a sector; press X to enter. Press F1 for help.")
   (overworld :initform t)
   (height :initform 5)
   (width :initform 5)

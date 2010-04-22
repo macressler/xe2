@@ -198,7 +198,7 @@
 	  [play-sample self "error"])
 	(let ((item [item-at-head self]))
 	  (if item
-	      (progn (push item <items>)
+	      (progn (setf <items> (append <items> (list item)))
 		     [play-sample self "doorbell"]
 		     [delete-from-world item])
 	      [say self "Nothing to push."])))))

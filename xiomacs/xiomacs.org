@@ -1,27 +1,10 @@
-** DONE [#B] implement xe2 key polling http://code.google.com/p/lispbuilder/wiki/UsingLispbuilderSDL#Input_State
-CLOSED: [2010-04-20 Tue 06:11]
-** DONE [#A] switch to polling input every timestep for cons http://code.google.com/p/lispbuilder/source/browse/trunk/lispbuilder-sdl/cffi/keysym.lisp
-CLOSED: [2010-04-20 Tue 06:11]
-** DONE let game indicate that sdl keys were handled ONCE per timestep
-CLOSED: [2010-04-21 Wed 20:29]
-** DONE player entry point that isn't an exit
-CLOSED: [2010-04-21 Wed 22:51]
-** DONE storage archive
-CLOSED: [2010-04-21 Wed 22:51]
-** TODO [#A] fix cpu utilization
-** TODO [#A] control change: swap X and Z
-** TODO [#A] picked up item goes to end (not replacing gun!)
-** TODO nastier guardics
-** TODO upgrade, D+
+** TODO shoot bombs to kick them ahead at enemies
 ** TODO [#A] scaled display of current inventory with labels
 ** TODO [#B] Simple mission structure with just a couple independent goals
-** TODO [#B] bombs should blow up other bombs. more powerful BOMBS!
 ** TODO [#B] recenter form view when entering data... also enter cell view
 ** TODO [#B] low HP warning light/sound
 ** TODO [#A] fix lepton gun hitting tail
 ** TODO [#A] fix drone collisions
-** DONE fix being able to pick up more items than segments
-CLOSED: [2010-04-19 Mon 20:59]
 ** TODO [#B] 800x600 TUTORIAL HOW TO PLAY SCREEN, document ZX
 
 ** TODO print object name and inspect clicked object in plist on right side
@@ -34,10 +17,6 @@ CLOSED: [2010-04-19 Mon 20:59]
 *** TODO [#A] pick up and put down, attach object to cursor? 
 ** TODO [#B] interactive commands with completion
 *** TODO menu composed of visit "foo" links
-** DONE [#A] world paste function
-CLOSED: [2010-04-12 Mon 05:58]
-** DONE [#A] command button runs its text to prompt
-CLOSED: [2010-04-10 Sat 21:12]
 ** TODO [#B] hotkey for delete at cursor
 ** TODO [#B] comprehensive mouse support
 ** TODO [#B] generic page browser with minimap preview?

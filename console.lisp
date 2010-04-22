@@ -650,9 +650,7 @@ window. Set this in the game startup file.")
   "Initialize the console, open a window, and play.
 We want to process all inputs, update the game state, then update the
 display."
-  (let ((fps (make-instance 'sdl:fps-mixed)))
-    (set-frame-rate *frame-rate*)
-    (setf (sdl:dt) *dt*)
+  (let ((fps (make-instance 'sdl:fps-mixed :dt *dt*)))
     (cond (*fullscreen*
 	   (sdl:window *screen-width* *screen-height*
 		       :fps fps 
@@ -669,6 +667,7 @@ display."
 			 :fps fps
 			 :title-caption *window-title*
 			 :position *window-position*)))
+    (set-frame-rate *frame-rate*)
     (reset-joystick)
     (sdl:clear-display sdl:*black*)
     (show-widgets)

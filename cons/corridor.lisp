@@ -131,7 +131,7 @@
   (hit-points :initform (make-stat :base 20 :max 4 :min 0))
   (open :initform nil)
   (clock :initform (random *guardic-eye-closed-time*))
-  (speed :initform (make-stat :base 2))
+  (speed :initform (make-stat :base 3))
   (strength :initform (make-stat :base 10))
   (defense :initform (make-stat :base 10))
   (energy :initform (make-stat :base 1000 :min 0 :max 1000))

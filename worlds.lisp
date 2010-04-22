@@ -863,14 +863,15 @@ sources and ray casting."
   (assert <player>)
   ;; start player at same phase (avoid free catch-up turns)
   (message "STARTWORLD: ~S ~S" <phase-number> (field-value :phase-number <player>))
-  ;; get everyone on the same turn.
+  ;; get everyone on the same turn, and start 'er up
   (setf <phase-number> (+ 1 (field-value :phase-number <player>)))
   (let ((grid <grid>)
 	(phase-number <phase-number>))
     (dotimes (i <height>)
       (dotimes (j <width>)
 	(do-cells (cell (aref grid i j))
-	  (setf (field-value :phase-number cell) phase-number)))))
+	  (setf (field-value :phase-number cell) phase-number)
+	  [start cell]))))
   (dolist (sprite <sprites>)
     (setf (field-value :phase-number sprite) <phase-number>))
   ;; mark the world as entered

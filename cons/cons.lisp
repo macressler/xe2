@@ -82,8 +82,8 @@
 	    ("L" (:shift) "move :east .")
 	    ("J" (:shift) "move :south .")
 	    
-	    ("Z" nil "act .")
-	    ("X" nil "rotate .")
+	    ("Z" nil "rotate .")
+	    ("X" nil "act .")
 	    ("C" nil "pop .")
 	    ;;
 	    ("P" (:control) "pause .")

@@ -121,7 +121,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
     (if (zerop clock) 
 	[explode self]
 	(progn 
-	  [expend-action-points self 40]		    
+	  [expend-action-points self 32]		    
 	  (setf <tile> (bomb-tile clock))
 	  [play-sample self "countdown"]
 	  (dotimes (n 10)
@@ -129,18 +129,22 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 	  (decf clock)))))
 
 (define-method explode bomb ()  
-  (labels ((boom (r c &optional (probability 50))
+  (labels ((boom (r c &optional (probability 70))
 	     (prog1 nil
 	       (when (and (< (random 100) probability)
-			  [in-bounds-p *world* r c])
+			  [in-bounds-p *world* r c]
+			  [can-see-* self r c :barrier])
 		 [drop-cell *world* (clone =explosion=) r c :no-collisions nil])))
 	   (damage (r c &optional (probability 100))
 	     (prog1 nil
 	       (when (and (< (random 100) probability)
-			  [in-bounds-p *world* r c])
+			  [in-bounds-p *world* r c]
+			  [can-see-* self r c :barrier])
 		 (do-cells (cell [cells-at *world* r c])
 		   (when (clon:has-method :damage cell)
-		     [damage cell 8]))))))
+		     [damage cell 16])
+		   (when (clon:has-method :hit cell)
+		     [hit cell]))))))
     (dolist (dir xe2:*compass-directions*)
       (multiple-value-bind (r c)
 	  (step-in-direction <row> <column> dir)
@@ -150,6 +154,10 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 		     (- <row> 2) 
 		     (- <column> 2) 
 		     5 5)
+    (trace-rectangle #'boom 
+		     (- <row> 3) 
+		     (- <column> 3) 
+		     7 7)
     ;; definitely damage everything in radius
     (trace-rectangle #'damage
 		     (- <row> 2) 
