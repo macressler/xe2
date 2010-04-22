@@ -450,7 +450,8 @@ However, ammunition is unlimited, making BUSTER an old standby.")
   (name :initform "REPAIR-1")
   (description :initform "The single-use program REPAIR-1 restores a few hit points when activated.")
   (tile :initform "health")
-  (categories :initform '(:item)))
+  (call-interval :initform 20)
+  (categories :initform '(:item :defun)))
 
 (define-method call health (caller)
   (when [is-player caller]
