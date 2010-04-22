@@ -62,10 +62,14 @@
   (movement-cost :initform (make-stat :base 10))
   (stepping :initform t)
   (light-radius :initform 7)
+  (first-start :initform nil)
   (categories :initform '(:actor :obstacle :player :target :container :light-source))
   (excluded-fields :initform '(:segments)))
 
 (define-method loadout agent ()
+  [emote self '((("I'd better get moving."))
+		(("Use the arrow keys (or numpad)"))
+		(("to move, and SHIFT to fire.")))]
   (push (clone =buster-defun=) <items>))
 
 (define-method start agent ()
@@ -73,7 +77,11 @@
     (setf <direction> :north)
     (setf <last-direction> :north)
     (if (field-value :overworld *world*)
-	(setf <tile> "player32")
+	(progn (setf <tile> "player32")
+	       (unless <first-start>
+		 (setf <first-start> t)
+		 ;; enter the first room on the map. FIXME
+		 [act self]))
 	(clon:with-field-values (row column) self
 	  (setf <tile> "agent-north")
 	  [make-segments self]))))
@@ -252,12 +260,17 @@
   [update-tiles self]
   (when (plusp <call-clock>)
     (decf <call-clock>))
-  (when (keyboard-modifier-down-p :lshift)
+  (when (or (keyboard-modifier-down-p :lshift)
+	    (keyboard-modifier-down-p :rshift))
     [call self <direction>])
   (dolist (item <items>)
     (when [in-category item :actor]
       [run item])))
-;;  [do-keys self])
+
+(define-method emote agent (text &optional (timeout 3.0))
+  (let ((balloon (clone =balloon= :text text :timeout timeout :following self :style :balloon)))
+    [play-sample self "talk"]
+    [drop self balloon]))
 
 (define-method quit agent ()
   (xe2:quit :shutdown))
