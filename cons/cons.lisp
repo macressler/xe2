@@ -314,7 +314,7 @@
 	       (setf *player* player)
 	       [play universe
 ;;	       	     :address (list '=zeta-x= :sequence-number (genseq))
-	       	     :address (list '=archive2= :sequence-number (genseq))
+	       	     :address (list '=zeta-x= :sequence-number (genseq))
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]
