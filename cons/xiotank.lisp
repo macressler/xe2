@@ -476,7 +476,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
   (state :initform nil))
 
 (define-method intone oscillator (waveform &optional (note "A-2"))
-  [stop self]
+  [stop-playing self]
   (setf <waveform> waveform)
   (setf <note> note)
   [update-tile self])
