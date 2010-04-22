@@ -1662,8 +1662,7 @@ also the file LIBSDL-LICENSE for details.
 (defparameter *do-cffi-loading* t)
 
 (defun do-cffi-loading ()
-  (unless *windows*
-    (cffi:define-foreign-library sdl
+  (cffi:define-foreign-library sdl
       (:darwin (:or (:framework "SDL")
 		    (:default "libSDL")))
       (:unix (:or "libSDL-1.2.so.0.7.2"
@@ -1705,7 +1704,7 @@ also the file LIBSDL-LICENSE for details.
 		  "libSDL_image-1.2.so"
 		  "libSDL_image.so"
 		  "libSDL_image")))
-    (cffi:use-foreign-library sdl-image)))
+    (cffi:use-foreign-library sdl-image))
 
 (defun play (&optional (module-name "standard") &rest args)
   "This is the main entry point to XE2. MODULE-NAME is loaded 
@@ -1728,8 +1727,7 @@ and its .startup resource is loaded."
 		   *next-module*)
      do (unwind-protect
 	       (progn 
-		 (when *do-cffi-loading*
-		   (do-cffi-loading))
+		 #+linux (do-cffi-loading)
 		 ;;
 		 (sdl:with-init (sdl:SDL-INIT-VIDEO sdl:SDL-INIT-AUDIO sdl:SDL-INIT-JOYSTICK)
 		   (load-user-init-file)	
