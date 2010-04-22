@@ -181,9 +181,12 @@ biosilicate materials."))
 
 ;;; The Biome
 
-(define-prototype biome (:parent xe2:=world=)
+(define-prototype biome (:parent =sector=)
   (name :initform "Biosilicate Hive Biome")
   (ambient-light :initform :total)
+  (floor :initform "reactor-background")
+  (barrier :initform "reactor-foreground")
+  (accent :initform "reactor-accent")
   (size :initform 10)
   (required-modes :initform '(:vehicle :spacesuit))
   (clusters :initform 10)

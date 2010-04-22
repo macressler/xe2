@@ -152,7 +152,8 @@ select a sector; press X to enter. Press F1 for help.")
 						      :sequence-number (genseq))) row column]))))
 
 (define-method after-start-method alien-base ()
-  [describe self])
+  [describe self]
+  [start <player>])
 
 ;; (define-method begin-ambient-loop alien-base ()
 ;;   (play-music "mello"))

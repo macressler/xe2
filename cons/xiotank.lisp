@@ -486,7 +486,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
 
 (define-method start oscillator ()
   (setf <channel> nil)
-  (if <state> [start-playing self <waveform> <note>] [stop-playing-self]))
+  (if <state> [start-playing self <waveform> <note>] [stop-playing self]))
 
 (define-method start-playing oscillator (waveform &optional (note "A-2"))
   (unless <channel>

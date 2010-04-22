@@ -175,6 +175,7 @@
 		       (clon:object-p (car (last segments))))
 	      (clon:with-field-values (row column last-direction) (car (last segments))
 		(step-in-direction row column (opposite-direction last-direction)))))
+      (message "ADD-SEGMENT: ~S" (list force-row force-column row column (null segments)))
       (let ((segment (clone =segment=)))
 	[drop-cell *world* segment (or force-row) (or force-column column)]
 	(push segment segments)))))
