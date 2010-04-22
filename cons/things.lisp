@@ -94,21 +94,14 @@
 "The BUSTER program fires a relatively weak particle weapon when activated.
 However, ammunition is unlimited, making BUSTER an old standby.")
   (tile :initform "buster")
-  (reload-time :initform 7)
+  (call-interval :initform 7)
   (clock :initform 0)
-  (categories :initform '(:item :target :defun :actor)))
+  (categories :initform '(:item :target :defun)))
 
 (define-method call buster-defun (caller)
   (clon:with-field-values (direction row column) caller
-    (when (zerop <clock>)
-      (progn [play-sample caller "fire"]
-	     (setf <clock> <reload-time>)
-	     [drop-cell *world* (clone =buster-particle= direction) row column]))))
-	
-(define-method run buster-defun ()
-  (clon:with-fields (clock) self 
-    (when (plusp clock)
-      (decf clock))))
+    [play-sample caller "fire"]
+    [drop-cell *world* (clone =buster-particle= direction) row column]))
 
 ;;; A bomb with countdown display.
 
@@ -179,6 +172,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
   (name :initform "BOMB")
   (description :initform "This single-use BOMB program drops a timed explosive device.")
   (tile :initform "bomb-ammo")
+  (call-interval :initform 20)
   (categories :initform '(:item :target :defun)))
 
 (define-method call bomb-defun (caller)
@@ -700,6 +694,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
   (description :initform 
 "The LEPTON program fires a strong homing missile.")
   (tile :initform "lepton-defun")
+  (call-interval :initform 20)
   (categories :initform '(:item :target :defun)))
 
 (define-method call lepton-defun (caller)

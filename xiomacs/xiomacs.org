@@ -2,15 +2,17 @@
 CLOSED: [2010-04-20 Tue 06:11]
 ** DONE [#A] switch to polling input every timestep for cons http://code.google.com/p/lispbuilder/source/browse/trunk/lispbuilder-sdl/cffi/keysym.lisp
 CLOSED: [2010-04-20 Tue 06:11]
-** TODO let game indicate that sdl keys were handled ONCE per timestep
+** DONE let game indicate that sdl keys were handled ONCE per timestep
+CLOSED: [2010-04-21 Wed 20:29]
+** TODO archive tutorial 
 ** TODO [#A] scaled display of current inventory with labels
-** TODO [#B] picked up item goes to end (not replacing gun!)
-** TODO [#B] Simple mission structure with 2 missions
-** TODO [#C] bombs should blow up other bombs. more powerful BOMBS!
+** TODO [#B] Simple mission structure with just a couple independent goals
+** TODO [#B] bombs should blow up other bombs. more powerful BOMBS!
+** TODO [#B] recenter form view when entering data... also enter cell view
 ** TODO [#B] low HP warning light/sound
 ** TODO [#A] fix lepton gun hitting tail
-** TODO [#C] recenter form view when entering data... also enter cell view
-** TODO [#B] fix drone collisions
+** TODO [#A] fix drone collisions
+** TODO [#C] picked up item goes to end (not replacing gun!)
 ** DONE fix being able to pick up more items than segments
 CLOSED: [2010-04-19 Mon 20:59]
 ** TODO [#B] 800x600 TUTORIAL HOW TO PLAY SCREEN, document ZX
