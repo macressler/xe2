@@ -313,7 +313,8 @@ They fire powerful heat-seeking bullets, but these can be shot down."))
 (define-method choose-new-direction scanner ()
   (setf <direction>
 	(getf xe2:*left-turn*
-	      (or <direction> :north))))
+	      (getf xe2:*left-turn* 
+		    (or <direction> :north)))))
   
 (define-method loadout scanner ()
   [make-inventory self]

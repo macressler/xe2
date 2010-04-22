@@ -871,7 +871,7 @@ sources and ray casting."
       (dotimes (j <width>)
 	(do-cells (cell (aref grid i j))
 	  (setf (field-value :phase-number cell) phase-number)
-	  [start cell]))))
+	  (unless [is-player cell] [start cell])))))
   (dolist (sprite <sprites>)
     (setf (field-value :phase-number sprite) <phase-number>))
   ;; mark the world as entered

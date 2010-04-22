@@ -273,6 +273,9 @@
 (define-method quit agent ()
   (xe2:quit :shutdown))
 
+(define-method do-exit agent ()
+  [exit *universe*])
+
 (define-method exit agent ()
   (dolist (segment <segments>)
     [die segment])
@@ -333,6 +336,7 @@
 (defcell tail-defun 
   (name :initform "TAIL")
   (tile :initform "tail-defun")
+  (call-interval :initform 20)
   (categories :initform '(:item :target :defun)))
 
 (define-method call tail-defun (caller)

@@ -85,6 +85,7 @@
 	    ("Z" nil "rotate .")
 	    ("X" nil "act .")
 	    ("C" nil "pop .")
+	    ("0" (:control) "do-exit .")
 	    ;;
 	    ("P" (:control) "pause .")
 	    ("PAUSE" nil "pause .")
