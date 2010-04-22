@@ -96,6 +96,8 @@
 	       (has-field :team object)
 	       (not (eq <team> (field-value :team object))))
 	  [hit object self]
+	 [damage object 5]
+	 
 	  [die self])))
 
 (defcell rail-cannon

@@ -18,6 +18,9 @@
     [move self <direction>]
     (setf <direction> nil)))
 
+(define-method damage segment (points)
+  [damage [get-player *world*] points])
+
 (define-method hit segment (&optional other)
   [hit [get-player *world*]])
 
