@@ -48,12 +48,18 @@
 ;;; Keyboard state
 
 (defun keyboard-id (key)
-  (let ((entry (find key *sdl-key-identifiers* :key #'car)))
-    (second entry)))
+  "Look up the SDL symbol corresponding to the XE2 symbol KEY. See keys.lisp."
+  (let* ((entry (find key *key-identifiers* :key #'first))
+	 (entry2 (find (second entry) *sdl-key-identifiers* :key #'second)))
+    (first entry2)))
 
 (defun keyboard-mod (mod)
-  (let ((entry (find mod *sdl-key-modifiers* :key #'car)))
-    (second entry)))
+  "Look up the SDL symbol corresponding to the XE2 symbol MOD. See keys.lisp."
+  (let* ((entry (find mod *key-modifiers* :key #'first))
+	 (entry2 (find (second entry) *sdl-key-modifiers* :key #'second)))
+    (first entry2)))
+
+
 
 (defun keyboard-held-p (key) 
   "Returns the duration in seconds that the key has been depressed over a number of game loops."

@@ -43,6 +43,7 @@ Then it fires and gives chase.")
     (if (< dist 13)
 	(if (> 9 dist)
 	    (progn [fire self dir]
+		   [expend-action-points self 50]
 		   (xe2:percent-of-time 3 [move self dir]))
 	    (if [obstacle-in-direction-p *world* <row> <column> dir]
 		[move self (random-direction)]

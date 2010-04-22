@@ -44,6 +44,11 @@
 
 ;;; Key bindings
 
+;; The shift-direction to CALL stuff is not actually triggered by the
+;; keybindings. Instead, to obtain satisfactory behavior, the shift
+;; key is polled every physics timestep. See the RUN method in
+;; player.lisp
+
 (defparameter *numpad-keybindings* 
   '(("KP8" nil "move :north .")
     ("KP4" nil "move :west .")
@@ -55,15 +60,15 @@
     ("RIGHT" nil "move :east .")
     ("DOWN" nil "move :south .")
     ;; call without moving
-    ("KP8" (:shift) "call :north .")
-    ("KP4" (:shift) "call :west .")
-    ("KP6" (:shift) "call :east .")
-    ("KP2" (:shift) "call :south .")
+    ("KP8" (:shift) "move :north .")
+    ("KP4" (:shift) "move :west .")
+    ("KP6" (:shift) "move :east .")
+    ("KP2" (:shift) "move :south .")
     ;; arrows call without moving
-    ("UP" (:shift) "call :north .")
-    ("LEFT" (:shift) "call :west .")
-    ("RIGHT" (:shift) "call :east .")
-    ("DOWN" (:shift) "call :south .")))
+    ("UP" (:shift) "move :north .")
+    ("LEFT" (:shift) "move :west .")
+    ("RIGHT" (:shift) "move :east .")
+    ("DOWN" (:shift) "move :south .")))
 
 (defparameter *qwerty-keybindings*
   (append *numpad-keybindings*
@@ -71,12 +76,12 @@
 	    ("H" nil "move :west .")
 	    ("L" nil "move :east .")
 	    ("J" nil "move :south .")
-	    ;;
-	    ("K" (:shift) "call :north .")
-	    ("H" (:shift) "call :west .")
-	    ("L" (:shift) "call :east .")
-	    ("J" (:shift) "call :south .")
-	    ;;
+	    
+ 	    ("K" (:shift) "move :north .")
+	    ("H" (:shift) "move :west .")
+	    ("L" (:shift) "move :east .")
+	    ("J" (:shift) "move :south .")
+	    
 	    ("Z" nil "act .")
 	    ("X" nil "rotate .")
 	    ("C" nil "pop .")

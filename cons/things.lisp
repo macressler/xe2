@@ -94,12 +94,21 @@
 "The BUSTER program fires a relatively weak particle weapon when activated.
 However, ammunition is unlimited, making BUSTER an old standby.")
   (tile :initform "buster")
-  (categories :initform '(:item :target :defun)))
+  (reload-time :initform 7)
+  (clock :initform 0)
+  (categories :initform '(:item :target :defun :actor)))
 
 (define-method call buster-defun (caller)
   (clon:with-field-values (direction row column) caller
-    [play-sample caller "fire"]
-    [drop-cell *world* (clone =buster-particle= direction) row column]))
+    (when (zerop <clock>)
+      (progn [play-sample caller "fire"]
+	     (setf <clock> <reload-time>)
+	     [drop-cell *world* (clone =buster-particle= direction) row column]))))
+	
+(define-method run buster-defun ()
+  (clon:with-fields (clock) self 
+    (when (plusp clock)
+      (decf clock))))
 
 ;;; A bomb with countdown display.
 

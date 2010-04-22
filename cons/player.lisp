@@ -43,12 +43,15 @@
   (description :initform "You are a sentient warrior cons cell.")
   (tail-length :initform 3)
   (segments :initform nil)
+  (firing :initform nil)
   (items :initform nil)
   (direction :initform :north)
   (last-direction :initform :north :documentation "Last direction actually moved.")
   (dead :initform nil)
   (last-turn-moved :initform 0)
   (team :initform :player)
+  (call-clock :initform 0)
+  (call-interval :initform 7)
   (input-phase :initform 0)
   (hit-points :initform (make-stat :base 20 :min 0 :max 20))
   (movement-cost :initform (make-stat :base 10))
@@ -234,16 +237,25 @@
 
 (define-method call agent (&optional direction)
   (unless <dead>
-    (when direction
-      [aim self direction])
-    (let ((item (car <items>)))
-      (if (and item [in-category item :item]
-	       (clon:has-method :call item))
-	  [call item self]
-	  [say self "Cannot call."]))))
+    (when (zerop <call-clock>)
+      (setf <call-clock> <call-interval>)
+      (when direction
+	[aim self direction])
+      (let ((item (car <items>)))
+	(if (and item [in-category item :item]
+		 (clon:has-method :call item))
+	    [call item self]
+	    [say self "Cannot call."])))))
 
 (define-method run agent () 
-  [update-tiles self])
+  [update-tiles self]
+  (when (plusp <call-clock>)
+    (decf <call-clock>))
+  (when (keyboard-modifier-down-p :lshift)
+    [call self <direction>])
+  (dolist (item <items>)
+    (when [in-category item :actor]
+      [run item])))
 ;;  [do-keys self])
 
 (define-method quit agent ()

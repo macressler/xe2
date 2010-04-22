@@ -21,8 +21,7 @@
 (in-package :xe2)
 
 (defparameter *key-identifiers*
-  '((UNKNOWN 0)
-  (:FIRST 0)
+  '((:FIRST 0)
   (:BACKSPACE 8)
   (:TAB 9)
   (:CLEAR 12)
