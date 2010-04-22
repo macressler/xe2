@@ -165,10 +165,11 @@
   ;; attack!
   (if (< [distance-to-player self] 20)
       (let ((cannon [equipment-slot self :center-bay]))
-	(if <open> 
-	    (progn [fire cannon [player-row *world*]
-			 [player-column *world*]])
-	    (percent-of-time 3 [move self (random-direction)])))))
+	(when <open> 
+	    (progn (when [can-see-player self]
+		     [fire cannon [player-row *world*]
+			   [player-column *world*]]))))))
+
 					  
 (define-method damage guardic-eye (points)
   ;; only damage when open

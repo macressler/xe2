@@ -981,6 +981,22 @@ are as with `format'."
   [get-screen-coordinates (field-value :viewport *world*)
 			  <row> <column>])
 
+;; TODO is this needed?
+(define-method deserialize cell ()
+  (with-field-values (equipment) self
+    (when (listp equipment)
+      (loop while equipment do
+	(pop equipment) ;; get rid of keyword
+	(let ((item (pop equipment)))
+	  (when item
+	    (setf (field-value :equipper item)
+		  self)))))))
+
+(define-method hit cell (&optional other) nil)
+
+(define-method can-see-player cell ()
+  [line-of-sight *world* <row> <column> [player-row *world*] [player-column *world*]])
+
 ;;; User Interaction with keyboard and mouse
 
 (define-method select cell ()
@@ -1196,69 +1212,72 @@ world, and collision detection is performed between sprites and cells.")
       [grid-coordinates self]
     [drop-cell *world* cell (+ r delta-row) (+ c delta-column)]))
   
-(define-method hit cell (&optional other) nil)
-
 ;;; Popup text balloons
 
 (defcell balloon 
   (categories :initform '(:drawn :actor :balloon))
-  text stroke-color background-color timeout)
+  text stroke-color background-color timeout following scale)
 
 (define-method initialize balloon (&key text (stroke-color ".white") (background-color ".gray30")
-					(style :balloon) (timeout nil) name tile description)
+					(style :balloon) (timeout nil) name tile description following
+					(scale 1))
   (setf <text> text) 
+  (when following (setf <following> following))
   (when tile (setf <tile> tile))
   (when name (setf <name> name))
   (when description (setf <description> description))
   (setf <stroke-color> stroke-color)
   (setf <background-color> background-color)
   (setf <style> style)
+  (setf <scale> scale)
   (setf <timeout> (if (floatp timeout)
 		      ;; specify in (roughly) seconds if floating
-		      (truncate (* 15 timeout)) ;; TODO fixme
+		      (truncate (/ (* timeout 1000)
+				   xe2:*dt*))
 		      ;; leave as frames if integer
 		      timeout)))
   
 (define-method draw balloon (x y image)
-  (clon:with-field-values (text style) self
-    (let* ((offset (ecase style
-		     (:balloon (field-value :tile-size *world*))
-		     (:flat 0)))
-	   (x0 x)
-	   (y0 y)
-	   (x1 (+ x0 offset))
-	   (y1 y0)
-	   (margin 4)
-	   (height (+ (* 2 margin) (apply #'+ (mapcar #'formatted-line-height text))))
-	   (width (+ (* 2 margin) (apply #'max (mapcar #'formatted-line-width text)))))
-      (draw-box x1 y1 width height 
-		:stroke-color <stroke-color>
-		:color <background-color>
-		:destination image)
-      (when (eq style :balloon)
-      	(draw-line x0 y0 x1 y1 :destination image))
-      (let ((x2 (+ margin x1))
-	    (y2 (+ margin y1)))
-	(dolist (line text)
-	  (render-formatted-line line x2 y2 :destination image)
-	  (incf y2 (formatted-line-height line)))))))
+  (clon:with-field-values (text style scale) self
+    (clon:with-field-values (tile-size) *world*
+      (let* ((offset (ecase style
+		       (:balloon tile-size)
+		       (:flat 0)))
+	     (x0 (+ x tile-size))
+	     (y0 (+ y tile-size))
+	     (x1 (+ x0 (* scale offset)))
+	     (y1 (+ y0 (* scale offset)))
+	     (margin 4)
+	     (height (+ (* 2 margin) (apply #'+ (mapcar #'formatted-line-height text))))
+	     (width (+ (* 2 margin) (apply #'max (mapcar #'formatted-line-width text)))))
+	(draw-box x1 y1 width height 
+		  :stroke-color <stroke-color>
+		  :color <background-color>
+		  :destination image)
+	(when (eq style :balloon)
+	  (draw-line x0 y0 x1 y1 :destination image))
+	(let ((x2 (+ margin x1))
+	      (y2 (+ margin y1)))
+	  (dolist (line text)
+	    (render-formatted-line line x2 y2 :destination image)
+	    (incf y2 (formatted-line-height line))))))))
 
 (define-method run balloon ()
   [expend-default-action-points self]
+  (when <following>
+    (multiple-value-bind (r c) [grid-coordinates <following>]
+      ;; follow emoter
+      [move-to self r c]))
   (when (integerp <timeout>)
     (when (minusp (decf <timeout>))
       [die self])))
 
-;; TODO is this needed?
-(define-method deserialize cell ()
-  (with-field-values (equipment) self
-    (when (listp equipment)
-      (loop while equipment do
-	(pop equipment) ;; get rid of keyword
-	(let ((item (pop equipment)))
-	  (when item
-	    (setf (field-value :equipper item)
-		  self)))))))
+(define-method emote cell (text &optional (timeout 3.0))
+  (let ((balloon (clone =balloon= :text text :timeout timeout 
+			:following self :style :balloon
+			:scale 2)))
+    [play-sample self "talk"]
+    [drop self balloon]))
 
 ;;; Sprite specials; editor placeholders for sprites.
 

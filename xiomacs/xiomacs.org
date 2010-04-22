@@ -4,7 +4,9 @@ CLOSED: [2010-04-20 Tue 06:11]
 CLOSED: [2010-04-20 Tue 06:11]
 ** DONE let game indicate that sdl keys were handled ONCE per timestep
 CLOSED: [2010-04-21 Wed 20:29]
-** TODO archive tutorial 
+** TODO player entry point that isn't an exit
+** TODO storage archive
+** TODO upgrade, D+
 ** TODO [#A] scaled display of current inventory with labels
 ** TODO [#B] Simple mission structure with just a couple independent goals
 ** TODO [#B] bombs should blow up other bombs. more powerful BOMBS!

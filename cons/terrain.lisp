@@ -10,6 +10,13 @@
 (define-method do-action exit ()
   [exit *universe* :player [get-player *world*]])
 
+(define-prototype drop-point (:parent =gateway=)
+  (tile :initform "gateway")
+  (categories :initform '(:gateway :player-entry-point)))
+
+(define-method activate drop-point ()
+  [say self "This exit is malfunctioning, and will not operate."])
+
 ;;; Indestructible wall of many colors
 
 (defcell floor 
@@ -147,8 +154,8 @@ select a sector; press Z to enter. Press F1 for help.")
 (define-method after-start-method alien-base ()
   [describe self])
 
-(define-method begin-ambient-loop alien-base ()
-  (play-music "mello"))
+;; (define-method begin-ambient-loop alien-base ()
+;;   (play-music "mello"))
 
 ;;; Zeta
 

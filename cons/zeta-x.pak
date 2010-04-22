@@ -1,49 +1,47 @@
 ((:NAME "zeta-x" :TYPE :OBJECT :PROPERTIES COMMON-LISP:NIL :FILE
   COMMON-LISP:NIL :DATA
   (:%CLON%OBJECT% :PARENT CONS-GAME::=ALIEN-BASE= :FIELDS
-   (:SERIALIZED-GRID
-    #2A((((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
-           (:DESCRIPTION
-            "You never know what you'll find in a storage chamber. All manner of
-supplies, ammunition, and sometimes special items may be found here."
-            :ADDRESS (CONS-GAME::=STORAGE=) :WIDGET COMMON-LISP:NIL :COLUMN 0
-            :ROW 0 :EXCLUDED-FIELDS
-            (:PROXY :OCCUPANT :PARENT-CONTAINER :EQUIPPER :RENDER-CELL :WORLD)
-            :CATEGORIES (:GATEWAY :ACTOR) :TILE "storage-gateway" :NAME
-            "Storage cube")))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
-           (:DESCRIPTION
-            "The station's data security depends on the operation of the computers
-here. Important secret data files may sometimes be obtained, or even
-new abilities."
-            :ADDRESS (CONS-GAME::=SECURITY774=) :WIDGET COMMON-LISP:NIL :COLUMN
-            1 :ROW 0 :CATEGORIES (:GATEWAY :ACTOR) :TILE "unknown-gateway"
-            :NAME "Security sector")))
-         COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL)
-        (COMMON-LISP:NIL
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
-           (:DESCRIPTION
-            "The reactor cores contained in these chambers are the main source of
-the enemy's power."
-            :ADDRESS (CONS-GAME::=REACTOR1138=) :WIDGET COMMON-LISP:NIL :COLUMN
-            1 :ROW 1 :CATEGORIES (:GATEWAY :ACTOR) :TILE "unknown-gateway"
-            :NAME "XIO Reactor")))
-         COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL)
-        (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
-         COMMON-LISP:NIL)
-        (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
-         COMMON-LISP:NIL)
-        (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
-         COMMON-LISP:NIL))
-    :LIGHT-GRID
-    #2A((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)) :VARIABLES
-    (:%CLON%HASH-TABLE% COMMON-LISP:EQUAL) :AMBIENT-LIGHT :TOTAL
-    :EDGE-CONDITION :BLOCK :SCALE (1 CONS-GAME::XM) :TILE-SIZE 32 :WIDTH 5
-    :HEIGHT 5 :OVERWORLD COMMON-LISP:T :DESCRIPTION
+   (:NAME "zeta-x" :DESCRIPTION
     "Welcome to CONS. Your mission is to infiltrate, explore, and
 ultimately destroy a high-security enemy starbase of unknown purpose.
 The colored squares above represent the sectors of the base you can
 currently visit. Use the movement keys (see sidebar at right) to
 select a sector; press Z to enter. Press F1 for help."
+    :OVERWORLD COMMON-LISP:T :HEIGHT 5 :WIDTH 5 :TILE-SIZE 32 :SCALE
+    (1 CONS-GAME::XM) :EDGE-CONDITION :BLOCK :AMBIENT-LIGHT :TOTAL :VARIABLES
+    (:%CLON%HASH-TABLE% COMMON-LISP:EQUAL) :LIGHT-GRID
+    #2A((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0))
+    :SERIALIZED-GRID
+    #2A((((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
+           (:NAME "storage3827" :TILE "unknown-gateway" :CATEGORIES
+            (:GATEWAY :ACTOR) :EXCLUDED-FIELDS
+            (:PROXY :OCCUPANT :PARENT-CONTAINER :EQUIPPER :RENDER-CELL :WORLD)
+            :ROW 0 :COLUMN 0 :WIDGET COMMON-LISP:NIL :ADDRESS "storage3827"
+            :DESCRIPTION
+            "You never know what you'll find in a storage chamber. All manner of
+supplies, ammunition, and sometimes special items may be found here.")))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
+           (:NAME "Security sector" :TILE "gateway" :CATEGORIES
+            (:GATEWAY :ACTOR) :ROW 0 :COLUMN 1 :WIDGET COMMON-LISP:NIL :ADDRESS
+            (CONS-GAME::=SECURITY774=) :DESCRIPTION
+            "The station's data security depends on the operation of the computers
+here. Important secret data files may sometimes be obtained, or even
+new abilities.")))
+         COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL)
+        (COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
+           (:NAME "XIO Reactor" :TILE "gateway" :CATEGORIES (:GATEWAY :ACTOR)
+            :ROW 1 :COLUMN 1 :WIDGET COMMON-LISP:NIL :ADDRESS
+            (CONS-GAME::=REACTOR1138=) :DESCRIPTION
+            "The reactor cores contained in these chambers are the main source of
+the enemy's power.")))
+         COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL)
+        (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
+         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
+         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
+         COMMON-LISP:NIL))))
+  :OBJECT COMMON-LISP:NIL))ess F1 for help."
     :NAME "zeta-x"))
   :OBJECT COMMON-LISP:NIL))

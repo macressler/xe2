@@ -108,7 +108,7 @@ supplies, ammunition, and sometimes special items may be found here.")
   (ambient-light :initform :total)
   (required-modes :initform nil)
   (scale :initform '(1 xm))
-  (edge-condition :initform :block)
+  (edge-condition :initform :exit)
   (grammar :initform 
 	   '((world >> (:pushloc
 			5 :jump

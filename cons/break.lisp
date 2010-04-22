@@ -370,7 +370,7 @@
 
 (defparameter *themes* (list *plasma-theme* *psi-theme* *chi-theme*))
 
-(defvar *theme* *plasma-theme*)
+(defparameter *theme* *plasma-theme*)
 
 ;;; Bust these bricks
 
@@ -407,8 +407,10 @@
 (define-method loadout brick ()
   (incf *bricks*))
 
-(define-method hit brick (&optional ball)
+(define-method hit brick (&optional thing)
   (let ((floor (clone =dancefloor=)))
+    (when (and thing [in-category thing :particle])
+      [die thing])
     [drop self floor]
     [light floor]
     [die self]))

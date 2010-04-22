@@ -267,11 +267,6 @@
     (when [in-category item :actor]
       [run item])))
 
-(define-method emote agent (text &optional (timeout 3.0))
-  (let ((balloon (clone =balloon= :text text :timeout timeout :following self :style :balloon)))
-    [play-sample self "talk"]
-    [drop self balloon]))
-
 (define-method quit agent ()
   (xe2:quit :shutdown))
 
