@@ -1651,11 +1651,11 @@ also the file LIBSDL-LICENSE for details.
 (defvar *library-search-paths-setup-hook* nil)
 
 (defun setup-library-search-paths ()
-(run-hook '*library-search-paths-setup-hook*)
-#+darwin (setf cffi:*foreign-library-directories*
-	       (union cffi:*foreign-library-directories*
-		      '(#P"/opt/local/lib" #P"/sw/lib/")
-		      :test #'equal)))
+  (run-hook '*library-search-paths-setup-hook*)
+  #+darwin (setf cffi:*foreign-library-directories*
+                 (union cffi:*foreign-library-directories*
+                        '(#P"/opt/local/lib" #P"/sw/lib/")
+                        :test #'equal)))
 
 (defvar *play-args* nil)
 
