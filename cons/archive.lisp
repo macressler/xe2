@@ -88,5 +88,10 @@
   		       4 :draw drop-eye)))))
 
 (define-method begin-ambient-loop archive ()
-  (play-music "xiomacs" :loop t))
+  (play-music "next" :loop t))
     
+(define-prototype archive2 (:parent =archive=))
+
+(define-method generate archive2 (&rest params)
+  [clone-onto self "archive2"])
+

@@ -13,11 +13,11 @@ select a sector; press Z to enter. Press F1 for help."
     #2A((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0))
     :SERIALIZED-GRID
     #2A((((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
-           (:NAME "storage3827" :TILE "unknown-gateway" :CATEGORIES
-            (:GATEWAY :ACTOR) :EXCLUDED-FIELDS
+           (:NAME "Storage cube" :TILE "gateway" :CATEGORIES (:GATEWAY :ACTOR)
+            :EXCLUDED-FIELDS
             (:PROXY :OCCUPANT :PARENT-CONTAINER :EQUIPPER :RENDER-CELL :WORLD)
-            :ROW 0 :COLUMN 0 :WIDGET COMMON-LISP:NIL :ADDRESS "storage3827"
-            :DESCRIPTION
+            :ROW 0 :COLUMN 0 :WIDGET COMMON-LISP:NIL :ADDRESS
+            (CONS-GAME::=STORAGE3827=) :DESCRIPTION
             "You never know what you'll find in a storage chamber. All manner of
 supplies, ammunition, and sometimes special items may be found here.")))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
@@ -36,12 +36,18 @@ new abilities.")))
             "The reactor cores contained in these chambers are the main source of
 the enemy's power.")))
          COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL)
-        (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
-         COMMON-LISP:NIL)
+        (COMMON-LISP:NIL
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=SECTOR-GATEWAY= :FIELDS
+           (:NAME "XIO Reactor" :TILE "unknown-gateway" :CATEGORIES
+            (:GATEWAY :ACTOR) :EXCLUDED-FIELDS
+            (:PROXY :OCCUPANT :PARENT-CONTAINER :EQUIPPER :RENDER-CELL :WORLD)
+            :ROW 2 :COLUMN 1 :WIDGET COMMON-LISP:NIL :ADDRESS
+            (CONS-GAME::=ARCHIVE2=) :DESCRIPTION
+            "The reactor cores contained in these chambers are the main source of
+the enemy's power.")))
+         COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL)
         (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
          COMMON-LISP:NIL)
         (COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL COMMON-LISP:NIL
          COMMON-LISP:NIL))))
-  :OBJECT COMMON-LISP:NIL))ess F1 for help."
-    :NAME "zeta-x"))
   :OBJECT COMMON-LISP:NIL))

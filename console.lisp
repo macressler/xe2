@@ -59,8 +59,6 @@
 	 (entry2 (find (second entry) *sdl-key-modifiers* :key #'second)))
     (first entry2)))
 
-
-
 (defun keyboard-held-p (key) 
   "Returns the duration in seconds that the key has been depressed over a number of game loops."
   (sdl:key-held-p (keyboard-id key)))

@@ -956,7 +956,12 @@ supplies, ammunition, and sometimes special items may be found here."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 3 :COLUMN
             15)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=HEALTH= :FIELDS
+           (:NAME "REPAIR-1" :DESCRIPTION
+            "The single-use program REPAIR-1 restores a few hit points when activated."
+            :TILE "health" :CALL-INTERVAL 20 :CATEGORIES (:ITEM :DEFUN) :ROW 3
+            :COLUMN 16))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 3 :COLUMN
             16)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
@@ -1416,61 +1421,110 @@ Then it fires and gives chase."
           (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 5 :COLUMN
             16)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
-           (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 5 :COLUMN
-            17)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
-           (:NAME "Guardic eye" :TILE "guardic" :TEAM :ENEMY :AUTO-LOADOUT
-            COMMON-LISP:T :HIT-POINTS
-            (:BASE 4 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
-             COMMON-LISP:NIL)
-            :CLOCK 13 :SPEED
-            (:BASE 1 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :STRENGTH
-            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :DEFENSE
-            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :ENERGY
-            (:BASE 100 :MIN 0 :MAX 100 :DELTA COMMON-LISP:NIL :UNIT
-             COMMON-LISP:NIL)
-            :STEPPING COMMON-LISP:T :MOVEMENT-COST
-            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :EQUIPMENT-SLOTS (:CENTER-BAY) :FIRING-WITH :CENTER-BAY :MAX-ITEMS
-            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :DESCRIPTION
-            "Invulnerable until red eye opens. Fires particle weapons." :ROW 5
-            :COLUMN 18 :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :EQUIPMENT
+           (:ACTION-POINTS -5 :EQUIPMENT
             (:CENTER-BAY
              (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
-              (:NAME "Rail gun cannon" :TILE "gun" :CATEGORIES
-               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :EQUIP-FOR (:CENTER-BAY)
-               :WEIGHT 7000 :ACCURACY
-               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
                 COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
                :ATTACK-POWER
                (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
                 COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :ATTACK-COST
-               (:BASE 40 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
                 COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :ENERGY-COST
-               (:BASE 1 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :CONTAINER COMMON-LISP:NIL))
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
              (:CENTER-BAY) COMMON-LISP:NIL)
-            :ACTION-POINTS -5))
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 17 :ROW 5
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 15 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
           (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+           (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 5 :COLUMN
+            17)))
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 5 :COLUMN
             18)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 5 :COLUMN
             19)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 20 :ROW 5
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 1 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 5 :COLUMN
             20)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
@@ -3124,7 +3178,54 @@ Then it fires and gives chase."
           (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 11 :COLUMN
             16)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 17 :ROW 11
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 18 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 11 :COLUMN
             17)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
@@ -3133,7 +3234,54 @@ Then it fires and gives chase."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 11 :COLUMN
             19)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 20 :ROW 11
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 4 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 11 :COLUMN
             20)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
@@ -3480,7 +3628,12 @@ Then it fires and gives chase."
           (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 12 :COLUMN
             39)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=HEALTH= :FIELDS
+           (:NAME "REPAIR-1" :DESCRIPTION
+            "The single-use program REPAIR-1 restores a few hit points when activated."
+            :TILE "health" :CALL-INTERVAL 20 :CATEGORIES (:ITEM :DEFUN) :ROW 12
+            :COLUMN 40))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 12 :COLUMN
             40)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
@@ -3633,7 +3786,54 @@ Then it fires and gives chase."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 13 :COLUMN
             16)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 17 :ROW 13
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 5 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 13 :COLUMN
             17)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
@@ -3642,7 +3842,54 @@ Then it fires and gives chase."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 13 :COLUMN
             19)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 20 :ROW 13
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 8 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 13 :COLUMN
             20)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
@@ -3654,7 +3901,54 @@ Then it fires and gives chase."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 13 :COLUMN
             23)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 24 :ROW 13
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 9 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 13 :COLUMN
             24)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
@@ -3884,52 +4178,7 @@ Then it fires and gives chase."
           (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 14 :COLUMN
             11)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
-           (:NAME "Guardic eye" :TILE "guardic" :TEAM :ENEMY :AUTO-LOADOUT
-            COMMON-LISP:T :HIT-POINTS
-            (:BASE 4 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
-             COMMON-LISP:NIL)
-            :CLOCK 14 :SPEED
-            (:BASE 1 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :STRENGTH
-            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :DEFENSE
-            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :ENERGY
-            (:BASE 100 :MIN 0 :MAX 100 :DELTA COMMON-LISP:NIL :UNIT
-             COMMON-LISP:NIL)
-            :STEPPING COMMON-LISP:T :MOVEMENT-COST
-            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :EQUIPMENT-SLOTS (:CENTER-BAY) :FIRING-WITH :CENTER-BAY :MAX-ITEMS
-            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :DESCRIPTION
-            "Invulnerable until red eye opens. Fires particle weapons." :ROW 14
-            :COLUMN 12 :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :EQUIPMENT
-            (:CENTER-BAY
-             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
-              (:NAME "Rail gun cannon" :TILE "gun" :CATEGORIES
-               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :EQUIP-FOR (:CENTER-BAY)
-               :WEIGHT 7000 :ACCURACY
-               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :ATTACK-POWER
-               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :ATTACK-COST
-               (:BASE 40 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :ENERGY-COST
-               (:BASE 1 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :CONTAINER COMMON-LISP:NIL))
-             (:CENTER-BAY) COMMON-LISP:NIL)
-            :ACTION-POINTS -5))
-          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 14 :COLUMN
             12)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
@@ -5250,7 +5499,54 @@ Then it fires and gives chase."
           (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 18 :COLUMN
             16)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 17 :ROW 18
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 13 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 18 :COLUMN
             17)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
@@ -5308,7 +5604,12 @@ Then it fires and gives chase."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 18 :COLUMN
             34)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=HEALTH= :FIELDS
+           (:NAME "REPAIR-1" :DESCRIPTION
+            "The single-use program REPAIR-1 restores a few hit points when activated."
+            :TILE "health" :CALL-INTERVAL 20 :CATEGORIES (:ITEM :DEFUN) :ROW 18
+            :COLUMN 35))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 18 :COLUMN
             35)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
@@ -5762,7 +6063,54 @@ Then it fires and gives chase."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 20 :COLUMN
             23)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 24 :ROW 20
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 18 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 20 :COLUMN
             24)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS
@@ -6683,50 +7031,52 @@ the player gets too close."
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 24 :COLUMN
             16)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
-           (:NAME "Guardic eye" :TILE "guardic" :TEAM :ENEMY :AUTO-LOADOUT
-            COMMON-LISP:T :HIT-POINTS
-            (:BASE 4 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
-             COMMON-LISP:NIL)
-            :CLOCK 13 :SPEED
-            (:BASE 1 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :STRENGTH
-            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :DEFENSE
-            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :ENERGY
-            (:BASE 100 :MIN 0 :MAX 100 :DELTA COMMON-LISP:NIL :UNIT
-             COMMON-LISP:NIL)
-            :STEPPING COMMON-LISP:T :MOVEMENT-COST
-            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :EQUIPMENT-SLOTS (:CENTER-BAY) :FIRING-WITH :CENTER-BAY :MAX-ITEMS
-            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :DESCRIPTION
-            "Invulnerable until red eye opens. Fires particle weapons." :ROW 24
-            :COLUMN 17 :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :EQUIPMENT
+           (:ACTION-POINTS -5 :EQUIPMENT
             (:CENTER-BAY
              (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
-              (:NAME "Rail gun cannon" :TILE "gun" :CATEGORIES
-               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :EQUIP-FOR (:CENTER-BAY)
-               :WEIGHT 7000 :ACCURACY
-               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
                 COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
                :ATTACK-POWER
                (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
                 COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :ATTACK-COST
-               (:BASE 40 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
                 COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :ENERGY-COST
-               (:BASE 1 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
-                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
-               :CONTAINER COMMON-LISP:NIL))
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
              (:CENTER-BAY) COMMON-LISP:NIL)
-            :ACTION-POINTS -5))
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 17 :ROW 24
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 9 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
           (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 24 :COLUMN
             17)))
@@ -6748,7 +7098,54 @@ the player gets too close."
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 24 :COLUMN
             23)))
-         ((:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
+         ((:%CLON%OBJECT% :PARENT CONS-GAME::=GUARDIC-EYE= :FIELDS
+           (:ACTION-POINTS -5 :EQUIPMENT
+            (:CENTER-BAY
+             (:%CLON%OBJECT% :PARENT CONS-GAME::=RAIL-CANNON= :FIELDS
+              (:CONTAINER COMMON-LISP:NIL :ENERGY-COST
+               (:BASE 0 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-COST
+               (:BASE 5 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ATTACK-POWER
+               (:BASE 18 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :ACCURACY
+               (:BASE 100 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+                COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+               :WEIGHT 7000 :EQUIP-FOR (:CENTER-BAY) :CATEGORIES
+               (:EQUIPPED :ITEM :WEAPON :EQUIPMENT) :TILE "gun" :NAME
+               "Rail gun cannon"))
+             (:CENTER-BAY) COMMON-LISP:NIL)
+            :INVENTORY #(COMMON-LISP:NIL COMMON-LISP:NIL) :COLUMN 24 :ROW 24
+            :DESCRIPTION
+            "Invulnerable until red eye opens. Fires particle weapons."
+            :CATEGORIES (:ACTOR :OBSTACLE :ENEMY :TARGET) :MAX-ITEMS
+            (:BASE 2 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :FIRING-WITH :CENTER-BAY :EQUIPMENT-SLOTS (:CENTER-BAY)
+            :MOVEMENT-COST
+            (:BASE 6 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STEPPING COMMON-LISP:T :ENERGY
+            (:BASE 1000 :MIN 0 :MAX 1000 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :DEFENSE
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :STRENGTH
+            (:BASE 10 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :SPEED
+            (:BASE 4 :MIN COMMON-LISP:NIL :MAX COMMON-LISP:NIL :DELTA
+             COMMON-LISP:NIL :UNIT COMMON-LISP:NIL)
+            :CLOCK 1 :HIT-POINTS
+            (:BASE 20 :MIN 0 :MAX 4 :DELTA COMMON-LISP:NIL :UNIT
+             COMMON-LISP:NIL)
+            :AUTO-LOADOUT COMMON-LISP:T :TEAM :ENEMY :TILE "guardic" :NAME
+            "Guardic eye"))
+          (:%CLON%OBJECT% :PARENT CONS-GAME::=FLOOR= :FIELDS
            (:CATEGORIES (:FLOOR) :TILE "storage-background" :ROW 24 :COLUMN
             24)))
          ((:%CLON%OBJECT% :PARENT CONS-GAME::=BARRIER= :FIELDS

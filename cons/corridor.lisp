@@ -120,8 +120,8 @@
 
 ;;; the eyeboss
 
-(defparameter *guardic-eye-open-time* 50)
-(defparameter *guardic-eye-closed-time* 20)
+(defparameter *guardic-eye-open-time* 70)
+(defparameter *guardic-eye-closed-time* 80)
 
 (defcell guardic-eye
   (name :initform "Guardic eye")
@@ -131,7 +131,7 @@
   (hit-points :initform (make-stat :base 20 :max 4 :min 0))
   (open :initform nil)
   (clock :initform (random *guardic-eye-closed-time*))
-  (speed :initform (make-stat :base 4))
+  (speed :initform (make-stat :base 2))
   (strength :initform (make-stat :base 10))
   (defense :initform (make-stat :base 10))
   (energy :initform (make-stat :base 1000 :min 0 :max 1000))
@@ -144,6 +144,7 @@
   (description :initform "Invulnerable until red eye opens. Fires particle weapons."))
 
 (define-method loadout guardic-eye ()
+  (setf <speed> (make-stat :base 2))
   [make-inventory self]
   [make-equipment self]
   [equip self [add-item self (clone =rail-cannon=)]])
@@ -167,9 +168,9 @@
       (let ((cannon [equipment-slot self :center-bay]))
 	(when <open> 
 	    (progn (when [can-see-player self]
+		     [expend-action-points self 150]
 		     [fire cannon [player-row *world*]
 			   [player-column *world*]]))))))
-
 					  
 (define-method damage guardic-eye (points)
   ;; only damage when open
@@ -404,3 +405,170 @@ channel; corridors adjacent to a reactor are especially hot.")
 	  (column (random <width>)))
       [drop-cell self xr7 row column :loadout t])))
 
+;;; Radiation graviceptors leave energy behind when you kill them
+
+(defcell graviceptor
+ (tile :initform "gravicept")
+ (hit-points :initform (make-stat :base 3 :max 3 :min 0))
+ (speed :initform (make-stat :base 1))
+ (strength :initform (make-stat :base 10))
+ (defense :initform (make-stat :base 10))
+ (stepping :initform t)
+ (team :initform :enemy)
+ (movement-cost :initform (make-stat :base 40))
+ (max-items :initform (make-stat :base 2))
+ (direction :initform (random-direction))
+ (categories :initform '(:actor :obstacle :enemy :target))
+ (description :initform 
+"The deadly Graviceptor seeks out the player and explodes into a cloud
+of poisonous radioactive gas."))
+
+(define-method run graviceptor ()
+  (clon:with-field-values (row column) self
+    (let* ((world *world*)
+	   (direction [direction-to-player world row column]))
+      (if [adjacent-to-player world row column]
+	  [explode self]
+	  (if [obstacle-in-direction-p world row column direction]
+	      (let ((target [target-in-direction-p world row column direction]))
+		(if (and target (not [in-category target :enemy]))
+		    [explode self]
+		    (progn (setf <direction> (random-direction))
+			   [>>move self direction])))
+	      (progn (when (< 7 (random 10))
+		       (setf <direction> (random-direction)))
+		     [>>move self direction]))))))
+
+(define-method drop-gas graviceptor (row column &key
+					       (height (+ 3 (random 5)))
+					       (width (+ 3 (random 5))))
+  (labels ((drop-gas (r c)
+	     (prog1 nil
+	       [drop-cell *world* (clone =gas=) r c])))
+    [play-sample self "pop-ssh"]
+    (trace-rectangle #'drop-gas row column height width :fill)))
+
+(define-method explode graviceptor ()
+  ;; only when not in space debris... debris are "safe zones" from mines
+  (labels ((boom (r c &optional (probability 50))
+	     (prog1 nil
+	       (when (and (< (random 100) probability)
+			  [in-bounds-p *world* r c])
+		 [drop-cell *world* (clone =explosion=) r c :no-collisions nil]))))
+    (dolist (dir xe2:*compass-directions*)
+      (multiple-value-bind (r c)
+	  (step-in-direction <row> <column> dir)
+	(boom r c 100)))
+    ;; randomly sprinkle some fire around edges
+    (trace-rectangle #'boom 
+		     (- <row> 2) 
+		     (- <column> 2) 
+		     5 5)
+    ;; release radiation
+					;      (when (< 3 (random 10))
+    [drop-gas self (- <row> 2) (- <column> 2) :height 5 :width 5]
+    [die self]))
+
+(define-method damage graviceptor (points)
+  (declare (ignore points))
+  [stat-effect [get-player *world*] :score 5000]
+  [>>say :narrator "Graviceptor destroyed. 5000 Bonus Points."]
+  [explode self])
+
+(define-method hit graviceptor (&optional other)
+  [damage self 1]
+  (when other [die other]))
+
+;;; A radiation probe releases a trail of toxic graviceptor particles.
+
+(defcell radiation 
+  (categories :initform '(:actor))
+  (clock :initform 200)
+ (team :initform :enemy)
+  (description :initform 
+"A radiation trail. Don't touch it. Fades after several turns."))
+  
+(define-method initialize radiation (&key direction clock)
+  (setf <clock> clock)
+  (setf <tile> (ecase direction
+		 (:north "radiation-north")
+		 (:south "radiation-south")
+		 (:east "radiation-east")
+		 (:west "radiation-west")
+		 (:northeast "radiation-northeast")
+		 (:northwest "radiation-northwest")
+		 (:southeast "radiation-southeast")
+		 (:southwest "radiation-southwest")
+		 (:here "explosion"))))
+
+(define-method run radiation ()
+  [expend-action-points self 10]
+  (decf <clock>)
+  (when (zerop <clock>)
+    [die self]))
+
+(define-method damage radiation (points)
+  (declare (ignore points))
+  [die self])
+
+(define-method die radiation ()
+  (when (> 1 (random 80))
+    [drop self (clone =graviceptor=)])
+  [parent>>die self])
+
+(define-method step radiation (stepper)
+  (unless (same-team self stepper)
+    [drop self (clone =explosion=)]	       
+    [damage stepper 1]))
+	   
+(defcell probe 
+  (tile :initform "probe")
+  (hit-points :initform (make-stat :base 3 :max 3 :min 0))
+  (speed :initform (make-stat :base 1))
+  (strength :initform (make-stat :base 10))
+  (defense :initform (make-stat :base 10))
+  (stepping :initform t)
+  (team :initform :enemy)
+  (movement-cost :initform (make-stat :base 10))
+  (max-items :initform (make-stat :base 2))
+  (direction :initform (random-direction))
+  (movement-cost :initform (make-stat :base 10))
+  (categories :initform '(:actor :obstacle :enemy :target))
+  (trail-length :initform (make-stat :base 160))
+  (description :initform 
+"This automated probe scans the area releasing graviceptor mines.
+Avoid its radioactive trail and shoot it from a distance.
+Watch out---they can spawn mines even after death!"))
+
+(define-method move probe (direction)
+  [drop self (clone =radiation= 
+		    :direction direction 
+		    :clock [stat-value self :trail-length])]
+  [parent>>move self direction])
+
+(define-method run probe ()
+  (clon:with-field-values (row column) self
+    (let* ((world *world*)
+	   (direction [direction-to-player *world* row column])
+	   (distance [distance-to-player *world* row column]))
+      (if (< distance 8)
+	  (progn 
+	    (percent-of-time 4 [play-sample self "dtmf1"])
+	    (setf <direction> (if (< distance 4)
+				  (random-direction)
+				  direction))
+	    [>>move self <direction>])
+	  ;; bounce around 
+	  (progn 
+	    (when [obstacle-in-direction-p *world* <row> <column> <direction>]
+	      (setf <direction> (random-direction)))
+	    [>>move self <direction>])))))
+
+(define-method hit probe (&optional other)
+  [damage self 1]
+  (when other [die other]))
+
+(define-method die probe ()
+  [play-sample self "death-alien"]
+  [drop self (clone =explosion=)]
+  [parent>>die self])

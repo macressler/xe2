@@ -218,3 +218,7 @@ supplies, ammunition, and sometimes special items may be found here.")
 (define-method begin-ambient-loop storage ()
   (play-music "xiomacs" :loop t))
     
+(define-prototype storage3827 (:parent =storage=))
+
+(define-method generate storage3827 (&rest params)
+  [clone-onto self "storage3827"])

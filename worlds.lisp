@@ -923,7 +923,7 @@ The cells' :cancel method is invoked."
 	    (delete-if #'(lambda (c) (when [in-category c category]
 				       (prog1 t [cancel c])))
 		       (aref grid row column))))))
-			       
+	
 (define-method line-of-sight world (r1 c1 r2 c2 &optional (category :obstacle))
   "Return non-nil when there is a direct Bresenham's line of sight
 along grid squares between R1,C1 and R2,C2."
