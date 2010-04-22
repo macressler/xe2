@@ -144,13 +144,13 @@
                       (let ((j0 (* j tile-size))
                             (i0 (* i tile-size)))
                         (setf tile (field-value :tile cell))
-			(when tile 
-			  (draw-resource-image tile j0 i0 
-					       :render-cell (field-value :render-cell cell) 
-					       :destination image))
-                        (when (or (member :drawn (field-value :categories cell))
-                                  (null tile))
-                          (vector-push-extend cell pending-draws))))))
+                        (if (or (member :drawn (field-value :categories cell))
+				(null tile))
+			    (vector-push-extend cell pending-draws)
+			    (when tile 
+			      (draw-resource-image tile j0 i0 
+						   :render-cell (field-value :render-cell cell) 
+						   :destination image)))))))
 	      ;; not in bounds, or not lit; draw blackness
 	      (draw-resource-image ".blackness" (* j tile-size) (* i tile-size)
 				   :destination image))))
