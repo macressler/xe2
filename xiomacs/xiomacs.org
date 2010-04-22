@@ -1,4 +1,5 @@
 ** TODO shoot bombs to kick them ahead at enemies
+** TODO cycle inventory in other dir so that last-picked item is next
 ** TODO [#A] scaled display of current inventory with labels
 ** TODO [#B] Simple mission structure with just a couple independent goals
 ** TODO [#B] recenter form view when entering data... also enter cell view
