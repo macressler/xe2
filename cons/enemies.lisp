@@ -43,12 +43,13 @@ Then it fires and gives chase.")
     (if (< dist 13)
 	(if (> 9 dist)
 	    (progn [fire self dir]
-		   [expend-action-points self 50]
+		   [expend-action-points self 100]
 		   (xe2:percent-of-time 3 [move self dir]))
 	    (if [obstacle-in-direction-p *world* <row> <column> dir]
 		[move self (random-direction)]
 		[move self dir]))
-	(percent-of-time 3 [move self (random-direction)]))))
+	(if (percent-of-time 3 [move self (random-direction)])
+	    [expend-action-points self 10]))))
 
 (define-method die shocker () 
   (dotimes (n 10)
@@ -452,7 +453,7 @@ Hard to kill because of their evasive manuevers."))
 
 (defcell xiocond 
   (tile :initform "xiocond")
-  (categories :initform '(:actor :obstacle :target :enemy :opaque :xiocond :puck))
+  (categories :initform '(:actor :obstacle :target :enemy :opaque :xiocond))
   (speed :initform (make-stat :base 3))
   (team :initform :enemy)
   (movement-cost :initform (make-stat :base 20))

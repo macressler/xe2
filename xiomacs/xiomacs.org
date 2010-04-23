@@ -1,13 +1,15 @@
+** DONE less explosion randomness 
+CLOSED: [2010-04-23 Fri 18:20]
+** DONE no bombs on walls
+CLOSED: [2010-04-23 Fri 18:20]
+** TODO cycle inventory in other dir so that last-picked item is next
+** TODO fix shocker to prevent overfiring
+** TODO allow :deepcopy t field on some cells so that shallow copy can be used in most maps
 ** TODO shoot bombs to kick them ahead at enemies
 ** TODO check out japanese pc games  http://hg101.kontek.net/kagiri/kagiri.htm
 ** TODO react shield
-** TODO no bombs on walls
 ** TODO energy stat for particle gun
-** TODO prevent explosions from moving thru wall
-** TODO less explosion randomness 
-** TODO allow :deepcopy nil field so that deepcopy can be safely used.
-** TODO cycle inventory in other dir so that last-picked item is next
-** TODO fix shocker to prevent overfiring
+** TODO [#B] prevent explosions from moving thru wall
 ** TODO [#A] scaled display of current inventory with labels
 ** TODO [#B] Simple mission structure with just a couple independent goals
 ** TODO [#B] recenter form view when entering data... also enter cell view

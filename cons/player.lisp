@@ -240,9 +240,10 @@
   (unless <dead>
     (clon:with-fields (items) self
       (if items
-	  (let ((tail (pop items)))
+	  (let ((tail (car (last items)))
+		(newlist (butlast items)))
 	    [play-sample self "doorbell3"]
-	    (setf items (append items (list tail))))
+	    (setf items (cons tail newlist)))
 	  (progn 
 	    [play-sample self "error"]
 	    [say self "Cannot rotate empty list."])))))

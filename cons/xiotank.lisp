@@ -548,7 +548,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
 
 ;;; The sonic cannon
 
-(defparameter *wave-cannon-reload-time* 20)
+(defparameter *wave-cannon-reload-time* 40)
 
 (defcell wave-cannon
   (tile :initform "gun")

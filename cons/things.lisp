@@ -60,7 +60,7 @@
 
 (defcell buster-particle 
   (tile :initform "blueparticle")
-  (movement-cost :initform (make-stat :base 10))
+  (movement-cost :initform (make-stat :base 0))
   (speed :initform (make-stat :base 5 :min 0 :max 10))
   (team :initform :player)
   (categories :initform '(:actor :particle :target))
@@ -81,11 +81,14 @@
 		 (let ((thing (or [category-at-p *world* r c :target] obs)))
 		   (if (null thing)
 		       [move self <direction>]
-		       (progn (when (and (clon:has-method :hit thing)
-					 (not (same-team self thing)))
-				[drop self (clone =flash=)]
-				[hit thing])
-			      [die self])))))
+		       (progn 
+			 (when [in-category thing :puck]
+			   [kick thing <direction>])
+			 (when (and (clon:has-method :hit thing)
+				    (not (same-team self thing)))
+			   [drop self (clone =flash=)]
+			   [hit thing])
+			 [die self])))))
 	  [move self <direction>]))))
 
 (defcell buster-defun
@@ -108,37 +111,47 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 (defvar *bomb-tiles* '("bomb-1" "bomb-2" "bomb-3" "bomb-4"))
 
 (defun bomb-tile (n)
-  (nth (- n 1) *bomb-tiles*))
+  (nth (truncate (/ (- n 1) 30)) *bomb-tiles*))
 
 (defcell bomb 
-  (categories :initform '(:actor))
-  (clock :initform 4)
+  (categories :initform '(:actor :puck :target :obstacle))
+  (clock :initform 120)
+  (team :initform :enemy)
+  (direction :initform nil)
   (speed :initform (make-stat :base 1))
   (tile :initform (bomb-tile 4)))
 
+(define-method kick bomb (direction)
+  (setf <direction> direction))
+
 (define-method run bomb () 
-  (clon:with-fields (clock) self	       
+  (clon:with-fields (clock direction) self	       
     (if (zerop clock) 
 	[explode self]
 	(progn 
-	  [expend-action-points self 28]		    
-	  (setf <tile> (bomb-tile clock))
-	  [play-sample self "countdown"]
-	  (dotimes (n 10)
-	    [drop self (clone =particle=)])
+	  (when (and direction (evenp clock))
+	    (multiple-value-bind (r c) 
+		(step-in-direction <row> <column> direction)
+	      (unless [obstacle-at-p *world* r c]
+		[move-cell *world* self r c])))
+	  (when (zerop (mod clock 30))
+	    (setf <tile> (bomb-tile clock))
+	    [play-sample self "countdown"]
+	    (dotimes (n 10)
+	      [drop self (clone =particle=)]))
 	  (decf clock)))))
 
 (define-method explode bomb ()  
   (labels ((boom (r c &optional (probability 70))
 	     (prog1 nil
-	       (message "BOOM ~S" (list r c))
+;;	       (message "BOOM ~S" (list r c))
 	       (when (and (< (random 100) probability)
 			  [in-bounds-p *world* r c]
 			  [can-see-* self r c :barrier])
 		 [drop-cell *world* (clone =explosion=) r c :no-collisions nil])))
 	   (damage (r c &optional (probability 100))
 	     (prog1 nil
-	       (message "DAMAGE ~S" (list r c))
+;;	       (message "DAMAGE ~S" (list r c))
 	       (when (and (< (random 100) probability)
 			  [in-bounds-p *world* r c]
 			  [can-see-* self r c :obstacle])
