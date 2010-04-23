@@ -1,5 +1,13 @@
 ** TODO shoot bombs to kick them ahead at enemies
+** TODO check out japanese pc games  http://hg101.kontek.net/kagiri/kagiri.htm
+** TODO react shield
+** TODO no bombs on walls
+** TODO energy stat for particle gun
+** TODO prevent explosions from moving thru wall
+** TODO less explosion randomness 
+** TODO allow :deepcopy nil field so that deepcopy can be safely used.
 ** TODO cycle inventory in other dir so that last-picked item is next
+** TODO fix shocker to prevent overfiring
 ** TODO [#A] scaled display of current inventory with labels
 ** TODO [#B] Simple mission structure with just a couple independent goals
 ** TODO [#B] recenter form view when entering data... also enter cell view
@@ -7,7 +15,6 @@
 ** TODO [#A] fix lepton gun hitting tail
 ** TODO [#A] fix drone collisions
 ** TODO [#B] 800x600 TUTORIAL HOW TO PLAY SCREEN, document ZX
-
 ** TODO print object name and inspect clicked object in plist on right side
 ** TODO plist world would be pretty easy
 ** TODO integrate sprite spawning in map by using placeholder tile with draw methods

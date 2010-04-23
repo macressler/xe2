@@ -375,6 +375,19 @@
     (xe2:enable-classic-key-repeat 100 60)
     ;; [set-page-property *pager* :game :held-keys t]
     [add-page *pager* :help (list help)]
+
+    (labels ((light-hack (sr sc r c &optional (color ".white"))
+    	       (labels ((hack-overlay (image)
+    			  (multiple-value-bind (sx sy)
+    			      [get-screen-coordinates *viewport* sr sc]
+    			    (multiple-value-bind (x y)
+    				[get-screen-coordinates *viewport* r c]
+    			      (draw-line x y sx sy :destination image
+    					 :color color)
+			      (draw-circle x y 5 :destination image)))))
+    		 [add-overlay *viewport* #'hack-overlay])))
+      (setf xe2::*lighting-hack-function* #'light-hack))
+
 ))
 
 

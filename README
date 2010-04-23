@@ -1,5 +1,7 @@
 This README is a quick overview of the XE2 project and the repository.
 
+If you are NOT compiling from source, see BINARY-README.
+
 Description: XE2 is a reusable cross-platform roguelike game engine
              written in Common Lisp.
 
