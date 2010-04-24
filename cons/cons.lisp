@@ -316,8 +316,8 @@
 	       [set-player universe player]
 	       (setf *player* player)
 	       [play universe
+	       	     :address (list '=breakworld= :sequence-number (genseq))
 ;;	       	     :address (list '=zeta-x= :sequence-number (genseq))
-	       	     :address (list '=zeta-x= :sequence-number (genseq))
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]

@@ -390,6 +390,7 @@
 (defcell brick 
   (name :initform "Brick")
   (tile :initform "brick-purple")
+  (auto-deepcopy :initform t)
   (hit-points :initform (make-stat :min 0 :base 1))
   (orientation :initform :horizontal)
   (categories :initform '(:actor :obstacle :brick :horizontal :oriented))
@@ -792,106 +793,111 @@
 (define-method disembark paddle ()
   [unproxy self :dy -50 :dx 20])
 
-;; ;;; The xiobreak room
+;;; The xiobreak room
 
-;; (defcell drop-point 
-;;   (categories :initform '(:player-entry-point))
-;;   (tile :initform "floor"))
+(defparameter *breakworld-height* 60)
+(defparameter *breakworld-width* 50)
 
-;; (defparameter *room-height* (truncate (/ (- *xiobreak-window-height* 20) *tile-size*)))
-;; (defparameter *room-width* (truncate (/ *xiobreak-window-width* *tile-size*)))
+(define-prototype breakworld (:parent =sector=)
+  (height :initform *breakworld-height*)
+  (width :initform *breakworld-width*)
+  (edge-condition :initform :block))
 
-;; (define-prototype room (:parent xe2:=world=)
-;;   (height :initform *room-height*)
-;;   (width :initform *room-width*)
-;;   (edge-condition :initform :block))
-
-;; (define-method drop-border room ()
-;;   (clon:with-field-values (height width) self
-;;     (labels ((drop-horz-wall (r c)
-;; 	       (prog1 nil [drop-cell self (clone =wall-horizontal=) r c]))
-;; 	     (drop-vert-wall (r c)
-;; 	       (prog1 nil [drop-cell self (clone =wall-vertical=) r c]))
-;; 	     (drop-pit (r c)
-;; 	       (prog1 nil [drop-cell self (clone =pit=) r c])))
-;;       (drop-horz-wall 0 0)
-;;       (trace-row #'drop-horz-wall 0 0 width)
-;;       (trace-row #'drop-pit (- height 1) 0 width)
-;;       (trace-column #'drop-vert-wall 0 0 (- height 1))
-;;       (trace-column #'drop-vert-wall (- width 1) 0 (- height 1)))))
+(define-method drop-border breakworld ()
+  (clon:with-field-values (height width) self
+    (labels ((drop-horz-wall (r c)
+	       (prog1 nil [drop-cell self (clone =wall-horizontal=) r c]))
+	     (drop-vert-wall (r c)
+	       (prog1 nil [drop-cell self (clone =wall-vertical=) r c]))
+	     (drop-pit (r c)
+	       (prog1 nil [drop-cell self (clone =pit=) r c])))
+      (drop-horz-wall 0 0)
+      (trace-row #'drop-horz-wall 0 0 width)
+      (trace-row #'drop-pit (- height 1) 0 width)
+      (trace-column #'drop-vert-wall 0 0 (- height 1))
+      (trace-column #'drop-vert-wall (- width 1) 0 (- height 1)))))
 	          
-;; (define-method drop-floor room ()
-;;   (clon:with-field-values (height width) self
-;;     (dotimes (i height)
-;;       (dotimes (j width)
-;; 	[drop-cell self (clone =floor=) i j]))))
+(define-method drop-floor breakworld ()
+  (clon:with-field-values (height width) self
+    (dotimes (i height)
+      (dotimes (j width)
+	[drop-cell self (clone =floor=) i j]))))
 
-;; (define-method drop-brick-row room (row x0 x1 color)
-;;   (labels ((drop-brick (r c)
-;; 	     (let ((brick (clone =brick=)))
-;; 	       [paint brick color]
-;; 	       [drop-cell self brick r c :loadout t])))
-;;     (xe2:trace-row #'drop-brick row x0 x1)))
+(define-method drop-brick-row breakworld (row x0 x1 color)
+  (labels ((drop-brick (r c)
+	     (let ((brick (clone =brick=)))
+	       [paint brick color]
+	       [drop-cell self brick r c :loadout t])))
+    (xe2:trace-row #'drop-brick row x0 x1)))
 
-;; (defparameter *classic-layout-horz-margin* 0)
+(defparameter *classic-layout-horz-margin* 0)
 
-;; (defparameter *classic-layout-top-margin* 4)
+(defparameter *classic-layout-top-margin* 4)
 
-;; (defparameter *classic-layout-layers* 2)
+(defparameter *classic-layout-layers* 2)
 
-;; (define-method drop-classic-layout room (&optional (row-delta 0))
-;;   (let ((left *classic-layout-horz-margin*)
-;; 	(right (- <width> 2 *classic-layout-horz-margin*))
-;; 	(row (+ 1 row-delta *classic-layout-top-margin*))
-;; 	(scheme (car (one-of *color-schemes*))))
-;;     (dotimes (n *classic-layout-layers*)
-;;       (dolist (color scheme)
-;; 	[drop-brick-row self row left right color]
-;; 	(incf row)))))
+(define-method drop-classic-layout breakworld (&optional (row-delta 0))
+  (let ((left *classic-layout-horz-margin*)
+	(right (- <width> 2 *classic-layout-horz-margin*))
+	(row (+ 1 row-delta *classic-layout-top-margin*))
+	(scheme (car (one-of *color-schemes*))))
+    (dotimes (n *classic-layout-layers*)
+      (dolist (color scheme)
+	[drop-brick-row self row left right color]
+	(incf row)))))
 
-;; (define-method drop-unbreakable-mass room (row column height width)
-;;   (labels ((drop-wall (r c)
-;; 	     (prog1 nil
-;; 	       [delete-category-at self r c :brick]
-;; 	       [drop-cell self (clone =hard-brick=) r c])))
-;;     (trace-rectangle #'drop-wall row column height width t))) 
+(define-method drop-unbreakable-mass breakworld (row column height width)
+  (labels ((drop-wall (r c)
+	     (prog1 nil
+	       [delete-category-at self r c :brick]
+	       [drop-cell self (clone =hard-brick=) r c])))
+    (trace-rectangle #'drop-wall row column height width t))) 
 
-;; (define-method drop-masses room ()
-;;   (dotimes (i 3)
-;;     [drop-unbreakable-mass self (+ 5 (random 4)) (+ 3 (random (- <width> 15)))
-;; 			   (+ 3 (random 3)) (+ 5 (random 7))]))
+(define-method drop-masses breakworld ()
+  (dotimes (i 3)
+    [drop-unbreakable-mass self (+ 5 (random 4)) (+ 3 (random (- <width> 15)))
+			   (+ 3 (random 3)) (+ 5 (random 7))]))
 
-;; (define-method generate room (&key (height *room-height*)
-;; 				   (width *room-width*)
-;; 				   (grow-bricks 2)
-;; 				   (bomb-bricks 22)
-;; 				   (extra-bricks 2)
-;; 				   (platforms 3))
-;;   (setf <height> height)
-;;   (setf <width> width)
-;;   [create-default-grid self]
-;;   [drop-floor self]
-;;   [drop-border self]
-;;   [drop-classic-layout self]
-;;   (dotimes (n grow-bricks)
-;;     (let ((row (1+ (random 5)))
-;; 	  (column (1+ (random (- width 1)))))
-;;       [delete-category-at self row column :brick]
-;;       [drop-cell self (clone =grow-brick=) row column :loadout t]))
-;;   ;; (dotimes (n platforms)
-;;   ;;   (let ((platform (clone =platform=)))
-;;   ;;     [add-sprite self platform]
-;;   ;;     [update-position platform (+ 100 (random 400)) (+ 400 (random 120))]))
-;;   (dotimes (n extra-bricks)
-;;     (let ((row (1+ (random 5)))
-;; 	  (column (1+ (random (- width 1)))))
-;;       [delete-category-at self row column :brick]
-;;       [drop-cell self (clone =extra-brick=) row column :loadout t]))
-;;   (dotimes (n bomb-bricks)
-;;     (let ((row (+ 6 (random 5)))
-;; 	  (column (1+ (random (- width 3)))))
-;;       [delete-category-at self row column :brick]
-;;       [drop-cell self (clone =bomb-brick=) row column :loadout t]))
-;;   [drop-masses self]
-;;   [drop-cell self (clone =drop-point=) 32 5])
+(define-method generate breakworld (&key (height *breakworld-height*)
+				   (width *breakworld-width*)
+				   (grow-bricks 2)
+				   (bomb-bricks 22)
+				   sequence-number
+				   (extra-bricks 2)
+				   (platforms 3))
+  (message "generating")
+  (setf <height> height)
+  (setf <width> width)
+  [create-default-grid self]
+  [drop-floor self]
+  [drop-border self]
+  [drop-classic-layout self]
+  (dotimes (n grow-bricks)
+    (let ((row (1+ (random 5)))
+	  (column (1+ (random (- width 1)))))
+      [delete-category-at self row column :brick]
+      [drop-cell self (clone =grow-brick=) row column :loadout t]))
+  ;; (dotimes (n platforms)
+  ;;   (let ((platform (clone =platform=)))
+  ;;     [add-sprite self platform]
+  ;;     [update-position platform (+ 100 (random 400)) (+ 400 (random 120))]))
+  (dotimes (n extra-bricks)
+    (let ((row (1+ (random 5)))
+	  (column (1+ (random (- width 1)))))
+      [delete-category-at self row column :brick]
+      [drop-cell self (clone =extra-brick=) row column :loadout t]))
+  (dotimes (n bomb-bricks)
+    (let ((row (+ 6 (random 5)))
+	  (column (1+ (random (- width 3)))))
+      [delete-category-at self row column :brick]
+      [drop-cell self (clone =bomb-brick=) row column :loadout t]))
+  [drop-masses self]
+  [drop-cell self (clone =drop-point=) 32 5])
 
+(define-method begin-ambient-loop breakworld ()
+  (play-music "rappy" :loop t))
+
+(define-prototype breakworld707 (:parent =breakworld=))
+
+(define-method generate breakworld707 (&rest params)
+  [clone-onto self "breakworld707" :deepcopy])

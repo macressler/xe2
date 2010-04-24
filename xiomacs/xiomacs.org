@@ -12,9 +12,10 @@ CLOSED: [2010-04-23 Fri 19:00]
 ** DONE react shield
 CLOSED: [2010-04-23 Fri 19:51]
 ** TODO more bombs in reactor
-** TODO energy stat for particle gun
-** TODO [#B] low HP warning light/sound
+** DONE energy stat for particle gun
+CLOSED: [2010-04-23 Fri 20:51]
 ** TODO allow :deepcopy t field on some cells so that shallow copy can be used in most maps
+** TODO [#C] low HP warning light/sound
 ** TODO breakout ball and room
 ** TODO [#C] prevent explosions from moving thru wall
 ** TODO [#B] Simple mission structure with just a couple independent goals
