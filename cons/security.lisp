@@ -99,6 +99,6 @@ new abilities.")
 (define-prototype security774 (:parent =security=))
   
 (define-method generate security774 (&rest params)
-  [clone-onto self "security774" :deepcopy])
+  [clone-onto self "security774"])
 
 

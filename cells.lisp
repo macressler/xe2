@@ -76,6 +76,7 @@ rules and run the game the way you want.
 Sprites are also based on cells. See `defsprite'.")
   (type :initform :cell)
   (auto-loadout :initform nil :documentation "When non-nil, the :loadout method is invoked upon entry into a world.")
+  (auto-deepcopy :initform nil)
   (team :initform nil :documentation "Keyword symbol of team, if any.")
   (weight :documentation "Weight of the cell, in kilograms.")
   (widget :initform nil :documentation "XE2 widget object, if any.")

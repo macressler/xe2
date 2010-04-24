@@ -84,6 +84,7 @@
   (tile :initform "unknown-gateway")
   (categories :initform '(:gateway :actor))
   (world :initform nil)
+  (auto-deepcopy :initform t)
   (excluded-fields :initform (union (field-value :excluded-fields =cell=)
 				    (list :world))))
 

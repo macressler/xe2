@@ -838,6 +838,9 @@
  (:name "fire" :type :sample :file "fire.wav" :properties (:volume 10))
  (:name "break2" :type :sample :file "break2.wav" :properties (:volume 7))
 
+ (:name "shield-sound" :type :sample :file "shield.wav" :properties (:volume 8))
+ (:name "shield-warning" :type :sample :file "shield-warning.wav" :properties (:volume 50))
+
  (:name ".default-font" :type :font :properties (:height 14 :width 7) :data "7x14b")
  (:name "cons-package-lisp" :type :lisp :file "cons-package.lisp" :properties (:autoload t))
  (:name "break-lisp" :type :lisp :file "break.lisp" :properties (:autoload t))

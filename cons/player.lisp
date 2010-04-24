@@ -41,6 +41,8 @@
 
 ;;; Agent: the player
 
+(defparameter *react-shield-time* 30)
+
 (defcell agent 
   (tile :initform "agent-north")
   (description :initform "You are a sentient warrior cons cell.")
@@ -66,6 +68,7 @@
   (stepping :initform t)
   (light-radius :initform 7)
   (first-start :initform nil)
+  (react-shield-clock :initform 0)
   (categories :initform '(:actor :obstacle :player :target :container :light-source))
   (excluded-fields :initform '(:segments)))
 
@@ -73,6 +76,7 @@
   [emote self '((("I'd better get moving."))
 		(("Use the arrow keys (or numpad)"))
 		(("to move, and SHIFT to fire.")))]
+  (push (clone =lepton-defun=) <items>)
   (push (clone =buster-defun=) <items>))
 
 (define-method start agent ()
@@ -108,18 +112,22 @@
   [damage self 1])
 
 (define-method damage agent (points)
-  (labels ((do-circle (image)
-	     (prog1 t
-	       (multiple-value-bind (x y) 
-		   [image-coordinates self]
-		 (let ((x0 (+ x 8))
-		       (y0 (+ y 8)))
-		   (draw-circle x0 y0 25 :destination image)
-		   (draw-circle x0 y0 30 :destination image)
-		   (draw-circle x0 y0 35 :destination image)
-		   (draw-circle x0 y0 40 :destination image))))))
-    [>>add-overlay :viewport #'do-circle])
-  [parent>>damage self points])
+  (if (zerop <react-shield-clock>)
+      (labels ((do-circle (image)
+		 (prog1 t
+		   (multiple-value-bind (x y) 
+		       [image-coordinates self]
+		     (let ((x0 (+ x 8))
+			   (y0 (+ y 8)))
+		       (draw-circle x0 y0 25 :destination image)
+		       (draw-circle x0 y0 30 :destination image)
+		       (draw-circle x0 y0 35 :destination image)
+		       (draw-circle x0 y0 40 :destination image))))))
+	(setf <react-shield-clock> *react-shield-time*)
+	[play-sample self "shield-warning"]
+	[>>add-overlay :viewport #'do-circle]
+	[parent>>damage self points])
+      [play-sample self "ice"]))
   
 (define-method pause agent ()
   [pause *world*])
@@ -204,6 +212,7 @@
 	  (if item
 	      (progn (setf <items> (append <items> (list item)))
 		     [play-sample self "doorbell"]
+		     [print-items self]
 		     [delete-from-world item])
 	      [say self "Nothing to push."])))))
 	
@@ -216,11 +225,11 @@
 	  (if (clon:object-p item)
 	      (progn (setf items (delete item items))
 		     [play-sample self "doorbell2"]
-		     [drop-cell *world* item row column])
+		     [drop-cell *world* item row column]
+		     [print-items self])
 	      [say self "Nothing to drop."]))))))
   
 (define-method act agent ()
-  (message "ACT")
   (unless <dead>
     (let ((gateway [category-at-p *world* <row> <column> :gateway]))
       (if (clon:object-p gateway)
@@ -234,7 +243,8 @@
 		 [say self "Nothing to do here."]))))))
 
 (define-method expend-item agent ()
-  (pop <items>))
+  (pop <items>)
+  [print-items self])
 
 (define-method rotate agent () 
   (unless <dead>
@@ -243,7 +253,8 @@
 	  (let ((tail (car (last items)))
 		(newlist (butlast items)))
 	    [play-sample self "doorbell3"]
-	    (setf items (cons tail newlist)))
+	    (setf items (cons tail newlist))
+	    [print-items self])
 	  (progn 
 	    [play-sample self "error"]
 	    [say self "Cannot rotate empty list."])))))
@@ -261,10 +272,35 @@
 	      (setf <call-clock> (field-value :call-interval item)))
 	    [say self "Cannot call."])))))
 
+(define-method print-items agent ()
+  (labels ((print-item (item)
+	     [>>print :narrator nil :image (field-value :tile item)]
+	     [>>print :narrator "  "]
+	     [>>print :narrator (get-some-object-name item)]
+	     [>>print :narrator "  "])
+	   (newline ()
+	     [>>newline :narrator]))
+    [>>print :narrator " ITEMS: "]
+    (dolist (item <items>)
+      (print-item item))
+    (newline)))
+      
 (define-method run agent () 
   [update-tiles self]
   (when (plusp <call-clock>)
     (decf <call-clock>))
+  (when (plusp <react-shield-clock>)
+    (decf <react-shield-clock>)
+    [play-sample self "shield-sound"]
+    (labels ((do-circle (image)
+	       (prog1 t
+		 (multiple-value-bind (x y) 
+		     [image-coordinates self]
+		   (let ((x0 (+ x 8))
+			 (y0 (+ y 8)))
+		     (draw-circle x0 y0 (+ 25 (random 3)) :destination image :color (car (one-of (list ".cyan" ".hot pink" ".white"))))
+		     (draw-circle x0 y0 (+ 30 (random 3))  :destination image :color (car (one-of (list ".cyan" ".hot pink" ".white")))))))))
+      [>>add-overlay :viewport #'do-circle]))
   (when (or (keyboard-modifier-down-p :lshift)
 	    (keyboard-modifier-down-p :rshift))
     [call self <direction>])
@@ -336,7 +372,7 @@
 ;;; Player upgrade
 
 (defcell tail-defun 
-  (name :initform "TAIL")
+  (name :initform "Body Extender Segment")
   (tile :initform "tail-defun")
   (call-interval :initform 20)
   (categories :initform '(:item :target :defun)))

@@ -2,18 +2,23 @@
 CLOSED: [2010-04-23 Fri 18:20]
 ** DONE no bombs on walls
 CLOSED: [2010-04-23 Fri 18:20]
-** TODO cycle inventory in other dir so that last-picked item is next
-** TODO fix shocker to prevent overfiring
-** TODO allow :deepcopy t field on some cells so that shallow copy can be used in most maps
-** TODO shoot bombs to kick them ahead at enemies
+** DONE cycle inventory in other dir so that last-picked item is next
+CLOSED: [2010-04-23 Fri 18:33]
+** DONE fix shocker to prevent overfiring
+CLOSED: [2010-04-23 Fri 18:37]
+** DONE shoot bombs to kick them ahead at enemies
+CLOSED: [2010-04-23 Fri 19:00]
 ** TODO check out japanese pc games  http://hg101.kontek.net/kagiri/kagiri.htm
-** TODO react shield
+** DONE react shield
+CLOSED: [2010-04-23 Fri 19:51]
+** TODO more bombs in reactor
 ** TODO energy stat for particle gun
-** TODO [#B] prevent explosions from moving thru wall
-** TODO [#A] scaled display of current inventory with labels
+** TODO [#B] low HP warning light/sound
+** TODO allow :deepcopy t field on some cells so that shallow copy can be used in most maps
+** TODO breakout ball and room
+** TODO [#C] prevent explosions from moving thru wall
 ** TODO [#B] Simple mission structure with just a couple independent goals
 ** TODO [#B] recenter form view when entering data... also enter cell view
-** TODO [#B] low HP warning light/sound
 ** TODO [#A] fix lepton gun hitting tail
 ** TODO [#A] fix drone collisions
 ** TODO [#B] 800x600 TUTORIAL HOW TO PLAY SCREEN, document ZX

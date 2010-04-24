@@ -180,7 +180,7 @@ At the moment, only 0=off and 1=on are supported.")
 			  (loop while (< n (fill-pointer cells)) do
 			    (let* ((cell (aref cells n))
 				   (proto (object-parent cell))
-				   (new-cell (if deepcopy 
+				   (new-cell (if (or deepcopy (field-value :auto-deepcopy cell))
 						 ;; create a distinct object with the same local field values.
 						 (deserialize (serialize cell))
 						 ;; create a similar object

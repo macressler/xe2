@@ -92,7 +92,7 @@
 	  [move self <direction>]))))
 
 (defcell buster-defun
-  (name :initform "BUSTER")
+  (name :initform "Buster gun")
   (description :initform 
 "The BUSTER program fires a relatively weak particle weapon when activated.
 However, ammunition is unlimited, making BUSTER an old standby.")
@@ -132,8 +132,9 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 	  (when (and direction (evenp clock))
 	    (multiple-value-bind (r c) 
 		(step-in-direction <row> <column> direction)
-	      (unless [obstacle-at-p *world* r c]
-		[move-cell *world* self r c])))
+	      (if [obstacle-at-p *world* r c]
+		  (setf direction nil)
+		  [move-cell *world* self r c])))
 	  (when (zerop (mod clock 30))
 	    (setf <tile> (bomb-tile clock))
 	    [play-sample self "countdown"]
@@ -195,7 +196,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
     [die self]))
 
 (defcell bomb-defun
-  (name :initform "BOMB")
+  (name :initform "Bomb")
   (description :initform "This single-use BOMB program drops a timed explosive device.")
   (tile :initform "bomb-ammo")
   (call-interval :initform 20)
@@ -203,7 +204,6 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 
 (define-method call bomb-defun (caller)
   (clon:with-field-values (direction row column) caller
-    (message "BOMB-DEFUN DIR ~S" direction)
     (multiple-value-bind (r c) (step-in-direction row column direction)
       (if [obstacle-at-p *world* r c]
 	  (progn [play-sample self "error"]
@@ -477,7 +477,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 ;;; Health powerup
 
 (defcell health
-  (name :initform "REPAIR-1")
+  (name :initform "Repair unit")
   (description :initform "The single-use program REPAIR-1 restores a few hit points when activated.")
   (tile :initform "health")
   (call-interval :initform 20)
@@ -636,8 +636,9 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 					 <row> <column> <direction>
 					 '(:obstacle :target)]))
     (if target
-	(progn	
-	  [drop target (clone =sparkle=)]
+	(unless (same-team self target)	
+	  (dotimes (n 3)
+	    [drop target (clone =explosion=)])
 	  [damage target [stat-value self :hit-damage]]
 	  [play-sample target "serve"]
 	  (labels ((do-circle (image)
@@ -665,7 +666,8 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 			 (let ((enemy [enemy-at-p *world* r c]))
 			   (prog1 nil
 			     (when enemy
-			       (push enemy enemies))))))
+			       (when [can-see self enemy :barrier]
+				 (push enemy enemies)))))))
 		(trace-rectangle #'find-enemies (- <row> 3) (- <column> 3) 7 7 :fill))
 	      (if enemies
 		  (multiple-value-bind (row column) [grid-coordinates (car enemies)]
@@ -721,7 +723,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 ;;; Lepton weapon for player
 
 (defcell lepton-defun
-  (name :initform "LEPTON")
+  (name :initform "Lepton homing missile")
   (description :initform 
 "The LEPTON program fires a strong homing missile.")
   (tile :initform "lepton-defun")
