@@ -110,10 +110,10 @@
 
 (defsprite ball 
   (image :initform "ball")
-  (speed :initform (make-stat :base 20))
+  (speed :initform (make-stat :base 2))
   (bounce-clock :initform 0)
   (dead :initform nil)
-  (movement-distance :initform (make-stat :base 7 :min 0 :max 14))
+  (movement-distance :initform (make-stat :base 2 :min 0 :max 14))
   (movement-cost :initform (make-stat :base 10))
   (categories :initform '(:actor :ball :obstacle))
   (direction :initform :north))
@@ -187,11 +187,6 @@
 (define-method die ball ()
   (unless <dead>
     (setf <dead> t)
-    (decf *balls*)
-    (when (and (zerop [stat-value [get-player *world*] :balls])
-	       (zerop *balls*))
-      [play-sample self "doom"]
-      (setf *alive* nil))
     [remove-sprite *world* self]))
 
 ;;; Plasma
@@ -794,9 +789,27 @@
 (define-method disembark paddle ()
   [unproxy self :dy -50 :dx 20])
 
+;;; Ball defun
+
+(defcell ball-defun
+  (tile :initform "ball-defun")
+  (name :initform "Bouncing ball")
+  (description :initform "Launch a bouncing ball.")
+  (energy-cost :initform 5)
+  (call-interval :initform 20)
+  (categories :initform '(:item :target :defun)))
+
+(define-method call ball-defun (caller)
+  (let ((ball (clone =ball=)))
+    (clon:with-field-values (direction) caller
+      (multiple-value-bind (x y) [xy-coordinates caller]
+	[drop-sprite caller ball (+ x 8) (- y 10)]
+	[serve ball direction])
+      [expend-item caller])))
+
 ;;; The xiobreak room
 
-(defparameter *breakworld-height* 60)
+(defparameter *breakworld-height* 32)
 (defparameter *breakworld-width* 50)
 
 (define-prototype breakworld (:parent =sector=)
@@ -902,3 +915,4 @@
 
 (define-method generate breakworld707 (&rest params)
   [clone-onto self "breakworld707" :deepcopy])
+

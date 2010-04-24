@@ -362,6 +362,7 @@
 
  (:name "scanner" :type :image :file "scanner.png")
  (:name "tail-defun" :type :image :file "tail-defun.png")
+ (:name "ball-defun" :type :image :file "ball-defun.png")
 
  (:name "lepton" :type :image :file "lepton.png")
  (:name "lepton-defun" :type :image :file "lepton-defun.png")
