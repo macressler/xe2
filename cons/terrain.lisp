@@ -20,12 +20,18 @@
 ;;; Indestructible wall of many colors
 
 (defcell floor 
-  (categories :initform '(:floor)))
+  (tile :initform "storage-background")
+  (categories :initform '(:floor :debugged)))
   
 (define-method initialize floor (&rest ignore)
   (setf <tile> (if (has-field :floor *world*)
-		   (field-value :floor *world*)
+		   (prog1 (assert (field-value :floor *world*))
+		     (field-value :floor *world*))
 		   "storage-background")))
+
+(define-method start floor ()
+  (message "startfloor: ~S" (field-value :floor *world*))
+  [initialize self nil])
 
 (defcell barrier 
   (auto-loadout :initform t)
@@ -35,6 +41,9 @@
   (setf <tile> (if (has-field :barrier *world*)
 		   (field-value :barrier *world*)
 		   "storage-foreground")))
+
+(define-method start barrier ()
+  [initialize self nil])
 
 ;;; Generic sector of alien base; this is specialized below.
 
@@ -101,7 +110,7 @@
     (assert (clon:object-p world))
     (clon:with-field-values (description name) world
       (setf <description> description <name> name))
-    [update-tile self]))
+    [update-tile self])) 
 
 (define-method set sector-gateway (address)
   (when address 

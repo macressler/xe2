@@ -14,7 +14,7 @@
   (frame :initform (random 5))
   (dead :initform nil)
   (categories :initform '(:obstacle :actor))
-  (hit-points :initform (make-stat :base 70 :min 0 :max 15))
+  (hit-points :initform (make-stat :base 50 :min 0 :max 70))
   (speed :initform (make-stat :base 10 :min 0 :max 15)))
 
 (define-method run reactor-core ()

@@ -187,6 +187,8 @@
 (define-method die ball ()
   (unless <dead>
     (setf <dead> t)
+    (dotimes (n 10)
+      [drop self (clone =karma=)])
     [remove-sprite *world* self]))
 
 ;;; Plasma
