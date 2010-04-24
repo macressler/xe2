@@ -214,7 +214,7 @@
  (:name "multi-missile-northwest" :type :alias :data ":rotate 270:multi-missile-northeast")
 
  (:name "levelup" :type :image :file "levelup.png")
- (:name "speedup" :type :image :file "speedup.png")
+
  (:name "defenseup" :type :image :file "defenseup.png")
 
  (:name "mars-terrain-flat" :type :image :file "mars-terrain-flat2.png")

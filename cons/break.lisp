@@ -393,7 +393,7 @@
   (auto-deepcopy :initform t)
   (hit-points :initform (make-stat :min 0 :base 1))
   (orientation :initform :horizontal)
-  (categories :initform '(:actor :obstacle :brick :horizontal :oriented))
+  (categories :initform '(:actor :obstacle :brick :horizontal :oriented :target))
   (color :initform :purple))
 
 (define-method run brick ()
@@ -414,6 +414,7 @@
   (incf *bricks*))
 
 (define-method hit brick (&optional thing)
+  (message "hit brick")
   (let ((floor (clone =dancefloor=)))
     (when (and thing [in-category thing :particle])
       [die thing])
