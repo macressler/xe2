@@ -14,6 +14,7 @@ CLOSED: [2010-04-23 Fri 19:51]
 ** TODO more bombs in reactor
 ** DONE energy stat for particle gun
 CLOSED: [2010-04-23 Fri 20:51]
+** TODO fix wacko shocker behavior
 ** TODO allow :deepcopy t field on some cells so that shallow copy can be used in most maps
 ** TODO [#C] low HP warning light/sound
 ** TODO breakout ball and room

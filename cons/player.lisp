@@ -80,8 +80,8 @@
   [emote self '((("I'd better get moving."))
 		(("Use the arrow keys (or numpad)"))
 		(("to move, and SHIFT to fire.")))]
-  (push (clone =lepton-defun=) <items>)
-  (push (clone =energy=) <items>)
+  ;; (push (clone =lepton-defun=) <items>)
+  ;; (push (clone =energy=) <items>)
   (push (clone =buster-defun=) <items>))
 
 (define-method start agent ()
@@ -229,7 +229,7 @@
 	      [say self "Nothing to push."])))))
 	
 (define-method pop agent ()
-  (unless <dead>
+  (unless (or <dead> [in-overworld self])
     (clon:with-fields (items) self
       (multiple-value-bind (row column)
 	  [space-at-head self]

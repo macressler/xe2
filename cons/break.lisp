@@ -818,6 +818,7 @@
 (define-prototype breakworld (:parent =sector=)
   (height :initform *breakworld-height*)
   (width :initform *breakworld-width*)
+  (floor :initform "breakworld-background")
   (edge-condition :initform :block))
 
 (define-method drop-border breakworld ()

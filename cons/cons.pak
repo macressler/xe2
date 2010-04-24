@@ -820,6 +820,7 @@
  (:name "storage-accent" :type :canvas :properties (:width 16 :height 16 :background ".magenta2"))
  (:name "reactor-foreground" :type :image :file "orangeworld.png")
  (:name "reactor-background" :type :image :file "darkorangeworld.png")
+ (:name "breakworld-background" :type :image :file "breakworld-background.png")
  (:name "reactor-accent" :type :canvas :properties (:width 16 :height 16 :background ".cyan2"))
  (:name "corridor-foreground" :type :canvas :properties (:width 16 :height 16 :background ".purple2"))
  (:name "corridor-background" :type :canvas :properties (:width 16 :height 16 :background ".purple4"))
