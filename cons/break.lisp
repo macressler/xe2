@@ -33,8 +33,8 @@
 
 ;;; The underlying floor
 
-(defcell floor 
-  (tile :initform "floor"))
+;; (defcell floor 
+;;   (tile :initform "floor"))
 
 ;;; The dancefloor tiles
 
@@ -188,7 +188,8 @@
   (unless <dead>
     (setf <dead> t)
     (dotimes (n 10)
-      [drop self (clone =karma=)])
+      [drop self (clone =plasma=)])
+    [play-sample self "saddown"]
     [remove-sprite *world* self]))
 
 ;;; Plasma

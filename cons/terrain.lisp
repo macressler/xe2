@@ -21,6 +21,7 @@
 
 (defcell floor 
   (tile :initform "storage-background")
+  (auto-deepcopy :initform t)
   (categories :initform '(:floor :debugged)))
   
 (define-method initialize floor (&rest ignore)
@@ -29,9 +30,9 @@
 		     (field-value :floor *world*))
 		   "storage-background")))
 
-(define-method start floor ()
-  (message "startfloor: ~S" (field-value :floor *world*))
-  [initialize self nil])
+;; (define-method start floor ()
+;;   (message "startfloor: ~S" (field-value :floor *world*))
+;;   [initialize self nil])
 
 (defcell barrier 
   (auto-loadout :initform t)
@@ -42,14 +43,16 @@
 		   (field-value :barrier *world*)
 		   "storage-foreground")))
 
-(define-method start barrier ()
-  [initialize self nil])
+;; (define-method start barrier ()
+;;   [initialize self nil])
 
 ;;; Generic sector of alien base; this is specialized below.
 
 (define-prototype sector (:parent xe2:=world=)
   ;; theme variables
-  floor (barrier :initform nil) accent
+  (floor :initform "storage-background")
+  (barrier :initform "storage-foreground")
+  (accent :initform "storage-accent")
   ;; other
   (ambient-light :initform :total)
   (required-modes :initform nil)

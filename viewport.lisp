@@ -148,9 +148,9 @@
 				(null tile))
 			    (vector-push-extend cell pending-draws)
 			    (when tile 
-			      ;; TODO HAXXXX
-			      (when (member :debugged (field-value :categories cell))
-				(message "HAXXX ~S" tile))
+			      ;; ;; TODO HAXXXX
+			      ;; (when (member :debugged (field-value :categories cell))
+			      ;; 	(message "HAXXX ~S" tile))
 			      (draw-resource-image tile j0 i0 
 						   :render-cell (field-value :render-cell cell) 
 						   :destination image)))))))

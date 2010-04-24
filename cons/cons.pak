@@ -813,7 +813,7 @@
  (:name "security-background" :type :canvas :properties (:width 16 :height 16 :background ".DeepSkyBlue3"))
  (:name "security-accent" :type :canvas :properties (:width 16 :height 16 :background ".magenta"))
  (:name "archive-foreground" :type :canvas :properties (:width 16 :height 16 :background ".yellow"))
- (:name "archive-background" :type :canvas :properties (:width 16 :height 16 :background ".Green4"))
+ (:name "archive-background" :type :canvas :properties (:width 16 :height 16 :background ".green4"))
  (:name "archive-accent" :type :canvas :properties (:width 16 :height 16 :background ".cyan"))
  (:name "storage-foreground" :type :canvas :properties (:width 16 :height 16 :background ".orange1"))
  (:name "storage-background" :type :canvas :properties (:width 16 :height 16 :background ".gray20"))
