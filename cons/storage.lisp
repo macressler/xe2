@@ -72,7 +72,7 @@ around."))
     [drop self (ecase (random 4)
 		 (0 (clone =health=))
 		 (1 (clone =bomb-defun=))
-		 (2 (clone =shocker=))
+		 (2 (clone =energy=))
 		 (3 (clone =bomb=)))])
   [parent>>die self])
 
@@ -88,10 +88,10 @@ around."))
   
 (define-method die crate-special ()
   [drop self (ecase (random 4)
-	       (0 (clone =health=))
+	       (0 (clone =energy=))
 	       (1 (clone =bomb-defun=))
 	       (2 (clone =shocker=))
-	       (3 (clone =bomb=)))]
+	       (3 (clone =energy=)))]
   [parent>>die self])
 
 (define-method hit crate-special (&optional hitter)

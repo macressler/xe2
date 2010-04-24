@@ -170,6 +170,8 @@
 	[print-stat self :hit-points :warn-below 7 :show-max t]
 	[print-stat-bar self :hit-points :color ".red"]
 	[space self]
+	[print-stat self :energy :warn-below 10 :show-max t]
+	[print-stat-bar self :energy :color ".yellow" :divisor 2]
 	[newline self])))
 
 ;;; Custom bordered viewport

@@ -43,6 +43,8 @@
 
 (defparameter *react-shield-time* 30)
 
+(defparameter *energy-recovery-interval* 200)
+
 (defcell agent 
   (tile :initform "agent-north")
   (description :initform "You are a sentient warrior cons cell.")
@@ -59,6 +61,7 @@
   (call-interval :initform 7)
   (input-phase :initform 0)
   (hit-points :initform (make-stat :base 20 :min 0 :max 20))
+  (energy :initform (make-stat :base 80 :min 0 :max 80))
   (movement-cost :initform (make-stat :base 10))
   (speed :initform (make-stat :base 10 :min 0 :max 25))
   (strength :initform (make-stat :base 10))
@@ -69,6 +72,7 @@
   (light-radius :initform 7)
   (first-start :initform nil)
   (react-shield-clock :initform 0)
+  (energy-clock :initform *energy-recovery-interval*)
   (categories :initform '(:actor :obstacle :player :target :container :light-source))
   (excluded-fields :initform '(:segments)))
 
@@ -77,6 +81,7 @@
 		(("Use the arrow keys (or numpad)"))
 		(("to move, and SHIFT to fire.")))]
   (push (clone =lepton-defun=) <items>)
+  (push (clone =energy=) <items>)
   (push (clone =buster-defun=) <items>))
 
 (define-method start agent ()
@@ -92,6 +97,13 @@
 	(clon:with-field-values (row column) self
 	  (setf <tile> "agent-north")
 	  [make-segments self]))))
+
+(define-method expend-energy agent (points)
+  (if (>= [stat-value self :energy] points)
+      (prog1 t [stat-effect self :energy (- points)])
+      (prog1 nil 
+	[say self "Insufficient energy."]
+	[play-sample self "error"])))
 
 (define-method make-segments agent ()
   (setf <direction> :north)
@@ -268,8 +280,9 @@
 	(if (and item [in-category item :item]
 		 (clon:has-method :call item))
 	    (progn 
-	      [call item self]
-	      (setf <call-clock> (field-value :call-interval item)))
+	      (when [expend-energy self (field-value :energy-cost item)]
+		[call item self]
+		(setf <call-clock> (field-value :call-interval item))))
 	    [say self "Cannot call."])))))
 
 (define-method print-items agent ()
@@ -289,6 +302,11 @@
   [update-tiles self]
   (when (plusp <call-clock>)
     (decf <call-clock>))
+  (when (plusp <energy-clock>)
+    (decf <energy-clock>))
+  (when (zerop <energy-clock>)
+    (setf <energy-clock> *energy-recovery-interval*)
+    [stat-effect self :energy 1])
   (when (plusp <react-shield-clock>)
     (decf <react-shield-clock>)
     [play-sample self "shield-sound"]
@@ -375,6 +393,7 @@
   (name :initform "Body Extender Segment")
   (tile :initform "tail-defun")
   (call-interval :initform 20)
+  (energy-cost :initform 0)
   (categories :initform '(:item :target :defun)))
 
 (define-method call tail-defun (caller)

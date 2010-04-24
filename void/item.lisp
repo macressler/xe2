@@ -56,33 +56,6 @@ powerful, longer-range beta muon particles."))
 	   (0 =level-up=)
 	   (1 =speed-up=))))
 
-;;; There are also energy tanks for replenishing ammo.
-
-(defcell energy 
-  (tile :initform "energy")
-  (description :initform 
-"Refills part of your energy store, for energy ammo weapons."))
-
-(define-method step energy (stepper)
-  (when [is-player stepper]
-    (when (has-field :energy stepper)
-      [play-sample self "whoop"]
-      [stat-effect stepper :energy 7]
-      [die self])))
-
-(defcell energy-tank
-  (tile :initform "energy-max-up")
-  (description :initform 
-"Increases maximum energy store by 5."))
-
-(define-method step energy-tank (stepper)
-  (when [is-player stepper]
-    (when (has-field :energy stepper)
-      [play-sample self "fanfare"]
-      [stat-effect stepper :energy 5 :max]
-      [>>narrateln :narrator "Increased max energy by 5" :foreground ".yellow" :background ".blue"]
-      [die self])))
-
 ;;; A life powerup.
 
 (defcell diamond

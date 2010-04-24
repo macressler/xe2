@@ -97,6 +97,7 @@
 "The BUSTER program fires a relatively weak particle weapon when activated.
 However, ammunition is unlimited, making BUSTER an old standby.")
   (tile :initform "buster")
+  (energy-cost :initform 0)
   (call-interval :initform 7)
   (clock :initform 0)
   (categories :initform '(:item :target :defun)))
@@ -199,6 +200,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
   (name :initform "Bomb")
   (description :initform "This single-use BOMB program drops a timed explosive device.")
   (tile :initform "bomb-ammo")
+  (energy-cost :initform 5)
   (call-interval :initform 20)
   (categories :initform '(:item :target :defun)))
 
@@ -480,6 +482,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
   (name :initform "Repair unit")
   (description :initform "The single-use program REPAIR-1 restores a few hit points when activated.")
   (tile :initform "health")
+  (energy-cost :initform 0)
   (call-interval :initform 20)
   (categories :initform '(:item :defun)))
 
@@ -727,6 +730,7 @@ However, ammunition is unlimited, making BUSTER an old standby.")
   (description :initform 
 "The LEPTON program fires a strong homing missile.")
   (tile :initform "lepton-defun")
+  (energy-cost :initform 5)
   (call-interval :initform 20)
   (categories :initform '(:item :target :defun)))
 
@@ -737,6 +741,35 @@ However, ammunition is unlimited, making BUSTER an old standby.")
       [drop caller lepton]
       [seek lepton :enemy]
       [impel lepton direction])))
+
+;;; There are also energy tanks for replenishing ammo.
+
+(defcell energy 
+  (tile :initform "energy")
+  (name :initform "Energy refill")
+  (description :initform "Refills part of your energy store.")
+  (energy-cost :initform 0)
+  (call-interval :initform 20)
+  (categories :initform '(:item :target :defun)))
+
+(define-method call energy (caller)
+  [play-sample caller "whoop"]
+  [stat-effect caller :energy 20]
+  [expend-item caller])
+
+(defcell energy-tank
+  (tile :initform "energy-max-up")
+  (name :initform "Energy Tank")
+  (description :initform "Increases maximum energy store by 15.")
+  (energy-cost :initform 0)
+  (call-interval :initform 20)
+  (categories :initform '(:item :target :defun)))
+
+(define-method call energy-tank (caller)
+  [play-sample caller "fanfare"]
+  [stat-effect caller :energy 15 :max]
+  [>>narrateln :narrator "Increased max energy by 15!" :foreground ".yellow" :background ".blue"]
+  [expend-item caller])
 
 ;;; An exploding missile.
 
