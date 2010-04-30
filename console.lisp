@@ -363,7 +363,7 @@ key event symbols."
   (if (or (member sdl-mod *joystick-button-symbols*)
 	  (member sdl-mod *other-modifier-symbols*))
       sdl-mod
-      (ecase sdl-mod
+      (case sdl-mod
 	(:SDL-KEY-MOD-NONE nil)
 	(:SDL-KEY-MOD-LSHIFT :shift)
 	(:SDL-KEY-MOD-RSHIFT :shift)
