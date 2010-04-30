@@ -104,7 +104,7 @@
 
 (defparameter *default-pulsator-delay* 20)
 
-(defparameter *pulsing* nil)
+;;(defparameter *pulsing* nil)
 
 (defcell pulsator 
   (name :initform "Pulsator")
@@ -131,14 +131,14 @@
     (when delay (setf <delay> delay))
     (setf <state> t)
     (setf <trip> nil)
-    (setf *pulsing* t)
+    [set-variable *world* :pulsing t]
     [update-tile self]))
 
 (define-method stop pulsator ()
   (unless (null <state>)
     [say self "The pulsation stops."]
     (setf <state> nil)
-    (setf *pulsing* nil)
+    [set-variable world :pulsing nil]
     [update-tile self]
     (setf <clock> 0)))
 
@@ -192,7 +192,7 @@
 (define-method run delay ()
   [expend-action-points self 10]
   (setf <tile> (if <wave> "delay-on" "delay"))
-  (when (and *pulsing* <wave>)
+  (when (and [get-variable *world* :pulsing] <wave>)
     [add-sprite *world* <wave>]
     (destructuring-bind (x y) <coords>
       [update-position <wave> x y]
@@ -214,7 +214,7 @@
 (define-method run turret ()
   [expend-action-points self 10]
   [update-tile self]
-  (when *pulsing*
+  (when [get-variable *world* :pulsing]
     (setf <wave> (clone =wave=))
     [start <wave> :direction <direction>
 	   :team :neutral
@@ -226,7 +226,7 @@
 
 (define-method update-tile turret ()
   (setf <tile>
-	(if *pulsing*
+	(if [get-variable *world* :pulsing]
 	    (ecase <direction>
 	      (:east "turret-east-on")
 	      (:west "turret-west-on")
@@ -384,7 +384,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
 
 (define-method update-tile antifence ()
   (setf <tile>
-	(if *pulsing*
+	(if [get-variable *world* :pulsing]
 	    (ecase <direction>
 	      (:east "antifence-east-on")
 	      (:west "antifence-west-on")
@@ -539,7 +539,7 @@ An ANTI-fence only opens when an offending tone is silenced.")
   (setf <tile> (if (note-playing-p <note>)
 		   "resonator-on"
 		   "resonator"))
-  (when (and *pulsing* (note-playing-p <note>))
+  (when (and [get-variable *world* :pulsing] (note-playing-p <note>))
     (dotimes (n 5)
       [drop-cell *world* (clone =phi=) <row> <column> :exclusive nil])))
 
