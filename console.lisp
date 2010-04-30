@@ -386,6 +386,7 @@ key event symbols."
 	;; fix for windows
 	(:SDL-KEY-MOD-NUM nil)
 	(:SDL-KEY-CAPS :caps-lock)
+	(:SDL-KEY-MOD-CAPS :caps-lock) ;; macintosh 
 	(:SDL-KEY-MODE nil)
 	(:SDL-KEY-MOD-MODE :mode)
 	(:SDL-KEY-RESERVED nil)

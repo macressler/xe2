@@ -1,3 +1,34 @@
+** DONE less explosion randomness 
+CLOSED: [2010-04-23 Fri 18:20]
+** DONE no bombs on walls
+CLOSED: [2010-04-23 Fri 18:20]
+** DONE cycle inventory in other dir so that last-picked item is next
+CLOSED: [2010-04-23 Fri 18:33]
+** DONE fix shocker to prevent overfiring
+CLOSED: [2010-04-23 Fri 18:37]
+** DONE shoot bombs to kick them ahead at enemies
+CLOSED: [2010-04-23 Fri 19:00]
+** TODO check out japanese pc games  http://hg101.kontek.net/kagiri/kagiri.htm
+** DONE react shield
+CLOSED: [2010-04-23 Fri 19:51]
+** TODO more bombs in reactor
+** DONE energy stat for particle gun
+CLOSED: [2010-04-23 Fri 20:51]
+** DONE fix wacko shocker behavior
+CLOSED: [2010-04-25 Sun 12:09]
+** TODO READ http://blog.ted.com/2010/04/computing_a_the.php?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+TEDBlog+%28TEDBlog%29&utm_content=Google+Reader
+** TODO improve sound feedback on hitting things
+** TODO read http://www.gamasutra.com/view/feature/1630/breaking_down_breakout_system_and_.php?print=1
+** TODO don't crash when unrecognized key syms received.
+** TODO allow :deepcopy t field on some cells so that shallow copy can be used in most maps
+** TODO [#C] low HP warning light/sound
+** TODO breakout ball and room
+** TODO [#C] prevent explosions from moving thru wall
+** TODO [#B] Simple mission structure with just a couple independent goals
+** TODO [#B] recenter form view when entering data... also enter cell view
+** TODO [#A] fix lepton gun hitting tail
+** TODO [#A] fix drone collisions
+** TODO [#B] 800x600 TUTORIAL HOW TO PLAY SCREEN, document ZX
 *** DONE FIX no docs for exit
 CLOSED: [2010-03-29 Mon 11:42]
 *** TODO archive level... learn at any time, also heal

@@ -14,7 +14,11 @@ CLOSED: [2010-04-23 Fri 19:51]
 ** TODO more bombs in reactor
 ** DONE energy stat for particle gun
 CLOSED: [2010-04-23 Fri 20:51]
-** TODO fix wacko shocker behavior
+** DONE fix wacko shocker behavior
+CLOSED: [2010-04-25 Sun 12:09]
+** TODO READ http://blog.ted.com/2010/04/computing_a_the.php?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+TEDBlog+%28TEDBlog%29&utm_content=Google+Reader
+** TODO improve sound feedback on hitting things
+** TODO don't crash when unrecognized key syms received.
 ** TODO allow :deepcopy t field on some cells so that shallow copy can be used in most maps
 ** TODO [#C] low HP warning light/sound
 ** TODO breakout ball and room
