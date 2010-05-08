@@ -148,7 +148,7 @@
     (if (zerop <clock>)
 	(progn (xe2:play-sample "pulse")
 	       [update-tile self t]
-	       (setf *pulsing* t)
+	       [set-variable world :pulsing t]
 	       (setf <trip> nil)
 	       (labels ((do-circle (image)
 			  (prog1 t
@@ -161,9 +161,9 @@
 		 [>>add-overlay :viewport #'do-circle])
 	       (setf <clock> <delay>))
 	(progn (if <trip>
-		   (setf *pulsing* nil)
+		   [set-variable world :pulsing nil]
 		   (progn (setf <trip> t)
-			  (setf *pulsing* t)))
+			  [set-variable world :pulsing t]))
 	       (decf <clock>)))))
   
 (define-method hit pulsator (&optional object)
@@ -328,7 +328,7 @@ Only opens when the right tone is heard.")
 
 (define-method update-tile fence ()
   (setf <tile>
-	(if *pulsing*
+	(if [get-variable *world* :pulsing]
 	    (ecase <direction>
 	      (:east "fence-east-on")
 	      (:west "fence-west-on")
