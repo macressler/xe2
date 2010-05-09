@@ -349,26 +349,23 @@ calling TRACE-FUNCTION at each point of the line."
 		   (x x0)
 		   (step-y (if (< y0 y1) 1 -1)))
 	      ;; main loop
-	      (block tracing
-		  (incf err delta-err)
-		  (when (>= err 0.5)
-		    (incf y step-y)
-		    (decf err 1.0))
-                  (incf x)
-		(loop while (/= x x1) do
-		  ;; call the supplied trace function.
-		  ;; note that trace functions get args in order (row column).
-		  ;; terminate with result = nil if it returns non-nil.
-		  (when (if steep
-			    (funcall trace-function x y)
-			    (funcall trace-function y x))
-		    (return-from tracing t))
-		  (incf err delta-err)
-		  (when (>= err 0.5)
-		    (incf y step-y)
-		    (decf err 1.0))
-		  ;; for next iteration
-		  (incf x)))))))))
+	      (labels ((update-xy ()
+			 (incf err delta-err)
+			 (when (>= err 0.5)
+			   (incf y step-y)
+			   (decf err 1.0))
+			 (incf x)))
+		(block tracing
+		  (update-xy)
+		  (loop while (/= x x1) do
+		    ;; call the supplied trace function.
+		    ;; note that trace functions get args in order (row column).
+		    ;; terminate with result = nil if it returns non-nil.
+		    (when (if steep
+			      (funcall trace-function x y)
+			      (funcall trace-function y x))
+		      (return-from tracing t))
+		    (update-xy))))))))))
 
 ;;; Tracing macros
 
