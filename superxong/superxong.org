@@ -1,3 +1,26 @@
+* TASKS!
+
+** DONE Create 1280x720 background for "genesis" theme
+** TODO add support for static backgrounds to viewport
+** TODO get game running!
+
+* DONE Outline design of SUPER XONG
+CLOSED: [2010-05-20 Thu 15:53]
+** TODO NEVERENDING PUZZLE GAME with infinite level generator, like original XONG
+** TODO falling blocks with a snake pong element
+** TODO enemies chase and eat the ball
+** TODO pulsating beat blocks
+** TODO 8-way breakout firing
+** TODO SKINS to create and share, skin determines BPM and audiovisual aspects
+*** TODO decide on whether to use MOD files or oggs
+*** TODO cloudspace
+*** TODO jelly
+*** TODO 8bitheroes
+** TODO title screen and menu are all in-engine, no separate menus. 
+** TODO l1 aims, l2 fires
+** TODO DANCE MODE
+
+
 ** DONE less explosion randomness 
 CLOSED: [2010-04-23 Fri 18:20]
 ** DONE no bombs on walls

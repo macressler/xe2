@@ -23,12 +23,12 @@
 
 ;;; Packaging
 
-(defpackage :voyager
+(defpackage :superxong
   (:documentation "Space game.")
   (:use :xe2 :common-lisp)
-  (:export voyager))
+  (:export superxong))
 
-(in-package :voyager)
+(in-package :superxong)
 
 ;;; Walls
 
@@ -143,8 +143,8 @@
 (defparameter *room-window-width* 800)
 (defparameter *room-window-height* 600)
 
-(defun init-example ()
-  (xe2:message "Initializing Example...")
+(defun superxong ()
+  (xe2:message "Initializing SUPER XONG...")
   (clon:initialize)
   (xe2:set-screen-height *room-window-height*)
   (xe2:set-screen-width *room-window-width*)
@@ -181,4 +181,4 @@
    ;;
     (xe2:install-widgets prompt viewport narrator)))
 
-(init-example)
+(superxong)
