@@ -20,25 +20,6 @@
 
 (in-package :xe2)
 
-;; (defgame :cons 
-;;     :title "CONS" :description "A roguelike action game about lisp."
-;;   :dt 10 :physics-function #'cons-physics
-;;   :held-keys t
-;;   :splash-resource "splash" 
-;;   :splash-function #'spacebar
-;;   :splash-music "cons"
-;;   :help-resource "help-message" 
-;;   :screen-width 800 :screen-height 600
-;;   :keybindings '(("KP8" nil "aim :north .")
-;; 		 ("KP4" nil "aim :west .")
-;; 		 ("KP6" nil "aim :east .")
-;; 		 ("KP2" nil "aim :south .")
-;; 		 ;; arrows
-;; 		 ("UP" nil "aim :north .")
-;; 		 ("LEFT" nil "aim :west .")
-;; 		 ("RIGHT" nil "aim :east .")
-;; 		 ("DOWN" nil "aim :south .")))
-  
 ;; (defmacro defgame (module-name 
 ;; 		   (&key title description
 ;; 			 (prompt-prototype =prompt=)
