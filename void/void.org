@@ -1,0 +1,457 @@
+#+title: Void Mission: a sci-fi action roguelike game in Common Lisp
+#+author: David T. O'Toole <dto@gnu.org> <dto1138@gmail.com>
+
+## Copyright (C) 2010  David O'Toole
+
+## Author: David O'Toole <dto@gnu.org>
+## Keywords: 
+
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#+tags: Interface Player Structure Environment Controls Combat Enemies Planning Story
+#+property: tangle no
+#+property: cache no
+#+property: session yes
+#+property: results silent
+#+property: no-expand yes
+#+property: noweb yes
+#+startup: hideblocks
+
+#+source: package-definition
+#+begin_src lisp :tangle yes
+  (defpackage :void
+    (:use :xe2 :common-lisp)
+    (:export void))
+  
+  (in-package :void)
+#+end_src
+
+#+source: global-objects
+#+begin_src lisp
+  (defvar *form*)
+  (defvar *pager*)
+  (defvar *player*)
+#+end_src
+
+#+source: physics-function
+#+begin_src lisp
+  ;; physics function here
+#+end_src
+
+#+source: game-definition
+#+begin_src lisp 
+  (defgame :void
+    :title "Void Mission"
+    :description "A sci-fi roguelike game in Common Lisp."
+    :screen-width 1280
+    :screen-height 720
+    :dt 10
+    :physics-function #'physics)
+#+end_src
+
+#+source: startup-forms
+#+begin_src lisp
+
+#+end_src
+
+#+source: custom-widgets
+#+begin_src lisp
+
+#+end_src
+
+#+source: widget-configuration
+#+begin_src lisp
+
+#+end_src
+
+* Overview
+
+"Void Mission" is a sci-fi action roguelike divided into three
+episodes. The action takes place in a 2-D pixeled future in which you
+fly a transforming humanoid/jet suit in both exterior space and
+interior environments while firing projectile and/or energy weapons at
+enemies and simultaneously avoiding their fire. The story is largely
+told through text, represented in the game as data files, emails, or
+voice communications with a non-player character. Gameplay is tied
+into the story with missions that require balancing combat with
+exploration and puzzle solving.
+
+Void Mission's game play is that of a rogue-like with simplified
+controls. Only the four cardinal directions are available for movement
+and firing, and the player can only carry or use a few (i.e. between 1
+and 5) items at a time. The player also has fewer stats than in a
+typical roguelike, but various upgrades make sure that character
+development is still central.
+
+* Controls					       :Controls:
+
+  - Arrow keys (or numeric keypad) for player movement.
+  - Shift-arrow for activating the selected inventory item.
+    If this is a gun for example, you fire in that direction.
+  - Z to change the selected inventory item
+  - X for picking up items, activating switches, and so on.
+  - C to drop the selected inventory item
+
+** Default keybindings
+
+The CALL method is not actually triggered by the shift-direction
+keybindings. Instead, to obtain satisfactory behavior, the shift key
+is polled every physics timestep. See the player's RUN method.
+
+#+source: keybindings
+#+begin_src lisp
+  (defparameter *numpad-keybindings* 
+    '(("KP8" nil "move :north .")
+      ("KP4" nil "move :west .")
+      ("KP6" nil "move :east .")
+      ("KP2" nil "move :south .")
+      ;; 
+      ("UP" nil "move :north .")
+      ("LEFT" nil "move :west .")
+      ("RIGHT" nil "move :east .")
+      ("DOWN" nil "move :south .")
+      ;; 
+      ("KP8" (:shift) "move :north .")
+      ("KP4" (:shift) "move :west .")
+      ("KP6" (:shift) "move :east .")
+      ("KP2" (:shift) "move :south .")
+      ;; 
+      ("UP" (:shift) "move :north .")
+      ("LEFT" (:shift) "move :west .")
+      ("RIGHT" (:shift) "move :east .")
+      ("DOWN" (:shift) "move :south .")))
+  
+  (defparameter *qwerty-keybindings*
+    (append *numpad-keybindings*
+            '(("K" nil "move :north .")
+              ("H" nil "move :west .")
+              ("L" nil "move :east .")
+              ("J" nil "move :south .")
+              ;;
+              ("K" (:shift) "move :north .")
+              ("H" (:shift) "move :west .")
+              ("L" (:shift) "move :east .")
+              ("J" (:shift) "move :south .")
+              ;;
+              ("Z" nil "rotate .")
+              ("X" nil "act .")
+              ("C" nil "pop .")
+              ("0" (:control) "do-exit .")
+              ;;
+              ("P" (:control) "pause .")
+              ("PAUSE" nil "pause .")
+              ("ESCAPE" nil "restart .")
+              ("Q" (:control) "quit ."))))
+    
+  (define-prototype void-prompt (:parent xe2:=prompt=))
+  
+  (define-method install-keybindings void-prompt ()
+    (dolist (k *qwerty-keybindings*)
+      (apply #'bind-key-to-prompt-insertion self k)))
+  
+  ;; (define-method install-keybindings void-prompt ()
+  ;;   (let ((keys (ecase xe2:*user-keyboard-layout* 
+  ;;              (:qwerty *qwerty-keybindings*)
+  ;;              (:alternate-qwerty *alternate-qwerty-keybindings*)
+  ;;              (:dvorak *dvorak-keybindings*))))
+  ;;     (dolist (k keys)
+  ;;       (apply #'bind-key-to-prompt-insertion self k))))
+#+end_src
+
+** Joystick control
+
+
+* The player 						 :Player:
+
+The player is a human male who spends the entire game inside an Olvac
+mimetic-plasteel exosuit, and can move freely between
+interior and exterior scenes. This suit has two modes: humanoid mode,
+in which the suit acts as an exoskeleton for exploring human-scale
+environments, and a fighter mode with high-speed jetpack and wide,
+micro-thin plasteel wings for extra-vehicular activity and combat.
+
+The suit's energy shield is its sole defense; when SP (shield points)
+drop to zero, you die. 
+
+Character development comes in the form of upgrades such as additional
+inventory slots, increased firing power, hit points, new weapons, and
+so on.
+
+*** TODO Draw exosuit 16x16 graphics (tweak Blast Tactics voyager stuff)
+
+ file:gun.png
+
+** TODO Design and write about upgrade system
+
+* Mission structure 				      :Structure:
+
+Gameplay is mission-based, with one mission leading to others in a
+branching fashion. Each mission is self contained, and the player and
+his inventory are all that survive a mission.
+
+** TODO Define lisp mission structure
+
+ - http://norvig.com/ltd/test/micro-tale-spin.lisp
+
+* The game world 				    :Environment:
+
+Each mission takes place across one or more grid-based XE2 maps.
+
+* Combat system						 :Combat:
+
+The player can fire various bullets and beams at enemies, destructible
+objects, and other targets. Bullets take time to travel to a target;
+beams (usually energy weapons) are instantaneous point-to-point.
+
+Energy weapons use up the energy points (EN) meter, and cannot fire
+without sufficient EN. You can restore EN with Energy packs, or by
+visiting an energy recharge station.
+
+** TODO Import energy packs
+** TODO Create recharge station
+
+Shell based weapons have limited ammo, but do not require energy to
+fire.
+
+Some enemies are shielded from energy attacks, and require shell-based
+weapons to defeat.
+
+Various kinds of bombs and mines also exist. 
+
+** TODO Import kickable bombs from CONS
+** TODO Import seeking gravmines from BT
+** TODO Create sticky bombs
+** TODO Create grenade weapon, area effect explosion
+
+* Enemies						:Enemies:
+
+* Setting 						  :Story:
+
+It's 2061. If only there were enough endurium!
+
+It's been known for decades that Humanity's reach within the Milky Way
+is limited only by the supply of endurium, its rare and precious
+fuel. The energy crises of C.E. 2021 and C.E. 2027-2031 caused global
+economic, social, and environmental disruption, and with this
+disorganization came the concentration of wealth and power in the
+hands of the government and corporate elites.
+
+Early attempts at control and regulation of endurium met with initial
+success. The space-faring nations---Russia, China, India, Japan,
+Brazil, and the United States---along with the ESA (European Space
+Agency), could quite naturally claim endurium for themselves. But
+economies of scale and espionage in spaceflight technology eventually
+brought smaller deposits and endurium dust streams throughout the
+interstellar neighborhood within the reach of multinational
+corporations and various non-state actors. The largest of these formed
+what they called a "sovereign", open, and successful market in
+endurium, spaceflight technology, and various otherwise-controlled
+materials. The split between the Spacefaring Nations on the one hand,
+and the United Nations on the other, threatens to break into
+full-scale interstellar war; as Earth's environment continues to
+decay, the demand for endurium has reached a critical point.
+
+* Plot
+
+** Prologue
+
+A new high-powered telescope operated by Xiomacs Corporation detects a
+pattern of gas streamers radiating high in the ultraviolet, within a
+cavernous void in galactic space. Subsequent observations show that
+the streamers are emitted from a string of black holes. The
+scientists, seeing the pattern's obviously artificial nature, guess at
+a propulsion method being used to drive a spacecraft, and begin to
+look for something at the trail's leading edge. A year later one of
+the flare-ups is observed, and the calculations fall into place: the
+source of the black holes is an object about as massive as Jupiter,
+but much smaller and far more dense. And it has been accelerating for
+1.2 billion years by riding on streams of gas being ejected from the
+black holes at relativistic speeds. It is given the name DVO1, for
+Deep Void Object 1.
+
+** Episode 1
+
+A mysterious Xiomacs operative named Brennan stays in the Void Rider
+as mission commander, while you take off in an exosuit. Your mission
+is to rendezvous with the DVO and make initial discoveries.
+
+*** 1.1: Acquire cloud data
+
+The cloud obscuring the DVO is meant as a shield to protect it from
+the ultraviolet radiation caused by the black holes that propel it
+across the universe. Drop scanning devices at each of 3 nav points
+surrounding the cloud to complete this mission.
+
+**** TODO [#C] Create basic Defgame macro and use it for voidmission
+**** TODO [#A] Mostly empty space where you start at bottom, nebula cloud to north
+**** TODO [#A] Re-use existing passageway.ogg
+**** TODO [#B] Tiny thunder particle/sparks whenever cloud fragments glow
+**** TODO [#B] Occasional flashes of background moving cloud fragments in the dark
+**** TODO [#B] Neon cloud pieces are irregular mostly-transparent pixel pngs that float along one another
+**** TODO [#A] Nav points 
+**** TODO [#A] Scanners
+**** TODO [#A] Macrovirii
+**** TODO [#B] Brainstorm dead simple log ui system
+**** TODO [#B] Dialogue and messages
+
+A strange transmission burst is received after the 1st scanning device
+is placed. The game's first enemies strike after the 2nd scanning
+device is placed.
+
+** TODO Burst sound and text
+
+The measurement data enable plotting a path through the cloud to the
+DVO itself.
+
+*** 1.2: Enter DVO orbit
+
+**** TODO Corridor level
+**** TODO Black space with DVO visible at one edge as a curved planet surface (NASA)
+**** TODO Xianghua cruiser sprite
+
+Long, narrow northward corridor with cloud walls and enemies.
+
+Fight your way through the cloud and enter orbit around the DVO. You
+discover a large Xianghua Industries cruiser already in orbit, a dead
+hulk with no energy or life signs. At this point it becomes obvious
+that you are not the first human to visit the DVO, and that at least
+one other Corporation has reached orbit and possibly the DVO itself.
+
+*** 1.3: Retrieve memory card
+
+**** TODO High-tech interior
+
+You must restore power to the Xianghua cruiser and retrieve a memory
+card with a copy of the map. Once power is restored, security gates
+will activate, and you must throw switches to turn them off. Once you
+get the memory card, this is combined with new information (ancient
+texts) possessed by Xiomacs. This helps Brennan choose an appropriate
+landing site on the DVO.
+
+** Episode 2
+
+*** 2.1 Investigate landing site
+
+You find yourself in a windswept ocean of grey sands with outcroppings
+of black glass. This more ambient level involves radar searching and
+some digging with charges, as well as a climactic boss encounter with
+a big sprite :)
+
+You find some supplies and a high-bandwidth transmitter at the
+scattered camp sites of the previous expedition's landing.
+
+After defeating this boss you may enter the DVO itself. 
+
+*** 2.2 Investigate DVO origins and purpose
+
+This level involves some tricky enemies and some tone-based puzzles,
+giving the first hint at the Ancients' mindset and language. Square,
+sine, and saw.
+
+You discover the probe carries the last embryos and the encoded
+knowledge of a dying species. The probe is automatically carrying out
+its mission to escape a replicating, matter-rearranging mechanical
+menace known as the Black Metal. The goal is for the probe to tear a
+portion of the universe away from ours at the moment of the Heat
+Death, so that the new universe and the old will be absolutely
+causally unconnected; only in this way can the Black Metal be escaped,
+and their race renewed. 
+
+The Ancients calculated that the Black Metal would grow forever,
+dominating matter and space without limit, and therefore all
+information and energy. It would be the extinction of all life, and
+eventually of all phenomena; a true Heat Death. (The metric expansion
+of space and the DVO's great speed ensure that any pursuing Black
+Metal objects could never reach the DVO.)
+
+*** 2.3 Return to surface
+
+You receive an urgent message from Brennan but he is cut off in
+mid-sentence, something about getting back to the ship. When you reach
+the surface, fighting many enemies along the way, the computer decides
+to speak, and tells you that you've come 31 million years in the
+future, and Brennan (and the rest of Humanity) are long dead.
+
+** Episode 3
+
+*** 3.1 Return to Void Rider
+
+The computer explains that it just awoke, and cannot control its
+malfunctioning defense systems (i.e. the enemies you have encountered
+up until this point.) Furthermore, the entire mission is in danger,
+because a tiny capsule of dormant Black Metal had been secretly
+installed aboard the Void Rider, still orbiting the DVO and now slowly
+being transformed. In fact the whole mission is a plot to take over
+all the DVO's, a plot organized and executed by the Black Metal
+itself, who manipulated Xiomacs Corporation through various human
+contact personalities. By contaminating the DVOs with Black Metal, the
+substance could survive and flourish in the new "tear-away" universes,
+and enlarge its dominion to the total range of possible universes; a
+dark consciousness that has absorbed literally Everything. The only
+way to destroy the Void Rider is to steer it into the path of one of
+the black holes as it is ejected from the DVO.
+
+*** 3.2 Reprogram flight computer
+
+Go aboard the Void Rider and reprogram the flight computer so that it
+flies into the path of the next black hole. Along the way one must
+find two encryption keys to unlock doors. Here one discovers documents
+and logs relating to the failed mission and what happened to Brennan
+and the Void Rider after you disappeared. You learn that Brennan may
+be alive, in stasis somewhere on the DVO. Furthermore the cosmological
+speculations of another crew member hint at manifold
+possibilities. After Brennan left for the DVO, the remaining crew ran
+out of supplies and starved. But before this happened, there were
+glimmers of a way back in time; by traveling in a shuttle along the
+trail of black holes left by the DVO, one could reverse time and
+travel to the point and time of the object's origin.
+
+*** 3.3 Restore engine power
+
+Reactivate the Void Rider's engines so that the flight computer can
+steer it into the path of the black hole, and then escape back to the
+DVO.
+
+The DVO fires a black hole, and the Void Rider is destroyed
+utterly. 
+
+*** 3.4 Investigate stasis chamber 
+
+The computer gets unusual levels of electromagnetic noise in one spot
+on the surface; you are led to a stasis chamber where you discover
+Brennan frozen in time. After un-freezing he takes the Black Metal
+capsule from his pocket and reveals that the Black Capsule contains
+sufficient Black Metal to dominate any new universe formed by the DVO,
+and that the hive mind has promised long life and vast powers to those
+who advance its cause. After a climactic battle with Brennan, the
+Black Capsule falls into the player's hands.
+
+*** 3.5 Destroy black capsule
+
+You take the black capsule to the propulsion lab, where it is disposed
+of in a black hole before ejection.
+
+The computer explains that in order to travel back to your own epoch,
+you need a much longer trail of black holes to accelerate along. The
+computer calculates that you'd need to wait many billions of years, so
+you enter a stasis chamber and awaken sometime just before the Heat
+Death, into a nearly featureless cosmos. The DVO has decayed
+significantly and seems barely able to continue its mission. The
+computer itself is tired of consciousness.
+
+You enter a stasis chamber and launch yourself back along the trail of
+black holes, slingshotting from one event horizon to another, and
+arrive in an unknown area.
+
+

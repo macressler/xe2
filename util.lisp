@@ -20,15 +20,15 @@
 
 (in-package :xe2)
 
-;; (defmacro defgame (module-name 
-;; 		   (&key title description
-;; 			 (prompt-prototype =prompt=)
-;; 			 dt physics-function
-;; 			 held-keys 
-;; 			 splash-image splash-function splash-music
-;; 			 screen-width screen-height
-;; 			 keybindings pages)
-;; 		   &body startup-forms)
+(defmacro defgame (module-name 
+		   (&key title description
+			 (prompt-prototype =prompt=)
+			 dt physics-function
+			 held-keys 
+			 splash-image splash-function splash-music
+			 screen-width screen-height
+			 keybindings pages)
+ 		   &body startup-forms)
   
   
 		   

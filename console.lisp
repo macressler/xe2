@@ -1714,6 +1714,8 @@ and its .startup resource is loaded."
   (initialize-resource-table)
   (setf *module-package-name* nil)
   (setf *physics-function* nil)
+  (setf *world* nil)
+  (clon:initialize)
   (setf *timesteps* 0)
   (setf *keyboard-timestep-number* 0)
   (setf *initialization-hook* nil)
