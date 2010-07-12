@@ -1,23 +1,26 @@
 #+title: Void Mission: a sci-fi action roguelike game in Common Lisp
 #+author: David T. O'Toole <dto@gnu.org> <dto1138@gmail.com>
 
-## Copyright (C) 2010  David O'Toole
+#+source: copyright-notice
+#+begin_src lisp
+;; Copyright (C) 2010  David O'Toole
 
-## Author: David O'Toole <dto@gnu.org>
-## Keywords: 
+;; Author: David O'Toole <dto@gnu.org>
+;; Keywords: 
 
-## This program is free software; you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
 
-## You should have received a copy of the GNU General Public License
-## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#+end_src
 
 #+tags: Interface Player Structure Environment Controls Combat Enemies Planning Story
 #+property: tangle no
@@ -26,7 +29,20 @@
 #+property: results silent
 #+property: no-expand yes
 #+property: noweb yes
-#+startup: hideblocks
+#+startup: showall
+
+#+source: xe2-lisp-file
+#+begin_src lisp :tangle yes
+<<copyright-notice>>
+<<package-definition>>
+<<global-objects>>
+<<settings>>
+<<keybindings>>
+<<physics-function>>
+<<cloud-world>>
+<<player-definition>>
+<<game-definition>>
+#+end_src
 
 #+source: package-definition
 #+begin_src lisp :tangle yes
@@ -41,38 +57,97 @@
 #+begin_src lisp
   (defvar *form*)
   (defvar *pager*)
+  (defvar *prompt*)
   (defvar *player*)
+  (defvar *viewport*)
 #+end_src
 
 #+source: physics-function
 #+begin_src lisp
-  ;; physics function here
+  (defun physics (&rest ignore)
+    (when *world* [run-cpu-phase *world* t]))
+#+end_src
+
+#+source: settings
+  (defvar *timestep* 20)
+  (defvar *grid-size* 16)
+  (defvar *address* '(=cloud=))
+  (defvar *width* 1280)
+  (defvar *height* 720)
+#+end_src
+
+#+source: cloud-world
+#+begin_src lisp
+  (defcell vaccuum 
+    (tile :initform "vaccuum"))
+  
+  (defcell red-plasma
+    (tile :initform "red-plasma"))
+  
+  (defcell blue-plasma
+    (tile :initform "nebula3")
+  
+  (defworld cloud
+    (name :initform "DVO UV Shield Cloud")
+    (scale :initform '(50 m))
+    (ambient-light :initform :total)
+    (description :initform))
+  
+  (define-method begin-ambient-loop cloud ()
+    (play-music "passageway" :loop t))
+  
+  (define-method drop-plasma cloud
+    (&optional &key (object =red-plasma=)
+               distance 
+               (row 0) (column 0)
+               (graininess 0.3)
+               (density 100)
+               (cutoff 0))
+    (clon:with-field-values (height width) self
+      (let* ((h0 (or distance height))
+             (w0 (or distance width))
+             (r0 (- row (truncate (/ h0 2))))
+             (c0 (- column (truncate (/ w0 2))))
+             (plasma (xe2:render-plasma h0 w0 :graininess graininess))
+             (value nil))
+        (dotimes (i h0)
+          (dotimes (j w0)
+            (setf value (aref plasma i j))
+            (when (< cutoff value)
+              (when (or (null distance)
+                        (< (distance (+ j r0) (+ c0 i) row column) distance))
+                (percent-of-time density
+                  [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
 #+end_src
 
 #+source: game-definition
 #+begin_src lisp 
   (defgame :void
-    :title "Void Mission"
-    :description "A sci-fi roguelike game in Common Lisp."
-    :screen-width 1280
-    :screen-height 720
-    :dt 10
-    :physics-function #'physics)
-#+end_src
-
-#+source: startup-forms
-#+begin_src lisp
-
-#+end_src
-
-#+source: custom-widgets
-#+begin_src lisp
-
-#+end_src
-
-#+source: widget-configuration
-#+begin_src lisp
-
+      (:title "Void Mission"
+       :description "A sci-fi roguelike game in Common Lisp."
+       :creator "David T. O'Toole <dto@gnu.org>"
+       :screen-width *width*
+       :screen-height *height*
+       :dt *timestep*
+       :physics-function #'void:physics)
+    ;; create some objects
+    (setf *prompt* (prompt (clone =void-prompt=)))
+    (setf *universe* (clone =universe=))
+    (setf *player* (clone =olvac=))
+    (setf *viewport* (clone =viewport=))
+    ;; configure the view
+    [resize viewport :height *height* :width *width*]
+    [move viewport :x 0 :y 0]
+    [set-origin viewport :x 0 :y 0 
+                :height (truncate (/ (- *height* 130) *grid-size*))
+                :width (truncate (/ *width* *grid-size*))]
+    [adjust viewport]
+    ;; now play!
+    [play universe
+          :player *player*
+          :address *address*
+          :prompt *prompt*
+          :viewport *viewport*])
 #+end_src
 
 * Overview
@@ -179,7 +254,7 @@ mimetic-plasteel exosuit, and can move freely between
 interior and exterior scenes. This suit has two modes: humanoid mode,
 in which the suit acts as an exoskeleton for exploring human-scale
 environments, and a fighter mode with high-speed jetpack and wide,
-micro-thin plasteel wings for extra-vehicular activity and combat.
+micro-thin plasteel wings for space travel and combat.
 
 The suit's energy shield is its sole defense; when SP (shield points)
 drop to zero, you die. 
@@ -280,6 +355,18 @@ but much smaller and far more dense. And it has been accelerating for
 black holes at relativistic speeds. It is given the name DVO1, for
 Deep Void Object 1.
 
+*** TODO Opening movie!
+**** TODO 3 cards progressive reveal of 3 short paragraphs, black screen white text.
+
+ It's A.D. 2061. Earth's resources are nearly exhausted. The
+ government/corporation complex elites now control humanity's only
+ remaining energy source, the rare material Endurium.
+ 
+**** TODO "freedom 0: the freedom to survive" propaganda poster 
+**** TODO false-color gas streamer images and fake data
+**** TODO slideshow of blurry diagrams filtered through xanalogtv
+**** show several progressive black hole events being labeled and photographed 
+
 ** Episode 1
 
 A mysterious Xiomacs operative named Brennan stays in the Void Rider
@@ -295,8 +382,8 @@ surrounding the cloud to complete this mission.
 
 **** TODO [#C] Create basic Defgame macro and use it for voidmission
 **** TODO [#A] Mostly empty space where you start at bottom, nebula cloud to north
-**** TODO [#A] Re-use existing passageway.ogg
 **** TODO [#B] Tiny thunder particle/sparks whenever cloud fragments glow
+**** TODO [#A] Limited sight distance
 **** TODO [#B] Occasional flashes of background moving cloud fragments in the dark
 **** TODO [#B] Neon cloud pieces are irregular mostly-transparent pixel pngs that float along one another
 **** TODO [#A] Nav points 

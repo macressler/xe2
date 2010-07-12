@@ -85,7 +85,7 @@ set-browser find-page *windows* transform-field-reference
 *screen-height* =inventory= formatted-line-width *last-event*
 formatted-line-height formatted-string-height formatted-string-width
 get-color create-image draw-image play define-prototype has-field
-defcell *choose-direction-menu* set-field-options field-option-value
+defcell defworld *choose-direction-menu* set-field-options field-option-value
 index-resource find-module-path index-module load-image-resource
 load-lisp-resource *executable* *resource-handlers* load-resource
 find-resource find-resource-object *colors* *world*

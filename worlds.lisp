@@ -1224,4 +1224,14 @@ narrator, and VIEWPORT as the viewport."
 (define-method drop-entry-point world (row column)
   [replace-cells-at self row column (clone =launchpad=)])
 
+;;; Convenience macro for defining worlds:
+
+(defmacro defworld (name &body args)
+  "Define a world named NAME, with the fields ARGS as in a normal
+prototype declaration. This is a convenience macro for defining new
+worlds."
+  `(define-prototype ,name (:parent =world=)
+     ,@args))
+
+
 ;;; worlds.lisp ends here

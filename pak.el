@@ -20,56 +20,10 @@
 
 ;;; Commentary:
 
-;; TODO Read/write pak files
-;; TODO Generate pak index of a directory?
-;; TODO Emacs tree widget view of mod resources?
-;; TODO import resources by making .pak files for existing media automatically
-
 ;;; Code:
 
 ;; See pak.lisp for more information.
 
-(defstruct pak-resource 
-  name type notes file data client-data)
-
-(defun pak-resource-to-plist (res)
-  (list :name (pak-resource-name res)
-	:type (pak-resource-type res)
-	:notes (pak-resource-notes res)
-	:file (pak-resource-file res)
-	:data (pak-resource-data res)))
-
-(defun pak-write-sexp-to-file (filename sexp)
-  (with-temp-buffer
-    (insert (format "%S" sexp))
-    (write-file filename)))
-
-(defun pak-read-sexp-from-file (filename)
-  (with-temp-buffer
-    (insert-file-contents filename)
-    (goto-char (point-min))
-    (read (current-buffer))))
-
-(defun pak-write (filename resources)
-  (pak-write-sexp-to-file (mapcar #'pak-resource-to-plist resources) filename))
-
-(defun pak-read (filename)
-  (mapcar #'make-pak-resource (pak-read-sexp-from-file filename)))
-
-(defun pak-read-table (filename) 
-  (let ((table (make-hash-table :test 'equal)))
-    (prog1 table
-      (dolist (res (pak-read filename))
-	(setf (gethash (pak-resource-name res) table)
-	      res)))))
-
-(defun pak-write-table (filename table)
-  (let (resources)
-    (maphash #'(lambda (k v)
-		 (declare (ignore k))
-		 (push v resources))
-	     table)
-    (pak-write filename resources)))
 
 (provide 'pak)
 ;;; pak.el ends here
