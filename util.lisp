@@ -20,15 +20,24 @@
 
 (in-package :xe2)
 
-;; (defmacro defgame (module-name 
-;; 		   (&key title description
-;; 			 (prompt-prototype =prompt=)
-;; 			 dt physics-function
-;; 			 held-keys 
-;; 			 splash-image splash-function splash-music
-;; 			 screen-width screen-height
-;; 			 keybindings pages)
-;;  		   &body startup-forms)
+(defmacro defgame (module-name 
+		   (&key title description
+			 (prompt-prototype =prompt=)
+			 timestep physics-function
+			 held-keys 
+			 splash-image splash-function splash-music
+			 screen-width screen-height
+			 keybindings pages
+			 &allow-other-keys)
+ 		   &body startup-forms)
+  `(progn
+     (xe2:set-screen-height ,screen-height)
+     (xe2:set-screen-width ,screen-width)
+     (setf xe2:*physics-function* ,physics-function)
+     (setf xe2:*dt* ,timestep)
+     ,@startup-forms))
+
+
   
   
 		   

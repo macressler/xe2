@@ -1,9 +1,9 @@
-;;; void.lisp --- a micro anti-shmup in common lisp
 
-;; Copyright (C) 2009  David O'Toole
+;; [[file:~/xe2/void/void.org][xe2-lisp-file]]
+;; Copyright (C) 2010  David O'Toole
 
 ;; Author: David O'Toole <dto@gnu.org>
-;; Keywords: games
+;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -14,584 +14,436 @@
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
+
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary 
-
-;; Void Tactics is a mini space-roguelike puzzler incorporating
-;; elements of the classic Asteroids, plus gravity and a unique weapon
-;; system. Shoot asteroids and enemies, or sweep your trail across
-;; them. Powerups extend your trail's length and enable higher scores.
-
-;;; Packaging
-
 (defpackage :void
-  (:documentation "Void Tactics: A sci-fi roguelike for Common Lisp.")
   (:use :xe2 :common-lisp)
-  (:export void))
+  (:export physics))
 
 (in-package :void)
-
-;;; Custom bordered viewport
-
-(define-prototype view (:parent xe2:=viewport=))
-
-(define-method render view ()
-  [parent>>render self]
-  (xe2:draw-rectangle 0 0 
-		      <width>
-		      <height>
-		      :color ".blue" :destination <image>))
-
-(defvar *view* (clone =view=))
-
-;;; Controlling the game.
-
-(define-prototype void-prompt (:parent xe2:=prompt=))
-
-(defparameter *basic-keybindings* 
-  '(("KP7" nil "move :northwest .")
-    ("KP8" nil "move :north .")
-    ("KP9" nil "move :northeast .")
+(defparameter *timestep* 20)
+(defparameter *grid-size* 16)
+(defparameter *address* '(=cloud=))
+(defparameter *width* 1280)
+(defparameter *height* 720)
+(defvar *form*)
+(defvar *pager*)
+(defvar *prompt*)
+(defvar *player*)
+(defvar *viewport*)
+(defparameter *numpad-keybindings* 
+  '(("KP8" nil "move :north .")
     ("KP4" nil "move :west .")
     ("KP6" nil "move :east .")
-    ("KP1" nil "move :southwest .")
     ("KP2" nil "move :south .")
-    ("KP3" nil "move :southeast .")
-    ;;
-    ("KP7" (:control) "fire :northwest .")
-    ("KP8" (:control) "fire :north .")
-    ("KP9" (:control) "fire :northeast .")
-    ("KP4" (:control) "fire :west .")
-    ("KP6" (:control) "fire :east .")
-    ("KP1" (:control) "fire :southwest .")
-    ("KP2" (:control) "fire :south .")
-    ("KP3" (:control) "fire :southeast .")
-    ;;
-    ("KP7" (:alt) "attack :northwest .")
-    ("KP8" (:alt) "attack :north .")
-    ("KP9" (:alt) "attack :northeast .")
-    ("KP4" (:alt) "attack :west .")
-    ("KP6" (:alt) "attack :east .")
-    ("KP1" (:alt) "attack :southwest .")
-    ("KP2" (:alt) "attack :south .")
-    ("KP3" (:alt) "attack :southeast .")
-    ;;
-    ("KP7" (:meta) "attack :northwest .")
-    ("KP8" (:meta) "attack :north .")
-    ("KP9" (:meta) "attack :northeast .")
-    ("KP4" (:meta) "attack :west .")
-    ("KP6" (:meta) "attack :east .")
-    ("KP1" (:meta) "attack :southwest .")
-    ("KP2" (:meta) "attack :south .")
-    ("KP3" (:meta) "attack :southeast .")
-    ;;
-    ("JOYSTICK" (:north :circle) "attack :north .")
-    ("JOYSTICK" (:northeast :circle) "attack :northeast .")
-    ("JOYSTICK" (:northwest :circle) "attack :northwest .")
-    ("JOYSTICK" (:east :circle) "attack :east .")
-    ("JOYSTICK" (:west :circle) "attack :west .")
-    ("JOYSTICK" (:south :circle) "attack :south .")
-    ("JOYSTICK" (:southwest :circle) "attack :southwest .")
-    ("JOYSTICK" (:southeast :circle) "attack :southeast .")
-    ;;
-    ("JOYSTICK" (:north :cross) "move :north .")
-    ("JOYSTICK" (:northeast :cross) "move :northeast .")
-    ("JOYSTICK" (:northwest :cross) "move :northwest .")
-    ("JOYSTICK" (:east :cross) "move :east .")
-    ("JOYSTICK" (:west :cross) "move :west .")
-    ("JOYSTICK" (:south :cross) "move :south .")
-    ("JOYSTICK" (:southwest :cross) "move :southwest .")
-    ("JOYSTICK" (:southeast :cross) "move :southeast .")
-    ;;
-    ("JOYSTICK" (:north :square) "fire :north .")
-    ("JOYSTICK" (:northeast :square) "fire :northeast .")
-    ("JOYSTICK" (:northwest :square) "fire :northwest .")
-    ("JOYSTICK" (:east :square) "fire :east .")
-    ("JOYSTICK" (:west :square) "fire :west .")
-    ("JOYSTICK" (:south :square) "fire :south .")
-    ("JOYSTICK" (:southwest :square) "fire :southwest .")
-    ("JOYSTICK" (:southeast :square) "fire :southeast .")))
+    ;; 
+    ("UP" nil "move :north .")
+    ("LEFT" nil "move :west .")
+    ("RIGHT" nil "move :east .")
+    ("DOWN" nil "move :south .")
+    ;; 
+    ("KP8" (:shift) "move :north .")
+    ("KP4" (:shift) "move :west .")
+    ("KP6" (:shift) "move :east .")
+    ("KP2" (:shift) "move :south .")
+    ;; 
+    ("UP" (:shift) "move :north .")
+    ("LEFT" (:shift) "move :west .")
+    ("RIGHT" (:shift) "move :east .")
+    ("DOWN" (:shift) "move :south .")))
 
 (defparameter *qwerty-keybindings*
-  (append *basic-keybindings*
-	  '(("Y" nil "move :northwest .")
-	    ("K" nil "move :north .")
-	    ("U" nil "move :northeast .")
-	    ("H" nil "move :west .")
-	    ("L" nil "move :east .")
-	    ("B" nil "move :southwest .")
-	    ("J" nil "move :south .")
-	    ("N" nil "move :southeast .")
-	    ;;
-	    ("Y" (:alt) "attack :northwest .")
-	    ("K" (:alt) "attack :north .")
-	    ("U" (:alt) "attack :northeast .")
-	    ("H" (:alt) "attack :west .")
-	    ("L" (:alt) "attack :east .")
-	    ("B" (:alt) "attack :southwest .")
-	    ("J" (:alt) "attack :south .")
-	    ("N" (:alt) "attack :southeast .")
-	    ;;
-	    ("Y" (:meta) "attack :northwest .")
-	    ("K" (:meta) "attack :north .")
-	    ("U" (:meta) "attack :northeast .")
-	    ("H" (:meta) "attack :west .")
-	    ("L" (:meta) "attack :east .")
-	    ("B" (:meta) "attack :southwest .")
-	    ("J" (:meta) "attack :south .")
-	    ("N" (:meta) "attack :southeast .")
-	    ;;
-	    ("Y" (:control) "fire :northwest .")
-	    ("K" (:control) "fire :north .")
-	    ("U" (:control) "fire :northeast .")
-	    ("H" (:control) "fire :west .")
-	    ("L" (:control) "fire :east .")
-	    ("B" (:control) "fire :southwest .")
-	    ("J" (:control) "fire :south .")
-	    ("N" (:control) "fire :southeast .")
-	    ;;
-	    ("W" nil "wait .")
-	    ("SPACE" nil "wait .")
-	    ("PERIOD" (:control) "restart .")
-	    ("KP-ENTER" nil "enter .")
-	    ("RETURN" nil "enter .")
-	    ("ESCAPE" (:control) "show-location .")
-	    ("3" nil "activate-extension .")
-	    ("2" nil "activate-pulse-cannon .")
-	    ("1" nil "activate-bomb-cannon .")
-	    ("P" (:control) "disembark .")
-	    ("P" nil "embark .")
-	    ("Q" (:control) "quit ."))))
+  (append *numpad-keybindings*
+          '(("K" nil "move :north .")
+            ("H" nil "move :west .")
+            ("L" nil "move :east .")
+            ("J" nil "move :south .")
+            ;;
+            ("K" (:shift) "move :north .")
+            ("H" (:shift) "move :west .")
+            ("L" (:shift) "move :east .")
+            ("J" (:shift) "move :south .")
+            ;;
+            ("Z" nil "rotate .")
+            ("X" nil "act .")
+            ("C" nil "pop .")
+            ("0" (:control) "do-exit .")
+            ;;
+            ("P" (:control) "pause .")
+            ("PAUSE" nil "pause .")
+            ("ESCAPE" nil "restart .")
+            ("Q" (:control) "quit ."))))
   
-(defparameter *alternate-qwerty-keybindings*
-  (append *basic-keybindings*
-	  '(
-	    ("Q" nil "move :northwest .")
-	    ("W" nil "move :north .")
-	    ("E" nil "move :northeast .")
-	    ("A" nil "move :west .")
-	    ("D" nil "move :east .")
-	    ("Z" nil "move :southwest .")
-	    ("X" nil "move :south .")
-	    ("C" nil "move :southeast .")
-	    ;;
-	    ("Q" (:alt) "attack :northwest .")
-	    ("W" (:alt) "attack :north .")
-	    ("E" (:alt) "attack :northeast .")
-	    ("A" (:alt) "attack :west .")
-	    ("D" (:alt) "attack :east .")
-	    ("Z" (:alt) "attack :southwest .")
-	    ("X" (:alt) "attack :south .")
-	    ("C" (:alt) "attack :southeast .")
-	    ;;
-	    ("Q" (:meta) "attack :northwest .")
-	    ("W" (:meta) "attack :north .")
-	    ("E" (:meta) "attack :northeast .")
-	    ("A" (:meta) "attack :west .")
-	    ("D" (:meta) "attack :east .")
-	    ("Z" (:meta) "attack :southwest .")
-	    ("X" (:meta) "attack :south .")
-	    ("C" (:meta) "attack :southeast .")
-	    ;;
-	    ("Q" (:control) "fire :northwest .")
-	    ("W" (:control) "fire :north .")
-	    ("E" (:control) "fire :northeast .")
-	    ("A" (:control) "fire :west .")
-	    ("D" (:control) "fire :east .")
-	    ("Z" (:control) "fire :southwest .")
-	    ("X" (:control) "fire :south .")
-	    ("C" (:control) "fire :southeast .")
-	    ;;
-	    ("S" nil "wait .")
-	    ("ESCAPE" (:control) "show-location .")
-	    ("SPACE" nil "wait .")
-	    ("PERIOD" (:control) "restart .")
-	    ("3" nil "activate-extension .")
-	    ("2" nil "activate-pulse-cannon .")
-	    ("1" nil "activate-bomb-cannon .")
-	    ("P" (:control) "quit ."))))
-  
-;; g c r
-;;  \|/
-;; h-.-n
-;;  /|\ 
-;; m w v
-
-(defparameter *dvorak-keybindings*
-  (append *basic-keybindings*
-	  '(("G" nil "move :northwest .")
-	    ("C" nil "move :north .")
-	    ("R" nil "move :northeast .")
-	    ("H" nil "move :west .")
-	    ("N" nil "move :east .")
-	    ("M" nil "move :southwest .")
-	    ("W" nil "move :south .")
-	    ("V" nil "move :southeast .")
-	    ;;
-	    ("G" (:alt) "attack :northwest .")
-	    ("C" (:alt) "attack :north .")
-	    ("R" (:alt) "attack :northeast .")
-	    ("H" (:alt) "attack :west .")
-	    ("N" (:alt) "attack :east .")
-	    ("M" (:alt) "attack :southwest .")
-	    ("W" (:alt) "attack :south .")
-	    ("V" (:alt) "attack :southeast .")
-	    ;;
-	    ("G" (:meta) "attack :northwest .")
-	    ("C" (:meta) "attack :north .")
-	    ("R" (:meta) "attack :northeast .")
-	    ("H" (:meta) "attack :west .")
-	    ("N" (:meta) "attack :east .")
-	    ("M" (:meta) "attack :southwest .")
-	    ("W" (:meta) "attack :south .")
-	    ("V" (:meta) "attack :southeast .")
-	    ;;
-	    ("G" (:control) "fire :northwest .")
-	    ("C" (:control) "fire :north .")
-	    ("R" (:control) "fire :northeast .")
-	    ("H" (:control) "fire :west .")
-	    ("N" (:control) "fire :east .")
-	    ("M" (:control) "fire :southwest .")
-	    ("W" (:control) "fire :south .")
-	    ("V" (:control) "fire :southeast .")
-	    ;;
-	    ("S" nil "wait .")
-	    ("SPACE" nil "wait .")
-	    ("KP-ENTER" nil "enter .")
-	    ("RETURN" nil "enter .")
-	    ("ESCAPE" (:control) "show-location .")
-	    ("PERIOD" (:control) "restart .")
-	    ("3" nil "activate-extension .")
-	    ("2" nil "activate-pulse-cannon .")
-	    ("1" nil "activate-bomb-cannon .")
-	    ("P" (:control) "disembark .")
-	    ("P" nil "embark .")
-	    ("Q" (:control) "quit ."))))
+(define-prototype void-prompt (:parent xe2:=prompt=))
 
 (define-method install-keybindings void-prompt ()
-  (let ((keys (ecase xe2:*user-keyboard-layout* 
-		(:qwerty *qwerty-keybindings*)
-		(:alternate-qwerty *alternate-qwerty-keybindings*)
-		(:dvorak *dvorak-keybindings*))))
-    (dolist (k keys)
-      (apply #'bind-key-to-prompt-insertion self k)))
-  ;; we also want to respond to timer events. this is how. 
-  [define-key self nil '(:timer) (lambda ()
-				   [run-cpu-phase *world* :timer])])
+  (dolist (k *qwerty-keybindings*)
+    (apply #'bind-key-to-prompt-insertion self k)))
 
-;;; Status widgets for ship and dude
+;; (define-method install-keybindings void-prompt ()
+;;   (let ((keys (ecase xe2:*user-keyboard-layout* 
+;;              (:qwerty *qwerty-keybindings*)
+;;              (:alternate-qwerty *alternate-qwerty-keybindings*)
+;;              (:dvorak *dvorak-keybindings*))))
+;;     (dolist (k keys)
+;;       (apply #'bind-key-to-prompt-insertion self k))))
+(defun physics (&rest ignore)
+  (when *world* [run-cpu-phase *world* t]))
+(defcell vaccuum 
+  (tile :initform "vaccuum"))
 
-(defvar *ship-status* nil)
-(defvar *dude-status* nil)
+(defcell red-plasma
+  (tile :initform "red-plasma"))
 
-(define-prototype status (:parent xe2:=formatter=)
-  (character :documentation "The character cell."))
+(defcell blue-plasma
+  (tile :initform "blue-plasma"))
 
-(define-method set-character status (character)
-  (setf <character> character))
+(define-prototype cloud (:parent xe2:=world=)
+  (name :initform "DVO UV Shield Cloud")
+  (scale :initform '(50 m))
+  (ambient-light :initform :total)
+  (description :initform "foo"))
 
-(define-method print-stat status (stat-name &key warn-below)
-  (let* ((stat (field-value stat-name <character>))
-	 (value [stat-value <character> stat-name]))
-    (destructuring-bind (&key min max base delta unit) stat
-      (let ((color (if (and (numberp warn-below)
-			    (< value warn-below))
-		       ".red"
-		       ".gray40")))
-	[print self (symbol-name stat-name)
-	       :foreground ".white"]
-	[print self ":["]
-	[print self (format nil "~S" value) 
-	       :foreground ".yellow"
-	       :background color]
-	(when unit 
-	  [print self " "]
-	  [print self (symbol-name unit)])
-	[print self "]"]
-	))))
+(define-method begin-ambient-loop cloud ()
+  (play-music "passageway" :loop t))
 
-(define-method print-equipment-slot status (slot-name)
-  [print self (symbol-name slot-name)]
-  [print self ": "]
-  (let* ((item [equipment-slot <character> slot-name]))
-    (if item
-	(clon:with-field-values (name tile) item
-	  [print self nil :image tile]
-	  [print self " "]
-	  [print self name]
-	  [print self "  "])
-	[print self "EMPTY  "])))
+(define-method drop-plasma cloud
+  (&optional &key (object =red-plasma=)
+             distance 
+             (row 0) (column 0)
+             (graininess 0.3)
+             (density 100)
+             (cutoff 0))
+  (clon:with-field-values (height width) self
+    (let* ((h0 (or distance height))
+           (w0 (or distance width))
+           (r0 (- row (truncate (/ h0 2))))
+           (c0 (- column (truncate (/ w0 2))))
+           (plasma (xe2:render-plasma h0 w0 :graininess graininess))
+           (value nil))
+      (dotimes (i h0)
+        (dotimes (j w0)
+          (setf value (aref plasma i j))
+          (when (< cutoff value)
+            (when (or (null distance)
+                      (< (distance (+ j r0) (+ c0 i) row column) distance))
+              (percent-of-time density
+                [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
 
-(define-method print-object-tag status (object)
-  (clon:with-field-values (name tile) object
-    [print self nil :image tile]
-    [print self " "]
-    [print self name]
-    [print self "  "]))
+(define-method generate cloud (&key (height 100)
+                                       (width 100)
+                                       (protostars 30)
+                                       (sequence-number (genseq)))
+  (setf <height> height <width> width)
+  [create-default-grid self]
+  (dotimes (i width)
+    (dotimes (j height)
+      [drop-cell self (clone (if (zerop (random 7))
+                                 =vaccuum= 
+                                 =blue-plasma=))
+                 i j]))
+  [drop-plasma self]
+  ;; (dotimes (i protostars)
+  ;;   (let ((r (random height))
+  ;;      (c (random width)))
+  ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
+  ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
+  ;;     [drop-cell self (clone =protostar=) r c]))
+  [drop-cell self (clone =launchpad=) (random height) (random width)])
+(defparameter *react-shield-time* 30)
+
+(defparameter *energy-recovery-interval* 200)
+
+(defcell agent 
+  (tile :initform "voyager")
+  (firing :initform nil)
+  (items :initform nil)
+  (direction :initform :north)
+  (last-direction :initform :north :documentation "Last direction actually moved.")
+  (dead :initform nil)
+  (last-turn-moved :initform 0)
+  (team :initform :player)
+  (call-clock :initform 0)
+  (call-interval :initform 7)
+  (hit-points :initform (make-stat :base 20 :min 0 :max 20))
+  (energy :initform (make-stat :base 80 :min 0 :max 80))
+  (oxygen :initform (make-stat :base 80 :min 0 :max 80))
+  (movement-cost :initform (make-stat :base 10))
+  (speed :initform (make-stat :base 10 :min 0 :max 10))
+  (hearing-range :initform 25)
+  (stepping :initform t)
+  (light-radius :initform 7)
+  (react-shield-clock :initform 0)
+  (energy-clock :initform *energy-recovery-interval*)
+  (categories :initform '(:actor :obstacle :player :target :container :light-source)))
+
+(define-method loadout agent ()
+  [emote self '((("I'd better get moving."))
+                (("Use the arrow keys (or numpad)"))
+                (("to move, and SHIFT to fire.")))])
+
+(define-method start agent ()
+  (clon:with-fields (segments) self
+    (setf <direction> :north)
+    (setf <last-direction> :north)
+    (if (field-value :overworld *world*)
+        (progn (setf <tile> "player32")
+               (unless <first-start>
+                 (setf <first-start> t)
+                 ;; enter the first room on the map. FIXME
+                 [act self]))
+        (clon:with-field-values (row column) self
+          (setf <tile> "agent-north")
+          [make-segments self]))))
+
+(define-method expend-energy agent (points)
+  (if (>= [stat-value self :energy] points)
+      (prog1 t [stat-effect self :energy (- points)])
+      (prog1 nil 
+        [say self "Insufficient energy."]
+        [play-sample self "error"])))
+
+(define-method damage agent (points)
+  (if (zerop <react-shield-clock>)
+      (labels ((do-circle (image)
+                 (prog1 t
+                   (multiple-value-bind (x y) 
+                       [image-coordinates self]
+                     (let ((x0 (+ x 8))
+                           (y0 (+ y 8)))
+                       (draw-circle x0 y0 25 :destination image)
+                       (draw-circle x0 y0 30 :destination image)
+                       (draw-circle x0 y0 35 :destination image)
+                       (draw-circle x0 y0 40 :destination image))))))
+        (setf <react-shield-clock> *react-shield-time*)
+        [play-sample self "shield-warning"]
+        [>>add-overlay :viewport #'do-circle]
+        [parent>>damage self points])
+      [play-sample self "ice"]))
   
-(define-method print-inventory-slot status (slot-number)
-  [print self (format nil "[~D]: " slot-number)]
-  (let ((item [item-at <character> slot-number]))
-    (if item
-	(clon:with-field-values (name tile) item
-				[print self nil :image tile]
-				[print self " "]
-				[print self (get-some-object-name item)]
-				[print self "  "])
-	[print self "EMPTY  "])))
+(define-method pause agent ()
+  [pause *world*])
 
-(defparameter *status-bar-character* " ")
+(defparameter *agent-tiles* '(:north "agent-north"
+                             :south "agent-south"
+                             :east "agent-east"
+                             :west "agent-west"))
 
-(define-method print-stat-bar status (stat &key 
-					   (color ".yellow")
-					   (background-color ".gray40"))
-  (let ((value (truncate [stat-value <character> stat]))
-	(max (truncate [stat-value <character> stat :max])))
-    (dotimes (i max)
-      [print self *status-bar-character*
-	     :foreground ".yellow"
-	     :background (if (< i value)
-			     color
-			   background-color)])))
+(define-method aim agent (direction)
+  (setf <direction> direction)
+  (setf <tile> (getf *agent-tiles* direction)))
 
-(define-method update status ()
-  [delete-all-lines self]
-  (let* ((char <character>))
-    (when char
-      (let ((hits [stat-value char :hit-points])
-	    (energy [stat-value char :energy]))
-	[println self "VEHICLE STATUS:" :foreground ".white" :background ".blue"]
-	[print-stat self :hit-points :warn-below 10]
-	[print-stat-bar self :hit-points :color ".red"]
-	[newline self]
-	[print-stat self :energy :warn-below 10]
-	[print-stat-bar self :energy :color ".cyan"]
-	[newline self]
-	[print-stat self :bomb-ammo :warn-below 2]
-	[print-stat-bar self :bomb-ammo :color ".green"]
-	[space self]
-	[print-stat self :oxygen :warn-below 50]
-	[print self " "]
-	[print-stat self :technetium]
-	[print self " "]
-	[print-stat self :endurium :warn-below 10]
-	[print self " "]
-	[newline self]
-	[print-stat self :pulse-ammo :warn-below 2]
-	[print-stat-bar self :pulse-ammo :color ".yellow"]
-	[space self]
-	[print-stat self :strength :warn-below 10]
-	[print self " "]
-	[print-stat self :defense :warn-below 10]
-	[print self " "]
-	[print-stat self :speed :warn-below 5]
-	[newline self]))
-    [print self "LOCATION: "]
-    [print self (format nil "[~A]" [location-name *world*])]
-    [print self " SCALE:"]
-    (destructuring-bind (num unit) (field-value :scale *world*)
-      [print self (format nil "[~A ~A]" num unit)])
-    [space self]
-    [print self " COORDINATES:"]
-    [print self (format nil "[~A ~A] " [player-row *world*]
-			[player-column *world*])]
-    [println self (format nil " MODES: ~A" (field-value :required-modes *world*))]
-    [print self "TERRAIN: "]
-    (let ((player [get-player *world*]))
-      (when (and player [is-located player])
-	(do-cells (cell [cells-at *world* 
-				  (field-value :row player)
-				  (field-value :column player)])
-	  (unless [is-player cell]
-	    [print-object-tag self cell])))
-      [newline self])))
+(define-method move agent (&optional direction)
+  (unless <dead>
+    (let ((phase (field-value :phase-number *world*))
+          (dir (or direction <direction>)))
+      (unless (= <last-turn-moved> phase)
+        (setf <last-turn-moved> phase)
+        [aim self dir]
+        (when [parent>>move self dir]
+          (setf <last-direction> dir))))))
 
-(define-prototype dude-status (:parent =status=))
+(define-method space-at-head agent ()
+  (values <row> <column>))
 
-(define-method update dude-status ()
-  [delete-all-lines self]
-  (assert <character>)
-  (when <character>
-    (let* ((char <character>)
-	   (hits [stat-value char :hit-points])
-	   (energy [stat-value char :energy]))
-      [println self "CONTRACTOR STATUS:" :foreground ".white" :background ".blue"]
-      [print-stat self :hit-points :warn-below 10]
-      [print-stat-bar self :hit-points :color ".red"]
-      [newline self]
-      ;; energy display
-      [print-stat self :energy :warn-below 10]
-      [print-stat-bar self :energy :color ".cyan"]
-      [newline self]
-      [print-stat self :oxygen :warn-below 50]
-      [print self " "]
-      [print-stat self :strength :warn-below 10]
-      [print self " "]
-      [print-stat self :defense :warn-below 10]
-      [print self " "]
-      [print-stat self :speed :warn-below 5]
-      [print self " "]
-      [newline self])))
+(define-method category-at-head agent (category)
+  (multiple-value-bind (row column) 
+      [space-at-head self]
+    [category-at-p *world* row column category]))
+
+(define-method item-at-head agent ()
+  [category-at-head self :item])
+
+(define-method obstacle-at-head agent ()
+  [category-at-head self :obstacle])
+  
+(define-method push agent () 
+  (unless <dead>
+    (if (= (length <items>) <tail-length>)
+        (progn 
+          [say self "Maximum capacity reached."]
+          [play-sample self "error"])
+        (let ((item [item-at-head self]))
+          (if item
+              (progn (setf <items> (append <items> (list item)))
+                     [play-sample self "doorbell"]
+                     [print-items self]
+                     [delete-from-world item])
+              [say self "Nothing to push."])))))
+        
+(define-method pop agent ()
+  (unless (or <dead> [in-overworld self])
+    (clon:with-fields (items) self
+      (multiple-value-bind (row column)
+          [space-at-head self]
+        (let ((item (car items)))
+          (if (clon:object-p item)
+              (progn (setf items (delete item items))
+                     [play-sample self "doorbell2"]
+                     [drop-cell *world* item row column]
+                     [print-items self])
+              [say self "Nothing to drop."]))))))
+  
+(define-method act agent ()
+  (unless <dead>
+    (let ((gateway [category-at-p *world* <row> <column> :gateway]))
+      (if (clon:object-p gateway)
+          [activate gateway]
+          (cond ([category-at-head self :action]
+                 [do-action [category-at-head self :action]])
+                ([category-at-head self :item]
+                 [push self])
+                (t 
+                 [play-sample self "error"]
+                 [say self "Nothing to do here."]))))))
+
+(define-method expend-item agent ()
+  (pop <items>)
+  [print-items self])
+
+(define-method rotate agent () 
+  (unless <dead>
+    (clon:with-fields (items) self
+      (if items
+          (let ((tail (car (last items)))
+                (newlist (butlast items)))
+            [play-sample self "doorbell3"]
+            (setf items (cons tail newlist))
+            [print-items self])
+          (progn 
+            [play-sample self "error"]
+            [say self "Cannot rotate empty list."])))))
+
+(define-method call agent (&optional direction)
+  (unless <dead>
+    (when (zerop <call-clock>)
+      (when direction
+        [aim self direction])
+      (let ((item (car <items>)))
+        (if (and item [in-category item :item]
+                 (clon:has-method :call item))
+            (progn 
+              (when [expend-energy self (field-value :energy-cost item)]
+                [call item self]
+                (setf <call-clock> (field-value :call-interval item))))
+            [say self "Cannot call."])))))
+
+(define-method print-items agent ()
+  (labels ((print-item (item)
+             [>>print :narrator nil :image (field-value :tile item)]
+             [>>print :narrator "  "]
+             [>>print :narrator (get-some-object-name item)]
+             [>>print :narrator "  "])
+           (newline ()
+             [>>newline :narrator]))
+    [>>print :narrator " ITEMS: "]
+    (dolist (item <items>)
+      (print-item item))
+    (newline)))
       
-;;; Splash screen
-  
-(defvar *pager* nil)
+(define-method run agent () 
+;;  [update-tiles self]
+  (when (plusp <call-clock>)
+    (decf <call-clock>))
+  (when (plusp <energy-clock>)
+    (decf <energy-clock>))
+  (when (zerop <energy-clock>)
+    (setf <energy-clock> *energy-recovery-interval*)
+    [stat-effect self :energy 1])
+  (when (plusp <react-shield-clock>)
+    (decf <react-shield-clock>)
+    [play-sample self "shield-sound"]
+    (labels ((do-circle (image)
+               (prog1 t
+                 (multiple-value-bind (x y) 
+                     [image-coordinates self]
+                   (let ((x0 (+ x 8))
+                         (y0 (+ y 8)))
+                     (draw-circle x0 y0 (+ 25 (random 3)) :destination image :color (car (one-of (list ".cyan" ".hot pink" ".white"))))
+                     (draw-circle x0 y0 (+ 30 (random 3))  :destination image :color (car (one-of (list ".cyan" ".hot pink" ".white")))))))))
+      [>>add-overlay :viewport #'do-circle]))
+  (when (or (keyboard-modifier-down-p :lshift)
+            (keyboard-modifier-down-p :rshift))
+    [call self <direction>])
+  (dolist (item <items>)
+    (when [in-category item :actor]
+      [run item])))
 
-(define-prototype splash (:parent =widget=))
+(define-method quit agent ()
+  (xe2:quit :shutdown))
 
-(define-method render splash ()
-  (xe2:draw-resource-image "splash" 0 0 
-			   :destination <image>))
+(define-method do-exit agent ()
+  [exit *universe*])
 
-(defvar *space-bar-function*)
+(define-method exit agent ()
+  (dolist (segment <segments>)
+    [die segment])
+  (setf <segments> nil))
 
-(define-method dismiss splash ()
-  (play-sample "go")
-  [select *pager* :play]
-  (when (functionp *space-bar-function*)
-    (funcall *space-bar-function*))
-  ;; TODO ugh this is a hack!
-  (xe2:show-widgets))
+(define-method die agent ()
+      (unless <dead>
+    (setf <tile> "agent-disabled")
+    (dolist (segment <segments>)
+      [die segment])
+    (setf <segments> nil)
+    (dotimes (n 30)
+      [drop self (clone =explosion=)])
+    [play-sample self "gameover"]
+    [say self "You died. Press escape to reset."]
+    (setf <dead> t)))
 
-(define-prototype splash-prompt (:parent =prompt=)
-  (default-keybindings :initform '(("SPACE" nil "dismiss ."))))
+(define-method restart agent ()
+  (let ((agent (clone =agent=)))
+    [say self "Restarting CONS..."]
+    (halt-sample t)
+    (setf *player* agent)
+    [destroy *universe*]
+    [set-player *universe* agent]
+;;    [set-prompt *form* agent]
+    [set-character *status* agent]
+    [play *universe*
+          :address (list '=zeta-x= :sequence-number (genseq))]
+    [loadout agent]))
 
-;;; Main program. 
+;;; Player upgrade
 
-(defparameter *void-window-width* 1180)
-(defparameter *void-window-height* 600)
+(defcell tail-defun 
+  (name :initform "Body Extender Segment")
+  (tile :initform "tail-defun")
+  (call-interval :initform 20)
+  (energy-cost :initform 0)
+  (categories :initform '(:item :target :defun)))
 
-(defparameter *right-column-width* 550)
-(defparameter *left-column-width* (- *void-window-width* 
-				     *right-column-width*))
-
-(defparameter *tile-size* 16)
-
-(defun void ()
-  (xe2:message "Initializing Void Tactics...")
-  (setf clon:*send-parent-depth* 2) 
-  (xe2:set-screen-height *void-window-height*)
-  (xe2:set-screen-width *void-window-width*)
-  ;; (xe2:set-frame-rate 30)
-  ;; (xe2:disable-timer)
-  ;; (xe2:enable-held-keys 1 15)
-  (setf xe2:*zoom-factor* 1)
-  (let* ((prompt (clone =void-prompt=))
-	 (universe (clone =universe=))
-	 (narrator (clone =narrator=))
-	 (ship-status (clone =status=))
-	 (dude-status (clone =dude-status=))
-	 (minimap (clone =minimap=))
-	 (ship (clone =olvac=))
-	 (dude (clone =contractor=))
-	 (splash (clone =splash=))
-	 (splash-prompt (clone =splash-prompt=))
-	 (textbox (clone =textbox=))
-	 (terminal (clone =narrator=))
-	 (stack (clone =stack=))
-	 (stack2 (clone =stack=)))
-    ;; hehe, turn this on for realtime
-    ;; (xe2:enable-timer)
-    ;; (xe2:set-frame-rate 30)
-    ;; (xe2:set-timer-interval 1)
-    ;; (xe2:enable-held-keys 1 3)
-    ;; 
-    (setf *view* (clone =view=))
-    ;;
-    [resize splash :height 580 :width *void-window-width*]
-    [move splash :x 200 :y 0]
-    [resize splash-prompt :width 10 :height 10]
-    [move splash-prompt :x 0 :y 0]
-    [hide splash-prompt]
-    [set-receiver splash-prompt splash]
-    ;;
-    [resize prompt :height 20 :width 100]
-    [move prompt :x 0 :y 0]
-    [hide prompt]
-    [install-keybindings prompt]
-    ;;
-    [resize narrator :height 100 :width *left-column-width*]
-    [set-verbosity narrator 0]
-    ;;
-    (labels ((spacebar ()
-	       (setf *ship-status* ship-status)
-	       (setf *dude-status* dude-status)
-	       ;;
-	       [resize ship-status :height 105 :width *void-window-width*]
-	       [set-character ship-status ship]
-	       [move ship-status :x 0 :y 0]
-	       ;;
-	       [resize dude-status :height 160 :width 500]
-	       [set-character dude-status dude]
-	       [move dude-status :x 0 :y 400]
-	       ;;
-	       [set-player universe ship]
-	       [play universe
-		     :address '(=star-sector= :width 80 :height 80 
-				:stars 80 :freighters 6 :sequence-number (genseq))
-		     :prompt prompt
-		     :narrator terminal
-		     :viewport *view*]
-	       [proxy ship dude]
-	       [loadout dude]
-	       [loadout ship]
-	       ;;
-	       [update ship-status]
-	       [update dude-status]
-	       [set-tile-size *view* *tile-size*]
-	       ;; the default is to track the current world:
-	       ;; [set-world *view* world] 
-	       [resize *view* :height 432 :width *left-column-width*]
-	       [move *view* :x 0 :y 0]
-	       [set-origin *view* 
-			   :x 0 :y 0 
-			   :height 24
-			   :width (truncate (/ *left-column-width*
-					       *tile-size*))]
-	       [adjust *view*]
-	       [set-tile-size minimap 2]
-	       [resize minimap :height 80 :width 120]
-	       [move minimap :x 500 :y 490]
-	       [set-origin minimap :x 0 :y 0 :height 40 :width 60]
-	       [adjust minimap]))
-      (setf *space-bar-function* #'spacebar))
-    ;;
-    [set-buffer textbox
-		(find-resource-object "help-message")]
-    [resize-to-fit textbox] 
-    [move textbox :x 0 :y 0]
-    ;;
-    (play-music "theme" :loop t)
-    (set-music-volume 255)	       
-    ;;
-    [resize stack :width *left-column-width* :height 580]
-    [move stack :x 0 :y 0]
-    [set-children stack (list ship-status *view*)]
-    ;;
-    [resize terminal :height (- *void-window-height* 100) :width *right-column-width*]
-    [move terminal :x *left-column-width* :y 100]
-    [set-verbosity terminal 0]
-    ;; [move stack2 :x *left-column-width* :y 0]
-    ;; [resize stack2 :width *right-column-width* :height 580]
-    ;; [set-children stack2 (list terminal)]
-    ;;
-    ;; HACK
-    ;; (labels ((light-hack (sr sc r c &optional (color ".white"))
-    ;; 	       (labels ((hack-overlay (image)
-    ;; 			  (multiple-value-bind (sx sy)
-    ;; 			      [get-screen-coordinates *view* sr sc]
-    ;; 			    (multiple-value-bind (x y)
-    ;; 				[get-screen-coordinates *view* r c]
-    ;; 			      (draw-line x y sx sy :destination image
-    ;; 					 :color color)))))
-    ;; 		 [add-overlay *view* #'hack-overlay])))
-    ;;   (setf xe2::*lighting-hack-function* #'light-hack))
-    ;;
-    (setf *pager* (clone =pager=))
-    [auto-position *pager*]; :width *left-column-width*]
-    (xe2:install-widgets splash-prompt splash)
-    [add-page *pager* :play stack prompt dude-status ship-status *view* minimap terminal]
-    [add-page *pager* :help textbox]))
-
+(define-method call tail-defun (caller)
+  [upgrade caller]
+  [expend-item caller])
+(defgame :void
+    (:title "Void Mission"
+     :description "A sci-fi roguelike game in Common Lisp."
+     :creator "David T. O'Toole <dto@gnu.org>"
+     :screen-width *width*
+     :screen-height *height*
+     :timestep *timestep*
+     :physics-function #'void:physics)
+  ;; create some objects
+  (setf *prompt* (prompt (clone =void-prompt=)))
+  (setf *universe* (clone =universe=))
+  (setf *player* (clone =agent=))
+  (setf *viewport* (clone =viewport=))
+  ;; configure the view
+  [resize viewport :height *height* :width *width*]
+  [move viewport :x 0 :y 0]
+  [set-origin viewport :x 0 :y 0 
+              :height (truncate (/ *height* *grid-size*))
+              :width (truncate (/ *width* *grid-size*))]
+  [adjust viewport]
+  (xe2:install-widgets *viewport*)
+  (xe2:enable-classic-key-repeat 100 60)
+  ;; now play!
+  [play universe
+        :player *player*
+        :address *address*
+        :prompt *prompt*
+        :viewport *viewport*])
+;; xe2-lisp-file ends here
