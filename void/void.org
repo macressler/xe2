@@ -424,21 +424,21 @@
        :timestep *timestep*
        :physics-function #'void:physics)
     ;; create some objects
-    (setf *prompt* (prompt (clone =void-prompt=)))
+    (setf *prompt* (clone =void-prompt=))
     (setf *universe* (clone =universe=))
     (setf *player* (clone =agent=))
     (setf *viewport* (clone =viewport=))
     ;; configure the view
-    [resize viewport :height *height* :width *width*]
-    [move viewport :x 0 :y 0]
-    [set-origin viewport :x 0 :y 0 
+    [resize *viewport* :height *height* :width *width*]
+    [move *viewport* :x 0 :y 0]
+    [set-origin *viewport* :x 0 :y 0 
                 :height (truncate (/ *height* *grid-size*))
                 :width (truncate (/ *width* *grid-size*))]
-    [adjust viewport]
+;;    [adjust *viewport*]
     (xe2:install-widgets *viewport*)
     (xe2:enable-classic-key-repeat 100 60)
     ;; now play!
-    [play universe
+    [play *universe*
           :player *player*
           :address *address*
           :prompt *prompt*
