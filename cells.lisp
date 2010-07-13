@@ -1077,13 +1077,13 @@ world, and collision detection is performed between sprites and cells.")
   (with-field-values (grid tile-size width height) *world*
     (let ((world-height (* tile-size height))
 	  (world-width (* tile-size width)))
-      (if (and (plusp x)
-	       (plusp y)
-	       (< x world-width)
-	       (< y world-height))
-	  (setf <x> x
-		<y> y)
-	  (setf <x> 0 <y> 0)))))
+      (when (and (plusp x)
+		 (plusp y)
+		 (< x world-width)
+		 (< y world-height))
+	(setf <x> x
+	      <y> y)))))
+;;	  (setf <x> 0 <y> 0)))))
 ;;	  [do-collision self nil]))))
 
 (define-method move sprite (direction &optional movement-distance)
@@ -1223,6 +1223,7 @@ world, and collision detection is performed between sprites and cells.")
 
 (defcell balloon 
   (categories :initform '(:drawn :actor :balloon))
+  (auto-loadout :initform t)
   text stroke-color background-color timeout following scale)
 
 (define-method initialize balloon (&key text (stroke-color ".white") (background-color ".gray30")
@@ -1249,6 +1250,7 @@ world, and collision detection is performed between sprites and cells.")
     (clon:with-field-values (tile-size) *world*
       (let* ((offset (ecase style
 		       (:balloon tile-size)
+		       (:clear 0)
 		       (:flat 0)))
 	     (x0 (+ x tile-size))
 	     (y0 (+ y tile-size))
@@ -1257,11 +1259,11 @@ world, and collision detection is performed between sprites and cells.")
 	     (margin 4)
 	     (height (+ (* 2 margin) (apply #'+ (mapcar #'formatted-line-height text))))
 	     (width (+ (* 2 margin) (apply #'max (mapcar #'formatted-line-width text)))))
-	(draw-box x1 y1 width height 
-		  :stroke-color <stroke-color>
-		  :color <background-color>
-		  :destination image)
 	(when (eq style :balloon)
+	  (draw-box x1 y1 width height 
+		    :stroke-color <stroke-color>
+		    :color <background-color>
+		    :destination image)
 	  (draw-line x0 y0 x1 y1 :destination image))
 	(let ((x2 (+ margin x1))
 	      (y2 (+ margin y1)))
@@ -1279,11 +1281,16 @@ world, and collision detection is performed between sprites and cells.")
     (when (minusp (decf <timeout>))
       [die self])))
 
-(define-method emote cell (text &optional (timeout 3.0))
-  (let ((balloon (clone =balloon= :text text :timeout timeout 
-			:following self :style :balloon
+(define-method emote cell (text &key (timeout 8.0) (style :clear))
+  (let* ((ftext (if (stringp text) (list (list (list text)))
+		    text))
+	 (balloon (clone =balloon= :text ftext :timeout timeout 
+			:following self :style style
 			:scale 2)))
     [play-sample self "talk"]
+    ;; get rid of any previous balloons first
+    [delete-category-at *world* <row> <column> :balloon]
+    ;; drop it
     [drop self balloon]))
 
 ;;; Sprite specials; editor placeholders for sprites.

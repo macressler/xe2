@@ -274,6 +274,19 @@
  (:name "upwoop" :type :sample :file "upwoop.wav" :properties (:volume 10))
  (:name "pop-ssh" :type :sample :file "pop-ssh.wav" :properties (:volume 30))
 
+ (:name "vox-brennan" :type :sample :file "vox-brennan.wav" :properties (:volume 130)) 
+ (:name "vox-energy" :type :sample :file "vox-energy.wav" :properties (:volume 130)) 
+ (:name "vox-hazard" :type :sample :file "vox-hazard.wav" :properties (:volume 130)) 
+ (:name "vox-message" :type :sample :file "vox-message.wav" :properties (:volume 130)) 
+ (:name "vox-radiation" :type :sample :file "vox-radiation.wav" :properties (:volume 130)) 
+ (:name "vox-repair" :type :sample :file "vox-repair.wav" :properties (:volume 130)) 
+ (:name "vox-restored" :type :sample :file "vox-restored.wav" :properties (:volume 130)) 
+ (:name "vox-shield" :type :sample :file "vox-shield-warning.wav" :properties (:volume 130)) 
+ (:name "vox-viceroy" :type :sample :file "vox-viceroy.wav" :properties (:volume 130))
+ (:name "vox-unidentified" :type :sample :file "vox-unidentified.wav" :properties (:volume 130)) 
+
+ (:name "ecaradio" :type :sample :file "ecaradio.wav" :properties (:volume 120)) 
+
  (:name "lymphocyte" :type :image :file "lymphocyte.png")
  (:name "lymph" :type :sample :file "lymph.wav" :properties (:volume 12))
 
@@ -737,6 +750,9 @@
 
  (:name "noise-white" :type :sample :file "white-noise.wav" :properties (:volume 4))
  (:name "pop" :type :sample :file "pop.wav" :properties (:volume 40))
+
+ (:name "navpoint-on" :type :image :file "navpoint-on.png")
+ (:name "navpoint-off" :type :image :file "navpoint-off.png")
 
  (:name "osc-sine-on" :type :image :file "osc-sine-on.png")
  (:name "osc-sine-off" :type :image :file "osc-sine-off.png")

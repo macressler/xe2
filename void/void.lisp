@@ -72,6 +72,8 @@
             ("0" (:control) "do-exit .")
             ;;
             ("B" nil "blab .")
+            ("F" nil "freak .")
+            ("A" nil "alienate .")
             ("P" (:control) "pause .")
             ("PAUSE" nil "pause .")
             ("ESCAPE" nil "restart .")
@@ -1227,16 +1229,17 @@ Then it fires and gives chase.")
   (alarm-clock :initform 0)
   (pulse :initform (random *pulse-delay*))
   (image :initform "drone")
+  (moving :initform t)
   (hit-points :initform (make-stat :base 40 :min 0))
   (direction :initform (random-direction))
   (speed :initform (make-stat :base 20))
-  (movement-distance :initform (make-stat :base 1))
+  (movement-distance :initform (make-stat :base 2))
   (movement-cost :initform (make-stat :base 20))
   (categories :initform '(:drone :actor :target)))
 
 (define-method run drone ()
-  (percent-of-time 20 [play-sample self "sense2"])
-  (when (< [distance-to-player self] 10)
+  (percent-of-time 16 [play-sample self "sense2"])
+  (when (< [distance-to-player self] 20)
     (if (zerop <alarm-clock>)
         (progn [play-sample self "alarm"]
                [say self "The drone spawns an enemy!"]
@@ -1256,8 +1259,8 @@ Then it fires and gives chase.")
                                 (draw-circle x0 y0 40 :destination image))))))
                  [>>add-overlay :viewport #'do-circle])
                (setf <alarm-clock> 60))
-        (decf <alarm-clock>)))
-  [move self <direction> [stat-value self :movement-distance]])
+        (decf <alarm-clock>))
+    [move self [direction-to-player self] [stat-value self :movement-distance]]))
 
 (define-method hit drone (&optional thing)
   (if [in-category thing :wave]
@@ -1293,72 +1296,154 @@ Then it fires and gives chase.")
             [damage self 2]
             [play-sample self "blaagh"]
             [die other]))))
-(defcell vaccuum 
-  (tile :initform "vaccuum"))
+(defparameter *default-navpoint-delay* 60)
 
-(defcell red-plasma
-  (tile :initform "red-plasma"))
+(defcell navpoint 
+  (name :initform "Navpoint")
+  (index :initform nil)
+  (tile :initform "navpoint-off")
+  (delay :initform *default-navpoint-delay*)
+  (clock :initform 0)
+  (trip :initform nil)
+  (auto-loadout :initform t)
+  (team :initform :neutral)
+  (state :initform nil)  
+  (speed :initform (make-stat :min 0 :base 10 :max 10))
+  (categories :initform '(:target :actor :navpoint)))
 
-(defcell blue-plasma
-  (tile :initform "blue-plasma"))
+(define-method initialize navpoint (index)
+  (assert (keywordp index))
+  (setf <index> index))
+  
+(define-method loadout navpoint ()
+  [stop self])
+  
+(define-method update-tile navpoint (&optional pulsing)
+  (setf <tile> (if pulsing "navpoint-on" "navpoint-off")))
 
-(defworld cloud
-  (name :initform "DVO UV Shield Cloud")
-  (scale :initform '(50 m))
-  (edge-condition :initform :block)
-  (background :initform "cloud")
-  (ambient-light :initform :total)
-  (description :initform "foo"))
+(define-method tap navpoint (delay)
+  (setf <delay> delay))
+
+(define-method activate navpoint (&optional delay)
+  (setf <clock> 0)
+  (when delay (setf <delay> delay))
+  (setf <state> t)
+  (setf <trip> nil)
+  [set-variable *world* :pulsing t]
+  (when (keywordp <index>)
+    [set-variable *world* <index> t])
+  [update-tile self])
+
+(define-method stop navpoint ()
+    (setf <state> nil)
+    [set-variable *world* :pulsing nil]
+    (when (keywordp <index>)
+      [set-variable *world* <index> nil])
+    [update-tile self]
+    (setf <clock> 0))
+
+(define-method run navpoint ()
+  [update-tile self]
+  (when <state>
+    (if (zerop <clock>)
+        (progn [play-sample self "pulse"]
+               [update-tile self t]
+               [set-variable *world* :pulsing t]
+               (setf <trip> nil)
+               (labels ((do-circle (image)
+                          (prog1 t
+                            (multiple-value-bind (x y) 
+                                [image-coordinates self]
+                              (let ((x0 (+ x 8))
+                                    (y0 (+ y 8)))
+                                (draw-circle x0 y0 40 :destination image)
+                                (draw-circle x0 y0 35 :destination image))))))
+                 [>>add-overlay :viewport #'do-circle])
+               (setf <clock> <delay>))
+        (progn (if <trip>
+                   [set-variable *world* :pulsing nil]
+                   (progn (setf <trip> t)
+                          [set-variable *world* :pulsing t]))
+               (decf <clock>)))))
   
-(define-method begin-ambient-loop cloud ()
-  (play-music "passageway" :loop t))
+(define-method step navpoint (stepper)
+  (unless <state>
+    (when [is-player stepper]
+      [emote stepper (format nil "Activated nav point ~A." <index>)]
+      [play-sample self "upwoop"]
+      [activate self])))
+
+  (defcell vaccuum 
+    (tile :initform "vaccuum"))
   
-(define-method drop-plasma cloud
-    (&optional &key (object =red-plasma=)
-               distance 
-               (row 0) (column 0)
-               (graininess 0.3)
-               (density 100)
-               (cutoff 0))
-    (clon:with-field-values (height width) self
-      (let* ((h0 (or distance height))
-             (w0 (or distance width))
-             (r0 (- row (truncate (/ h0 2))))
-             (c0 (- column (truncate (/ w0 2))))
-             (plasma (xe2:render-plasma h0 w0 :graininess graininess))
-             (value nil))
-        (dotimes (i h0)
-          (dotimes (j w0)
-            (setf value (aref plasma i j))
-            (when (< cutoff value)
-              (when (or (null distance)
-                        (< (distance (+ j r0) (+ c0 i) row column) distance))
-                (percent-of-time density
-                  [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
+  (defcell red-plasma
+    (tile :initform "red-plasma"))
   
-(define-method generate cloud (&key (height 100)
-                                    (width 100)
-                                    (protostars 30)
-                                    (sequence-number (genseq)))
-  (setf <height> height <width> width)
-  [create-default-grid self]
-  (dotimes (i width)
-    (dotimes (j 8)
-      (percent-of-time 5
-        [drop-cell self (clone =shocker=) j i])))
-  ;;    [drop-plasma self]
-  ;; (dotimes (i protostars)
-  ;;   (let ((r (random height))
-  ;;      (c (random width)))
-  ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
-  ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
+  (defcell blue-plasma
+    (tile :initform "blue-plasma"))
+  
+  (defworld cloud
+    (name :initform "DVO UV Shield Cloud")
+    (scale :initform '(50 m))
+    (edge-condition :initform :block)
+    (background :initform "cloud")
+    (ambient-light :initform :total)
+    (description :initform "foo"))
+    
+  (define-method begin-ambient-loop cloud ()
+    (play-music "passageway" :loop t))
+    
+  (define-method drop-plasma cloud
+      (&optional &key (object =red-plasma=)
+                 distance 
+                 (row 0) (column 0)
+                 (graininess 0.3)
+                 (density 100)
+                 (cutoff 0))
+      (clon:with-field-values (height width) self
+        (let* ((h0 (or distance height))
+               (w0 (or distance width))
+               (r0 (- row (truncate (/ h0 2))))
+               (c0 (- column (truncate (/ w0 2))))
+               (plasma (xe2:render-plasma h0 w0 :graininess graininess))
+               (value nil))
+          (dotimes (i h0)
+            (dotimes (j w0)
+              (setf value (aref plasma i j))
+              (when (< cutoff value)
+                (when (or (null distance)
+                          (< (distance (+ j r0) (+ c0 i) row column) distance))
+                  (percent-of-time density
+                    [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
+    
+  (define-method generate cloud (&key (height 100)
+                                      (width 100)
+                                      (protostars 30)
+                                      (sequence-number (genseq)))
+    (setf <height> height <width> width)
+    [create-default-grid self]
+    (dotimes (i width)
+      (dotimes (j 8)
+        (percent-of-time 5
+          [drop-cell self (clone =shocker=) j i])))
+    ;;    [drop-plasma self]
+    ;; (dotimes (i protostars)
+    ;;   (let ((r (random height))
+    ;;      (c (random width)))
+    ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
+    ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
     ;;     [drop-cell self (clone =protostar=) r c]))
     (dotimes (n 3)
-  (let ((drone (clone =drone=)))
-    [add-sprite self drone]
-    [update-position drone (+ 200 (random 400)) (+ 200 (random 500))]))
-  [drop-cell self (clone =launchpad=) 88 60])
+      (let ((drone (clone =drone=)))
+        [add-sprite self drone]
+        [update-position drone (+ 20 (random 1500)) (+ 20 (random 400))]))
+    [drop-cell self (clone =navpoint= :alpha) 8 10]
+    [drop-cell self (clone =navpoint= :beta) 88 23]
+    [drop-cell self (clone =navpoint= :gamma) 18 90]
+    [drop-cell self (clone =launchpad=) 88 60])
 (defparameter *react-shield-time* 30)
+
+(defparameter *vox-warning-clock* 400)
 
 (defparameter *energy-recovery-interval* 200)
 
@@ -1372,6 +1457,7 @@ Then it fires and gives chase.")
   (dead :initform nil)
   (last-turn-moved :initform 0)
   (team :initform :player)
+  (vox-warning-clock :initform 0)
   (call-clock :initform 0)
   (call-interval :initform 7)
   (hit-points :initform (make-stat :base 20 :min 0 :max 20))
@@ -1386,19 +1472,45 @@ Then it fires and gives chase.")
   (energy-clock :initform *energy-recovery-interval*)
   (categories :initform '(:actor :obstacle :player :target :container :light-source)))
 
+(define-method warn-maybe agent ()
+ (unless <dead>
+   (clon:with-fields (vox-warning-clock) self
+     (if (> 14 [stat-value self :hit-points])
+         (progn 
+           (setf vox-warning-clock (max 0 (1- vox-warning-clock)))
+           (when (zerop vox-warning-clock)
+             (setf vox-warning-clock *vox-warning-clock*)
+             [emote self "Shield warning!"]
+             [play-sample self "vox-shield"]))
+         (setf vox-warning-clock 0)))))
+
 (define-method loadout agent ()
   (push (clone =buster-defun=) <items>)
   [emote self '((("I'd better get moving."))
                 (("Use the arrow keys (or numpad)"))
                 (("to move, and SHIFT to fire."))) 
-                10.0])
+                :timeout 10.0])
 
 (define-method blab agent ()
-  [emote self '((("All three nav points should be to the north."))
-                (("Use the sensor pack to drop a sensor on each nav point."))
+  [emote self '((("I've got to drop sensors on all three nav points."))
+                (("Nav points look like this: ") (nil :image "navpoint-off"))
                 (("I'd better keep moving.")))
-                10.0])
+                :timeout 10.0])
+               
+(define-method freak agent ()
+  [play-sample self "vox-brennan"]
+  [emote self '((("BRENNAN:"))
+                (("I'm getting some radiation. Watch your scanners,"))
+                (("and focus on reaching those nav points.")))
+                :timeout 10.0])
 
+(define-method alienate agent ()
+  [play-sample self "vox-unidentified"]
+  (play-music "neo-eof" :loop t)
+  [emote self '((("#<AUDIO-LOG>"))
+                (("Warning: unknown data format.")))
+                :timeout 10.0])
+  
 (define-method start agent ())
 
 (define-method expend-energy agent (points)
@@ -1409,7 +1521,7 @@ Then it fires and gives chase.")
         [play-sample self "error"])))
 
 (define-method hit agent (&optional other)
- [damage self 1])
+ [damage self 5])
 
 (define-method damage agent (points)
   (if (zerop <react-shield-clock>)
@@ -1552,6 +1664,7 @@ Then it fires and gives chase.")
       
 (define-method run agent () 
 ;;  [update-tiles self]
+  [warn-maybe self]
   (when (plusp <call-clock>)
     (decf <call-clock>))
   (when (plusp <energy-clock>)

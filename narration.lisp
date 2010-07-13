@@ -137,8 +137,6 @@ http://en.wikipedia.org/wiki/Passive_voice"
 	  (setf <repeat-count> 0)
 	  [println self (apply #'format nil control-string args)]))
     (setf <last-line> (list (list (apply #'format nil control-string args))))))
-	       
-	
 
 (define-method narrate-message narrator (sender action receiver args &optional force)
   (unless (zerop <verbosity>)
