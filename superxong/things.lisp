@@ -1,4 +1,4 @@
-(in-package :cons-game)
+(in-package :void)
 
 (defun same-team (obj1 obj2)
   (eq (field-value :team obj1)

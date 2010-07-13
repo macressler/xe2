@@ -42,6 +42,8 @@
 <<keybindings>>
 <<physics-function>>
 <<things>>
+<<shocker>>
+<<drone>>
 <<cloud-world>>
 <<player-definition>>
 <<game-definition>>
@@ -132,12 +134,10 @@
                                       (sequence-number (genseq)))
     (setf <height> height <width> width)
     [create-default-grid self]
-    ;; (dotimes (i width)
-    ;;   (dotimes (j height)
-    ;;     [drop-cell self (clone (if (zerop (random 7))
-    ;;                                =vaccuum= 
-    ;;                                =blue-plasma=))
-    ;;                i j]))
+    (dotimes (i width)
+      (dotimes (j 8)
+        (percent-of-time 5
+          [drop-cell self (clone =shocker=) j i])))
     ;;    [drop-plasma self]
     ;; (dotimes (i protostars)
     ;;   (let ((r (random height))
@@ -145,6 +145,10 @@
     ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
     ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
       ;;     [drop-cell self (clone =protostar=) r c]))
+      (dotimes (n 3)
+    (let ((drone (clone =drone=)))
+      [add-sprite self drone]
+      [update-position drone (+ 200 (random 400)) (+ 200 (random 500))]))
     [drop-cell self (clone =launchpad=) 88 60])
 #+end_src
 
@@ -182,7 +186,14 @@
     (push (clone =buster-defun=) <items>)
     [emote self '((("I'd better get moving."))
                   (("Use the arrow keys (or numpad)"))
-                  (("to move, and SHIFT to fire.")))])
+                  (("to move, and SHIFT to fire."))) 
+		  10.0])
+
+  (define-method blab agent ()
+    [emote self '((("All three nav points should be to the north."))
+                  (("Use the sensor pack to drop a sensor on each nav point."))
+                  (("I'd better keep moving.")))
+		  10.0])
   
   (define-method start agent ())
   
@@ -193,6 +204,9 @@
           [say self "Insufficient energy."]
           [play-sample self "error"])))
   
+  (define-method hit agent (&optional other)
+   [damage self 1])
+
   (define-method damage agent (points)
     (if (zerop <react-shield-clock>)
         (labels ((do-circle (image)
@@ -314,6 +328,7 @@
                    (clon:has-method :call item))
               (progn 
                 (when [expend-energy self (field-value :energy-cost item)]
+		  (message "Calling.")
                   [call item self]
                   (setf <call-clock> (field-value :call-interval item))))
               [say self "Cannot call."])))))
@@ -373,9 +388,9 @@
   (define-method die agent ()
         (unless <dead>
       (setf <tile> "agent-disabled")
-      (dolist (segment <segments>)
-        [die segment])
-      (setf <segments> nil)
+      ;; (dolist (segment <segments>)
+      ;;   [die segment])
+      ;; (setf <segments> nil)
       (dotimes (n 30)
         [drop self (clone =explosion=)])
       [play-sample self "gameover"]
@@ -447,7 +462,8 @@
           :narrator *narrator*
           :address *address*
           :prompt *prompt*
-          :viewport *viewport*])
+          :viewport *viewport*]
+    [loadout *player*])
 #+end_src
     
 * Overview
@@ -524,6 +540,7 @@ is polled every physics timestep. See the player's RUN method.
               ("C" nil "pop .")
               ("0" (:control) "do-exit .")
               ;;
+	      ("B" nil "blab .")
               ("P" (:control) "pause .")
               ("PAUSE" nil "pause .")
               ("ESCAPE" nil "restart .")
@@ -1477,6 +1494,354 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 #+end_src
 
 * Enemies						:Enemies:
+
+#+source: drone
+#+begin_src lisp
+
+;;; Corruption
+
+(defcell corruption 
+  (tile :initform "corruption-east")
+  (description :initform "Deadly digital audio data corruption.")
+  (direction :initform :east)
+  (clock :initform 100)
+  (categories :initform '(:actor)))
+ 
+(define-method step corruption (stepper)
+  (when [is-player stepper]
+    [die stepper]))
+
+(define-method orient corruption (&optional dir)
+  (when dir (setf <direction> dir))
+  (setf <tile> (if (= 0 (random 2))
+		   (ecase <direction>
+		     (:north "corruption-north")
+		     (:south "corruption-south")
+		     (:east "corruption-east")
+		     (:west "corruption-west"))
+		   (ecase <direction>
+		     (:north "corruption2-north")
+		     (:south "corruption2-south")
+		     (:east "corruption2-east")
+		     (:west "corruption2-west")))))
+
+(define-method run corruption ()
+  (decf <clock>)
+  (percent-of-time 5 [play-sample self "datanoise"])
+  (if (plusp <clock>)
+      [orient self]
+      [die self]))
+
+;;; Corruptors who leave a trail of digital audio corruption 
+
+(defcell corruptor 
+  (tile :initform "corruptor")
+  (description :initform "Corruptors traverse the level, leaving a trail of deadly malformed data.")
+  (team :initform :enemy)
+  (color :initform :cyan)
+  (waveform :initform :saw)
+  (direction :initform (xe2:random-direction))
+  (movement-cost :initform (make-stat :base 20))
+  (max-items :initform (make-stat :base 2))
+  (speed :initform (make-stat :base 3 :min 0 :max 5))
+  (strength :initform (make-stat :base 10))
+  (defense :initform (make-stat :base 10))
+  (hearing-range :initform 15)
+  (energy :initform (make-stat :base 400 :min 0 :max 40 :unit :gj))
+  (hit-points :initform (make-stat :base 8 :min 0 :max 8))
+  (movement-cost :initform (make-stat :base 10))
+  (max-items :initform (make-stat :base 2))
+  (stepping :initform t)
+  (direction :initform :north)
+  (attacking-with :initform nil)
+  (firing-with :initform :center-bay)
+  (categories :initform '(:actor :obstacle  :target :container :light-source :vehicle :repairable))
+  (equipment-slots :initform '(:left-bay :right-bay :center-bay :extension)))
+
+(define-method loadout corruptor ()
+  [make-inventory self]
+  [make-equipment self]
+  [equip self [add-item self (clone =wave-cannon=)]])
+
+(define-method hit corruptor (&optional object)
+  [die self])
+
+(define-method run corruptor ()
+  (let ((cannon [equipment-slot self :center-bay]))
+    (when cannon [recharge cannon]))
+  (let ((dir [direction-to-player self])
+	(dist [distance-to-player self]))
+    (when [obstacle-in-direction-p *world* <row> <column> <direction>]
+      (setf <direction> (if (= 0 (random 4))
+			    (ecase <direction>
+			      (:north :west)
+			      (:west :south)
+			      (:south :east)
+			      (:east :north))
+			    (ecase <direction>
+			      (:north :east)
+			      (:west :north)
+			      (:south :west)
+			      (:east :south)))))
+    (let ((corruption (clone =corruption=)))
+      [orient corruption <direction>]
+      [drop self corruption]
+      [move self <direction>])))
+
+(define-method die corruptor () 
+  (dotimes (n 10)
+    [drop self (clone =noise=)])
+  [play-sample self "yelp"]
+  [parent>>die self])  
+
+(defsprite drone
+  (description :initform "A security drone. Manufactures attacking replicant xioforms.")
+  (team :initform :enemy)
+  (color :initform :magenta)
+  (waveform :initform :saw)
+  (alarm-clock :initform 0)
+  (pulse :initform (random *pulse-delay*))
+  (image :initform "drone")
+  (hit-points :initform (make-stat :base 40 :min 0))
+  (direction :initform (random-direction))
+  (speed :initform (make-stat :base 20))
+  (movement-distance :initform (make-stat :base 1))
+  (movement-cost :initform (make-stat :base 20))
+  (categories :initform '(:drone :actor :target)))
+
+(define-method run drone ()
+  (percent-of-time 20 [play-sample self "sense2"])
+  (when (< [distance-to-player self] 10)
+    (if (zerop <alarm-clock>)
+	(progn [play-sample self "alarm"]
+	       [say self "The drone spawns an enemy!"]
+	       (let ((enemy (or (percent-of-time 5 (clone =corruptor=))
+				(clone =shocker=))))
+		 [drop self enemy]
+		 [loadout enemy])
+	       (labels ((do-circle (image)
+			  (prog1 t
+			    (multiple-value-bind (x y) 
+				[image-coordinates self]
+			      (let ((x0 (+ x 10))
+				    (y0 (+ y 10)))
+				(draw-circle x0 y0 25 :destination image)
+				(draw-circle x0 y0 30 :destination image)
+				(draw-circle x0 y0 35 :destination image)
+				(draw-circle x0 y0 40 :destination image))))))
+		 [>>add-overlay :viewport #'do-circle])
+	       (setf <alarm-clock> 60))
+	(decf <alarm-clock>)))
+  [move self <direction> [stat-value self :movement-distance]])
+
+(define-method hit drone (&optional thing)
+  (if [in-category thing :wave]
+      (progn [play-sample self "yelp"]
+	     [damage self 1])
+      [>>say :narrator "This weapon has no effect on the Drone."]))
+
+(define-method die drone ()
+  [say self "The drone is destroyed!"]
+  (dotimes (n 30)
+    [drop self (clone =noise=)])
+  [parent>>die self])
+
+(define-method do-collision drone (other)
+  (if [is-player other]
+      [die other]
+      (if [in-category other :obstacle]
+	  ;; don't get hung up on the enemies we drop.
+	  (unless (and (has-field :team other)
+		       (eq :enemy (field-value :team other)))
+	    (unless (percent-of-time 10 (setf <direction> (opposite-direction <direction>)))
+	      (setf <direction> (ecase <direction>
+				  (:here :west)
+				  (:northwest :west)
+				  (:northeast :east)
+				  (:north :west)
+				  (:west :south)
+				  (:southeast :east)
+				  (:southwest :south)
+				  (:south :east)
+				  (:east :north)))))
+	  (when (eq :player (field-value :team other))
+	    [damage self 2]
+	    [play-sample self "blaagh"]
+	    [die other]))))
+#+end_src 
+
+#+source: shocker
+#+begin_src lisp
+;;; Basic enemy
+
+;;; The sonic cannon
+
+;;; Sound waves
+
+(defparameter *waveforms* '(:sine :square :saw :bass))
+(defparameter *wave-colors* '(:yellow :cyan :magenta :green))
+
+(defparameter *wave-samples*
+  '((:sine "A-2-sine" "A-4-sine")
+    (:saw "A-2-saw" "A-4-saw")
+    (:square "A-2-square" "A-4-square")))
+
+(defun wave-sample (type &optional (note "A-4"))
+  (assert (member type *waveforms*))
+  (concatenate 'string note "-" (string-downcase (symbol-name type))))
+
+(defparameter *wave-images*
+  '((:sine :green "sine-green" :yellow "sine-yellow" :magenta "sine-magenta" :cyan "sine-cyan")
+    (:square :green "square-green" :yellow "square-yellow" :magenta "square-magenta" :cyan "square-cyan")
+    (:saw :green "saw-green" :yellow "saw-yellow" :magenta "saw-magenta" :cyan "saw-cyan")))
+
+(defun wave-image (type &optional (color :green))
+  (assert (and (member type *waveforms*)
+	       (member color *wave-colors*)))
+  (getf (cdr (assoc type *wave-images*))
+	color))
+
+(defparameter *pulse-delay* 8)
+
+(defsprite wave
+  (description :initform "A sonic wave.")
+  (team :initform :player)
+  (color :initform :green)
+  (waveform :initform :sine)
+  (note :initform "A-4")
+  (clock :initform 60)
+  (pulse :initform (random *pulse-delay*))
+  (image :initform nil)
+  (direction :initform nil)
+  (speed :initform (make-stat :base 20))
+  (movement-distance :initform (make-stat :base 2))
+  (movement-cost :initform (make-stat :base 20))
+  (categories :initform '(:wave :actor)))
+
+(define-method start wave (&key (note "A-4") (waveform :sine) (direction :north) (team :player) (color :green))
+  (setf <waveform> waveform)
+  (setf <team> team)
+  (setf <note> note)
+  [update-image self (wave-image waveform color)]
+  (setf <sample> (wave-sample waveform note))
+  (setf <direction> direction))
+
+(define-method run wave ()
+  (decf <clock>)
+  (if (minusp <clock>)
+      [die self]
+      (progn [expend-action-points self 2]
+	     (when <direction> 
+	       (multiple-value-bind (y x) (xe2:step-in-direction <y> <x> <direction>
+								 [stat-value self :movement-distance])
+		 [update-position self x y])
+	       ;; decide whether to beep.
+	       (if (zerop <pulse>)
+		   (progn (setf <pulse> *pulse-delay*)
+			  [play-sample self <sample>])
+		   (decf <pulse>))))))
+
+(define-method refresh wave ()
+  (setf <clock> 60))
+
+(define-method do-collision wave (object)
+  (when (and (not [in-category object :wave])
+	     [in-category object :target]
+	     (has-field :team object)
+	     (not (eq <team> (field-value :team object))))
+    [hit object self]
+    (when [in-category object :particle]
+      [die object])
+    [die self]))
+
+(defparameter *wave-cannon-reload-time* 40)
+
+(defcell wave-cannon
+  (tile :initform "gun")
+  (reload-clock :initform 0)
+  (categories :initform '(:item :weapon :equipment))
+  (equip-for :initform '(:center-bay))
+  (weight :initform 7000)
+  (accuracy :initform (make-stat :base 100))
+  (attack-power :initform (make-stat :base 12))
+  (attack-cost :initform (make-stat :base 10))
+  (energy-cost :initform (make-stat :base 0)))
+
+(define-method fire wave-cannon (direction)
+  (if (plusp <reload-clock>)
+      nil ;; (decf <reload-clock>)
+      (progn 
+	(setf <reload-clock> *wave-cannon-reload-time*)
+	(if [expend-energy <equipper> [stat-value self :energy-cost]]
+	    (let ((wave (clone =wave=)))
+	      (multiple-value-bind (x y) [viewport-coordinates <equipper>]
+		[drop-sprite <equipper> wave (+ x 4) (+ y 4)]
+		[start wave :direction direction :team (field-value :team <equipper>)
+		       :color (field-value :color <equipper>)
+;;		       :note (car (one-of (list "A-4"  "A-2")))
+		       :waveform (field-value :waveform <equipper>)]))
+	    (when [is-player <equipper>]
+	      [say <equipper> "Not enough energy to fire!"])))))
+
+(define-method recharge wave-cannon ()
+  (decf <reload-clock>))
+
+(defcell shocker 
+  (tile :initform "shocker")
+  (auto-loadout :initform t)
+  (description :initform "Creeps about until catching sight of the player;
+Then it fires and gives chase.")
+  (team :initform :enemy)
+  (color :initform :cyan)
+  (waveform :initform :square)
+  (hit-points :initform (make-stat :base 2 :min 0 :max 45))
+  (movement-cost :initform (make-stat :base 10))
+  (max-items :initform (make-stat :base 2))
+  (speed :initform (make-stat :base 5 :min 0 :max 25))
+  (strength :initform (make-stat :base 10))
+  (defense :initform (make-stat :base 10))
+  (hearing-range :initform 15)
+  (energy :initform (make-stat :base 40 :min 0 :max 40 :unit :gj))
+  (movement-cost :initform (make-stat :base 10))
+  (max-items :initform (make-stat :base 2))
+  (stepping :initform t)
+  (direction :initform :north)
+  (attacking-with :initform nil)
+  (firing-with :initform :center-bay)
+  (categories :initform '(:actor :obstacle  :target :container :light-source :vehicle :repairable :enemy))
+  (equipment-slots :initform '(:left-bay :right-bay :center-bay :extension)))
+
+(define-method loadout shocker ()
+  [make-inventory self]
+  [make-equipment self]
+  [equip self [add-item self (clone =wave-cannon=)]])
+
+(define-method hit shocker (&optional object)
+  [die self])
+
+(define-method run shocker ()
+  (let ((cannon [equipment-slot self :center-bay]))
+    (when cannon [recharge cannon]))
+  (let ((dir [direction-to-player self])
+	(dist [distance-to-player self]))
+    (if (< dist 13)
+	(if (> 9 dist)
+	    (progn [fire self dir]
+		   [expend-action-points self 100]
+		   (xe2:percent-of-time 3 [move self dir]))
+	    (if [obstacle-in-direction-p *world* <row> <column> dir]
+		[move self (random-direction)]
+		[move self dir]))
+	(if (percent-of-time 3 [move self (random-direction)])
+	    [expend-action-points self 10]))))
+
+(define-method die shocker () 
+  (dotimes (n 10)
+    [drop self (clone =noise=)])
+  (percent-of-time 12 [drop self (clone =health=)])
+  [play-sample self "yelp"]
+  [parent>>die self])  
+#+end_src
 
 * Setting 						  :Story:
 

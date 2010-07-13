@@ -36,6 +36,8 @@ interacting cells. The world object performs the following tasks:
   (overworld :initform nil)
   (paused :initform nil :documentation "Non-nil when the game is paused.")
   (description :initform "Unknown area." :documentation "Brief description of area.")
+  (background :initform nil
+	      :documentation "String name of image to use as background.")
   (tile-size :initform 16 :documentation "Size in pixels of a grid tile.")
   (required-modes :initform nil :documentation 
 "A list of keywords specifying which modes of transportation are
@@ -666,7 +668,12 @@ so on, until no more messages are generated."
 	       ;; 	   [narrate-message <narrator> sender method-key rec args]))
 	       ;; stop everything if player dies
 					;(when (not [in-category player :dead])
-	       (apply #'send sender method-key rec args)))))))
+	       ;;
+	       ;; don't blow up when no narrator, etc
+	       ;; (if (not (clon:object-p receiver))
+	       ;; 	   (message "Warning: null receiver in message processing. ~S" 
+	       ;; 		    (list (object-name (object-parent sender)) method-key rec))
+		   (apply #'send sender method-key rec args)))))))
 
 (define-method get-phase-number world ()
   <phase-number>)

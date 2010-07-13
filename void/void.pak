@@ -41,7 +41,7 @@
 
  (:name "vaccuum" :type :image :file "vaccuum.png")
  (:name "blue-plasma" :type :image :file "blue-plasma.png")
- (:name "passageway" :type :music :file "passageway.ogg" :properties (:volume 40))
+ (:name "passageway" :type :music :file "passageway.ogg" :properties (:volume 60))
 
  (:name "psiblur1" :type :image :file "psiblur1.png")
  (:name "psiblur2" :type :image :file "psiblur2.png")
@@ -288,6 +288,7 @@
  
  (:name "humanoid" :type :image :file "humanoid.png")
  (:name "biclops" :type :image :file "biclops.png")
+ (:name "cloud" :type :image :file "cloud.png")
 
  (:name "drill-big" :type :sample :file "drill-big.wav" :properties (:volume 30))
  (:name "spawn" :type :sample :file "spawn.wav" :properties (:volume 20))
@@ -849,5 +850,6 @@
  (:name "shield-warning" :type :sample :file "shield-warning.wav" :properties (:volume 50))
 
  (:name ".default-font" :type :font :properties (:height 14 :width 7) :data "7x14b")
+
  (:name ".startup" :type :lisp :file "void.lisp" :properties (:autoload t))
 )

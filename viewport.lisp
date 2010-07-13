@@ -123,10 +123,20 @@
            objects cell)
       (setf (fill-pointer pending-draws) 0)
       (with-field-values (grid light-grid environment-grid phase-number
-                               height width sprites 
+                               height width sprites background
                                turn-number ambient-light) world
         ;; blank the display
         [clear self]
+	;; draw any background
+	(when (stringp background)
+	  (let ((surface (find-resource-object background))
+		(x-offset (* tile-size origin-x))
+		(y-offset (* tile-size origin-y))
+		(width (* tile-size origin-width))
+		(height (* tile-size origin-height)))
+	    (setf (sdl:cells surface)
+		  (list (list x-offset y-offset width height)))
+	    (draw-resource-image background 0 0 :render-cell 0 :destination image)))
         ;; draw the tiles
         (dotimes (i origin-height)
           (dotimes (j origin-width)
