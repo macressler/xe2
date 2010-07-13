@@ -88,63 +88,65 @@
   (defcell blue-plasma
     (tile :initform "blue-plasma"))
   
-  (define-prototype cloud (:parent xe2:=world=)
+  (defworld cloud
     (name :initform "DVO UV Shield Cloud")
     (scale :initform '(50 m))
+    (edge-condition :initform :block)
+    (background :initform "cloud")
     (ambient-light :initform :total)
     (description :initform "foo"))
-  
+    
   (define-method begin-ambient-loop cloud ()
     (play-music "passageway" :loop t))
-  
+    
   (define-method drop-plasma cloud
-    (&optional &key (object =red-plasma=)
-               distance 
-               (row 0) (column 0)
-               (graininess 0.3)
-               (density 100)
-               (cutoff 0))
-    (clon:with-field-values (height width) self
-      (let* ((h0 (or distance height))
-             (w0 (or distance width))
-             (r0 (- row (truncate (/ h0 2))))
-             (c0 (- column (truncate (/ w0 2))))
-             (plasma (xe2:render-plasma h0 w0 :graininess graininess))
-             (value nil))
-        (dotimes (i h0)
-          (dotimes (j w0)
-            (setf value (aref plasma i j))
-            (when (< cutoff value)
-              (when (or (null distance)
-                        (< (distance (+ j r0) (+ c0 i) row column) distance))
-                (percent-of-time density
-                  [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
-  
+      (&optional &key (object =red-plasma=)
+                 distance 
+                 (row 0) (column 0)
+                 (graininess 0.3)
+                 (density 100)
+                 (cutoff 0))
+      (clon:with-field-values (height width) self
+        (let* ((h0 (or distance height))
+               (w0 (or distance width))
+               (r0 (- row (truncate (/ h0 2))))
+               (c0 (- column (truncate (/ w0 2))))
+               (plasma (xe2:render-plasma h0 w0 :graininess graininess))
+               (value nil))
+          (dotimes (i h0)
+            (dotimes (j w0)
+              (setf value (aref plasma i j))
+              (when (< cutoff value)
+                (when (or (null distance)
+                          (< (distance (+ j r0) (+ c0 i) row column) distance))
+                  (percent-of-time density
+                    [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
+    
   (define-method generate cloud (&key (height 100)
-                                         (width 100)
-                                         (protostars 30)
-                                         (sequence-number (genseq)))
+                                      (width 100)
+                                      (protostars 30)
+                                      (sequence-number (genseq)))
     (setf <height> height <width> width)
     [create-default-grid self]
-    (dotimes (i width)
-      (dotimes (j height)
-        [drop-cell self (clone (if (zerop (random 7))
-                                   =vaccuum= 
-                                   =blue-plasma=))
-                   i j]))
-    [drop-plasma self]
+    ;; (dotimes (i width)
+    ;;   (dotimes (j height)
+    ;;     [drop-cell self (clone (if (zerop (random 7))
+    ;;                                =vaccuum= 
+    ;;                                =blue-plasma=))
+    ;;                i j]))
+    ;;    [drop-plasma self]
     ;; (dotimes (i protostars)
     ;;   (let ((r (random height))
     ;;      (c (random width)))
     ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
     ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
-    ;;     [drop-cell self (clone =protostar=) r c]))
+      ;;     [drop-cell self (clone =protostar=) r c]))
     [drop-cell self (clone =launchpad=) (random height) (random width)])
 #+end_src
 
 #+source: player-definition
 #+begin_src lisp 
-   (defparameter *react-shield-time* 30)
+  (defparameter *react-shield-time* 30)
   
   (defparameter *energy-recovery-interval* 200)
   
@@ -176,19 +178,7 @@
                   (("Use the arrow keys (or numpad)"))
                   (("to move, and SHIFT to fire.")))])
   
-  (define-method start agent ()
-    (clon:with-fields (segments) self
-      (setf <direction> :north)
-      (setf <last-direction> :north)
-      (if (field-value :overworld *world*)
-          (progn (setf <tile> "player32")
-                 (unless <first-start>
-                   (setf <first-start> t)
-                   ;; enter the first room on the map. FIXME
-                   [act self]))
-          (clon:with-field-values (row column) self
-            (setf <tile> "agent-north")
-            [make-segments self]))))
+  (define-method start agent ())
   
   (define-method expend-energy agent (points)
     (if (>= [stat-value self :energy] points)
@@ -227,15 +217,15 @@
     (setf <direction> direction)
     (setf <tile> (getf *agent-tiles* direction)))
   
-  (define-method move agent (&optional direction)
-    (unless <dead>
-      (let ((phase (field-value :phase-number *world*))
-            (dir (or direction <direction>)))
-        (unless (= <last-turn-moved> phase)
-          (setf <last-turn-moved> phase)
-          [aim self dir]
-          (when [parent>>move self dir]
-            (setf <last-direction> dir))))))
+  ;; (define-method move agent (&optional direction)
+  ;;   (unless <dead>
+  ;;     (let ((phase (field-value :phase-number *world*))
+  ;;           (dir (or direction <direction>)))
+  ;;       (unless (= <last-turn-moved> phase)
+  ;;         (setf <last-turn-moved> phase)
+  ;;         [aim self dir]
+  ;;         (when [parent>>move self dir]
+  ;;           (setf <last-direction> dir))))))
   
   (define-method space-at-head agent ()
     (values <row> <column>))
@@ -427,6 +417,7 @@
     (setf *prompt* (clone =void-prompt=))
     (setf *universe* (clone =universe=))
     (setf *player* (clone =agent=))
+    [set-player *universe* *player*]
     (setf *viewport* (clone =viewport=))
     ;; configure the view
     [resize *viewport* :height *height* :width *width*]
@@ -434,8 +425,11 @@
     [set-origin *viewport* :x 0 :y 0 
                 :height (truncate (/ *height* *grid-size*))
                 :width (truncate (/ *width* *grid-size*))]
-;;    [adjust *viewport*]
-    (xe2:install-widgets *viewport*)
+    [resize *prompt* :height 20 :width 100]
+    [move *prompt* :x 0 :y 0]
+    [hide *prompt*]
+    [install-keybindings *prompt*]
+    (xe2:install-widgets *prompt* *viewport*)
     (xe2:enable-classic-key-repeat 100 60)
     ;; now play!
     [play *universe*
@@ -444,7 +438,7 @@
           :prompt *prompt*
           :viewport *viewport*])
 #+end_src
-
+    
 * Overview
 
 "Void Mission" is a sci-fi action roguelike divided into three
@@ -527,8 +521,13 @@ is polled every physics timestep. See the player's RUN method.
   (define-prototype void-prompt (:parent xe2:=prompt=))
   
   (define-method install-keybindings void-prompt ()
+  (message "installing keybindings...")
     (dolist (k *qwerty-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
+  
+  ;; (define-method handle-key void-prompt (keylist)
+  ;;   (message "handling ~S" keylist)
+  ;;   [parent>>handle-key self keylist])
   
   ;; (define-method install-keybindings void-prompt ()
   ;;   (let ((keys (ecase xe2:*user-keyboard-layout* 
@@ -540,7 +539,6 @@ is polled every physics timestep. See the player's RUN method.
 #+end_src
 
 ** Joystick control
-
 
 * The player 						 :Player:
 
@@ -650,7 +648,8 @@ but much smaller and far more dense. And it has been accelerating for
 black holes at relativistic speeds. It is given the name DVO1, for
 Deep Void Object 1.
 
-*** TODO Opening movie!
+*** DONE Opening movie!
+CLOSED: [2010-07-13 Tue 05:24]
 **** TODO 3 cards progressive reveal of 3 short paragraphs, black screen white text.
 
  It's A.D. 2061. Earth's resources are nearly exhausted. The
@@ -660,7 +659,6 @@ Deep Void Object 1.
 **** TODO "freedom 0: the freedom to survive" propaganda poster 
 **** TODO false-color gas streamer images and fake data
 **** TODO slideshow of blurry diagrams filtered through xanalogtv
-**** show several progressive black hole events being labeled and photographed 
 
 ** Episode 1
 
@@ -675,12 +673,13 @@ the ultraviolet radiation caused by the black holes that propel it
 across the universe. Drop scanning devices at each of 3 nav points
 surrounding the cloud to complete this mission.
 
-**** TODO [#C] Create basic Defgame macro and use it for voidmission
-**** TODO [#A] Mostly empty space where you start at bottom, nebula cloud to north
-**** TODO [#B] Tiny thunder particle/sparks whenever cloud fragments glow
-**** TODO [#A] Limited sight distance
+**** DONE [#C] Create basic Defgame macro and use it for voidmission
+CLOSED: [2010-07-13 Tue 05:24]
 **** TODO [#B] Occasional flashes of background moving cloud fragments in the dark
+**** TODO [#B] Tiny thunder particle/sparks whenever cloud fragments glow
 **** TODO [#B] Neon cloud pieces are irregular mostly-transparent pixel pngs that float along one another
+**** TODO [#A] Mostly empty space where you start at bottom, nebula cloud to north
+**** TODO [#A] Limited sight distance
 **** TODO [#A] Nav points 
 **** TODO [#A] Scanners
 **** TODO [#A] Macrovirii
