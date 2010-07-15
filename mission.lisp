@@ -113,16 +113,17 @@
 (defmacro defmission (name (&key title description address)
 		      &rest goals)
   (let ((hash (gensym)))
+    (labels ((set-goal (entry)
+	       (destructuring-bind (var-name &rest goal-props) entry
+		 `(setf (gethash ,(make-keyword var-name) ,hash) (make-goal ,@goal-props)))))
     `(let ((,hash (make-hash-table)))
-       (dolist (entry ',goals)
-	 (destructuring-bind (var-name goal) entry
-	   (setf (gethash (make-keyword var-name) ,hash) goal)))
+       (progn ,@(mapcar #'set-goal goals))
        (define-prototype ,name (:parent xe2:=mission=)
 	 (name :initform ,(make-keyword name))
 	 (description :initform ,description)
 	 (address :initform ,address)
 	 (variables :initform ,hash)
-	 (title :initform ,title)))))
+	 (title :initform ,title))))))
 
 ;; The flow goes defmission, initialize, begin, win/lose, end
 
@@ -175,9 +176,4 @@ concatenation.")
 	 (generate (one-of (expansions phrase))))
 	(t (list phrase))))
 
-(defmission gather-cloud-data 
-   (:title "Gather cloud data"
-    :address '(=cloud=))
-  (:nav-points (make-goal :name "Activate all three nav points."
-                          :condition #'nav-points-completed-p)))
 ;;; mission.lisp ends here

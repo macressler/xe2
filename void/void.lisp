@@ -1315,14 +1315,15 @@ Then it fires and gives chase.")
             [play-sample self "blaagh"]
             [die other]))))
 (defun nav-points-completed-p ()
+  (message "Checking nav points...")
   (with-locals (alpha beta gamma)
     (and alpha beta gamma)))
 
 (defmission gather-cloud-data 
    (:title "Gather cloud data"
     :address '(=cloud=))
-  (:nav-points (make-goal :name "Activate all three nav points."
-                          :condition #'nav-points-completed-p)))
+  (:nav-points :name "Activate all three nav points."
+               :condition #'nav-points-completed-p))
 (defparameter *default-navpoint-delay* 60)
 
 (defcell navpoint 
@@ -1699,6 +1700,9 @@ Then it fires and gives chase.")
     (newline)))
       
 (define-method run agent () 
+  (when *mission*
+    (when [is-completed *mission*]
+      [emote self "I win!"]))
 ;;  [update-tiles self]
   [warn-maybe self]
   (when (plusp <call-clock>)
