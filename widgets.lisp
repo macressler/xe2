@@ -341,6 +341,9 @@ Example: [print my-formatter \"hello\" :foreground \"red\"]"
 (define-method space formatter ()
   [print self " "])
 
+(define-method clear-line formatter ()
+  (setf <current-line> (make-array 10 :adjustable t :fill-pointer 0)))
+
 (define-method newline formatter ()
   "Add the current line to the display, and start a fresh offscreen
 line."

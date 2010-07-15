@@ -210,9 +210,7 @@ At the moment, only 0=off and 1=on are supported.")
 		 (string (find-resource-object other-world))
 		 (clon:object other-world))))
     (with-fields (height width) other
-      (message "creating grid")
       [create-grid self :height height :width width]
-      (message "pasting region")
       (let ((*world* other))
 	[paste-region self other 0 0 0 0 height width deepcopy]))))
 
@@ -364,7 +362,6 @@ is the integer on the top of the stack."
 (define-method poploc world ()
   "Jump to the location on the top of the stack, and pop the stack."
   (let ((loc (pop <stack>)))
-    (message "LOC: ~S" loc)
     (if (and (listp loc) (= 3 (length loc)))
 	(destructuring-bind (r c dir) loc
 	  (setf <row> r <column> c <direction> dir))
@@ -538,7 +535,6 @@ cell is placed; nil otherwise."
 			      
 (define-method drop-player-at-last-location world (player)
   (setf <player> player)
-  (message "DROPPING PLAYER ~S" (list <player-exit-row> <player-exit-column>))
   [drop-cell self player <player-exit-row> <player-exit-column>])
   
 (define-method nth-cell world (n row column)
@@ -575,7 +571,6 @@ cell is placed; nil otherwise."
   ;; record current location so we can exit back to it
   (setf <player-exit-row> (field-value :row <player>))
   (setf <player-exit-column> (field-value :column <player>))
-  (message "EXITING AT ~S" (list <player-exit-row> <player-exit-column>))
   [exit <player>]
   [delete-cell self <player> <player-exit-row> <player-exit-column>])
   
@@ -886,7 +881,6 @@ sources and ray casting."
   "Prepare the world for play."
   (assert <player>)
   ;; start player at same phase (avoid free catch-up turns)
-  (message "STARTWORLD: ~S ~S" <phase-number> (field-value :phase-number <player>))
   ;; get everyone on the same turn, and start 'er up
   (setf <phase-number> (+ 1 (field-value :phase-number <player>)))
   (let ((grid <grid>)

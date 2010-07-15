@@ -250,38 +250,6 @@
 
 ;;; Fences
 
-(defsprite wire 
-  (image :initform "wire-east")
-  (clock :initform 20)
-  (speed :initform (make-stat :base 10))
-  (direction :initform :east)
-  (categories :initform '(:actor :obstacle :target)))
-
-(define-method orient wire (dir &optional (clock 5))
-  (setf <direction> dir)
-  (setf <clock> clock))
-
-(define-method run wire ()
-  (if (zerop <clock>) 
-      [die self]
-      (progn [move self <direction> 5]
-	     (decf <clock>)
-	     (percent-of-time 10 [play-sample self "woom"])
-	     (setf <image> (ecase <direction>
-			    (:east "wire-east")
-			    (:south "wire-south")
-			    (:west "wire-west")
-			    (:north "wire-north"))))))
-
-(define-method do-collision wire (object)
-  (when (and (has-field :team object)
-	     (eq :player (field-value :team object))
-	     [in-category object :wave])
-    [die object])
-  (when (and (has-field :hit-points object)
-	     (not (and (has-field :team object)
-		       (eq :enemy (field-value :team object)))))
-    [damage object 20]))
 
 ;; (define-method step wire (stepper)
 ;;   (when [is-player stepper]

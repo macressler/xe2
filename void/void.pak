@@ -766,6 +766,8 @@
  (:name "dust-cyan" :type :image :file "dust-cyan.png")
  (:name "dust-off" :type :image :file "dust-off.png")
 
+ (:name "dvo-orbit" :type :image :file "dvo-orbit.png")
+
  (:name "tank-disabled" :type :image :file "tank-disabled.png")
  (:name "tank-north" :type :image :file "tank-north.png")
  (:name "tank-east" :type :alias :data ":rotate 90:tank-north")
@@ -777,6 +779,7 @@
  (:name "tank-northwest" :type :alias :data ":rotate 270:tank-northeast")
 
  (:name "cons" :type :music :file "cons.ogg" :properties (:volume 40))
+ (:name "dvo" :type :music :file "dvo.ogg" :properties (:volume 40))
  (:name "beatup" :type :music :file "beatup.ogg" :properties (:volume 24))
  (:name "reprise" :type :music :file "reprise.ogg" :properties (:volume 24))
  (:name "xiobox" :type :music :file "xiobox.ogg" :properties (:volume 24))
@@ -864,7 +867,7 @@
  (:name "player32" :type :image :file "player32.png")
 
  (:name "break" :type :sample :file "break.wav" :properties (:volume 20))
- (:name "fire" :type :sample :file "fire.wav" :properties (:volume 10))
+ (:name "fire" :type :sample :file "fire.wav" :properties (:volume 4))
  (:name "break2" :type :sample :file "break2.wav" :properties (:volume 7))
 
  (:name "shield-sound" :type :sample :file "shield.wav" :properties (:volume 8))

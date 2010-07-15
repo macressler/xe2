@@ -34,7 +34,6 @@
   prerequisites)
 
 (defun check-condition (goal)
-  (message "checking goal condition: ~A" goal)
   (etypecase goal
     (keyword (check-condition (mission-variable-value goal)))
     (goal (or (eq :achieved (goal-state goal))
@@ -45,7 +44,6 @@
 			     (function (funcall condition)))
 			   (or (null prerequisites)
 			       (every #'check-condition prerequisites)))
-		  (message "ACHIEVED: ~S " (goal-name goal))
 		  (setf (goal-state goal) :achieved)))))))
 
 (defvar *mission* nil)

@@ -215,17 +215,11 @@ cells."
 (define-method describe cell (&optional description)
   "Narrate a description of the object. By default, uses
 the :description field of the cell."
-  (setf description (or description <description>))
-  [>>print-object-tag :narrator self] 
-  [>>newline :narrator]
-  (if (stringp description)
-      (dolist (line (split-string-on-lines description))
-	[>>narrateln :narrator line])
-      ;; it's a formatted string
-      (dolist (line description)
-	(dolist (string line)
-	  (apply #'send-queue nil :print :narrator string))
-	(send-queue nil :newline :narrator))))
+  [emote self (get-some-object-name self) :timeout 5.0])
+  ;; (setf description (or description <description>))
+  ;; (when (stringp description)
+  ;;   (dolist (line (split-string-on-lines description))
+      
 
 ;;; Statistics 
 

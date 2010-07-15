@@ -32,6 +32,7 @@
 (defvar *narrator*)
 (defvar *prompt*)
 (defvar *player*)
+(defvar *status*)
 (defvar *viewport*)
 (defparameter *numpad-keybindings* 
   '(("KP8" nil "move :north .")
@@ -98,7 +99,8 @@
 ;;     (dolist (k keys)
 ;;       (apply #'bind-key-to-prompt-insertion self k))))
 (defun physics (&rest ignore)
-  (when *world* [run-cpu-phase *world* t]))
+  (when *world* [run-cpu-phase *world* t])
+  (when *status* [update *status*]))
 (defparameter *dust-particle-sparkle-interval* 2000)
 (defparameter *dust-particle-sparkle-time* 4)
 
@@ -601,21 +603,22 @@ However, ammunition is unlimited, making BUSTER an old standby.")
       (progn (percent-of-time 3 [play-sample self (car (one-of '("dtmf1" "dtmf2" "dtmf3")))])
              [move self <direction>])))
 
-;;; Health powerup
+;;; Shield restore pack
 
-(defcell health
-  (name :initform "Repair unit")
-  (description :initform "The single-use program REPAIR-1 restores a few hit points when activated.")
+(defcell shield-pack
+  (name :initform "Shield pack")
+  (description :initform "This shield pack restores some shield energy.")
   (tile :initform "health")
   (energy-cost :initform 0)
   (call-interval :initform 20)
   (categories :initform '(:item :defun)))
 
-(define-method call health (caller)
+(define-method call shield-pack (caller)
   (when [is-player caller]
-    [stat-effect caller :hit-points 6]
-    [play-sample self "buzzfan"]
-    [say caller "Recovered 6 hit points."]
+    [stat-effect caller :hit-points 10]
+    [play-sample self "speedup"]
+    [play-sample self "vox-repair"]
+    [emote caller "Recovered 10 shield points."]
     [expend-item caller]))
 
 ;;; Shield
@@ -1140,7 +1143,7 @@ Then it fires and gives chase.")
 (define-method die shocker () 
   (dotimes (n 10)
     [drop self (clone =noise=)])
-  (percent-of-time 12 [drop self (clone =health=)])
+  (percent-of-time 12 [drop self (clone =shield-pack=)])
   [play-sample self "yelp"]
   [parent>>die self])
 ;;; Corruption
@@ -1314,6 +1317,115 @@ Then it fires and gives chase.")
             [damage self 2]
             [play-sample self "blaagh"]
             [die other]))))
+(defsprite wire 
+  (image :initform "wire-east")
+  (clock :initform 20)
+  (speed :initform (make-stat :base 10))
+  (direction :initform :east)
+  (categories :initform '(:actor :obstacle :target)))
+
+(define-method orient wire (dir &optional (clock 5))
+  (setf <direction> dir)
+  (setf <clock> clock))
+
+(define-method run wire ()
+  (if (zerop <clock>) 
+      [die self]
+      (progn [move self <direction> 5]
+             (decf <clock>)
+             (percent-of-time 10 [play-sample self "woom"])
+             (setf <image> (ecase <direction>
+                            (:east "wire-east")
+                            (:south "wire-south")
+                            (:west "wire-west")
+                            (:north "wire-north"))))))
+
+(define-method do-collision wire (object)
+  (when (and (has-field :team object)
+             (eq :player (field-value :team object))
+             [in-category object :wave])
+    [die object])
+  (when (and (has-field :hit-points object)
+             (not (and (has-field :team object)
+                       (eq :enemy (field-value :team object)))))
+    [damage object 20]))
+
+(defparameter *macrovirus-tiles*
+  '("macro1" "macro2" "macro3" "macro4"))
+
+(defcell macrovirus 
+  (tile :initform "macro1")
+  (team :initform :enemy)
+  (generation :initform 0)
+  (hit-points :initform (make-stat :base 4 :max 7 :min 0))
+  (speed :initform (make-stat :base 1))
+  (strength :initform (make-stat :base 10))
+  (defense :initform (make-stat :base 10))
+  (stepping :initform t)
+  (movement-cost :initform (make-stat :base 20))
+  (direction :initform (random-direction))
+  (categories :initform '(:actor :obstacle :enemy :target)))
+
+(define-method divide macrovirus ()
+  [play-sample self "munch1"]
+  [stat-effect self :hit-points 3]
+  (dotimes (i (if (zerop (random 17))
+                  2 1))
+    [drop self (clone =macrovirus=)]))
+
+(define-method hit macrovirus (&optional other)
+  (when (and other [in-category other :particle])
+    [die other])
+  [damage self 1])
+
+(define-method die macrovirus ()
+  [play-sample self "biodeath"]
+  [parent>>die self])
+
+(define-method grow macrovirus ()
+  [expend-action-points self 100]
+  (incf <generation>)
+  (when (= 2 <generation>)
+    [divide self])
+  (when (> <generation> 3)
+    [die self])
+  (setf <tile> (nth <generation> *macrovirus-tiles*)))
+
+(define-method find-food macrovirus (direction)
+  (let ((food [category-in-direction-p *world* <row> <column> direction :macrovirus-food]))
+    (when food
+      (prog1 food
+        [play-sample self (if (= 0 (random 1))
+                              "slurp1" "slurp2")]
+        [say self "The macrovirus eats pollen."]
+        [delete-from-world food]
+        [move self direction]
+        [grow self]))))
+
+(define-method run macrovirus ()
+  [move self (random-direction)]
+  (percent-of-time 10 [grow self])
+  (percent-of-time 35 (let ((direction (car (one-of (list :east :west)))))
+                        (let ((wire (clone =wire=)))
+                          [orient wire direction 30]
+                          (multiple-value-bind (x y) [xy-coordinates self]
+                            [drop-sprite self wire (+ x 2) (+ y 2)]))))
+  (if (< [distance-to-player self] 6)
+      (progn [move self [direction-to-player self]]
+             (if [adjacent-to-player self]
+                 [attack self [direction-to-player self]]))
+
+    ;; otherwise look for food
+      (block searching
+        (dolist (dir xe2:*compass-directions*)
+          (when (or [in-category self :dead]
+                    [find-food self dir])
+            (return-from searching))))))
+  
+(define-method attack macrovirus (direction)
+  (let ((player [get-player *world*]))
+    [play-sample self "munch2"]
+    [damage player 3]))
 (defun nav-points-completed-p ()
   (message "Checking nav points...")
   (with-locals (alpha beta gamma)
@@ -1329,11 +1441,6 @@ Then it fires and gives chase.")
                      :condition #'(lambda () (mission-variable-value :pressed-b-yet)))
   (:pressed-button-2 :name "Press the F button."
                      :condition #'(lambda () (mission-variable-value :pressed-f-yet))))
-
-(define-method run gather-cloud-data ()
-  (maphash #'(lambda (k v)
-               (print (list k v)))
-           <variables>))
 (defparameter *default-navpoint-delay* 60)
 
 (defcell navpoint 
@@ -1469,10 +1576,10 @@ Then it fires and gives chase.")
         (let ((dust (clone =dust-particle=)))
           [add-sprite self dust]
           [update-position dust (random 1590) (random 1590)]))
-      ;; (dotimes (i width)
-      ;;   (dotimes (j 8)
-      ;;     (percent-of-time 5
-      ;;       [drop-cell self (clone =shocker=) j i])))
+      (dotimes (i width)
+        (dotimes (j 8)
+          (percent-of-time 5
+            [drop-cell self (clone =shocker=) j i])))
       ;; (dotimes (n 3)
       ;;   (let ((drone (clone =drone=)))
       ;;     [add-sprite self drone]
@@ -1481,6 +1588,29 @@ Then it fires and gives chase.")
       [drop-cell self (clone =navpoint= :beta) 88 23]
       [drop-cell self (clone =navpoint= :gamma) 18 90]
       [drop-cell self (clone =launchpad=) 88 60])
+(defworld dvo-orbit
+  (name :initform "DVO UV Shield Cloud")
+  (scale :initform '(50 m))
+  (edge-condition :initform :block)
+  (background :initform "dvo-orbit")
+  (ambient-light :initform :total)
+  (description :initform "foo"))
+        
+(define-method begin-ambient-loop dvo-orbit ()
+  (play-music "dvo" :loop t))
+
+(define-method generate dvo-orbit (&key (height 200)
+                                        (width 100)
+                                        (protostars 30)
+                                        (sequence-number (genseq)))
+        (setf <height> height <width> width)
+        [create-default-grid self]
+        (dotimes (n 40)
+          [drop-cell self (clone =macrovirus=) (+ 150 (random 20)) (random 100)])
+        [drop-cell self (clone =launchpad=) 195 30])
+
+(defmission enter-dvo-orbit (:title "Enter DVO orbit."
+                                    :address '(=dvo-orbit=)))
 (defparameter *react-shield-time* 30)
 
 (defparameter *vox-warning-clock* 400)
@@ -1525,6 +1655,7 @@ Then it fires and gives chase.")
          (setf vox-warning-clock 0)))))
 
 (define-method loadout agent ()
+  [set-character *status* self]
   (push (clone =buster-defun=) <items>)
   [emote self '((("I'd better get moving."))
                 (("Use the arrow keys (or numpad)"))
@@ -1532,21 +1663,17 @@ Then it fires and gives chase.")
                 :timeout 10.0])
 
 (define-method blab agent ()
-  (with-mission-locals (pressed-b-yet)
-    (setf pressed-b-yet t)
-    [emote self '((("I've got to drop sensors on all three nav points."))
-                  (("Nav points look like this: ") (nil :image "navpoint-off"))
-                  (("I'd better keep moving.")))
-           :timeout 10.0]))
+  [emote self '((("I've got to drop sensors on all three nav points."))
+                (("Nav points look like this: ") (nil :image "navpoint-off"))
+                (("I'd better keep moving.")))
+         :timeout 10.0])
                
 (define-method freak agent ()
   [play-sample self "vox-brennan"]
-  (with-mission-locals (pressed-f-yet)
-    (setf pressed-f-yet t)
-    [emote self '((("BRENNAN:"))
-                  (("I'm getting some radiation. Watch your scanners,"))
-                  (("and focus on reaching those nav points.")))
-           :timeout 10.0]))
+  [emote self '((("BRENNAN:"))
+                (("I'm getting some radiation. Watch your scanners,"))
+                (("and focus on reaching those nav points.")))
+         :timeout 10.0])
   
 (define-method alienate agent ()
   [play-sample self "vox-unidentified"]
@@ -1701,15 +1828,14 @@ Then it fires and gives chase.")
              [>>print :narrator "  "])
            (newline ()
              [>>newline :narrator]))
-    [>>print :narrator " ITEMS: "]
     (dolist (item <items>)
       (print-item item))
     (newline)))
       
 (define-method run agent () 
-  (when *mission*
-    (when [is-completed *mission*]
-      [emote self "I win!"]))
+  ;; (when *mission*
+  ;;   (when [is-completed *mission*]
+  ;;     [emote self "I win!"]))
 ;;  [update-tiles self]
   [warn-maybe self]
   (when (plusp <call-clock>)
@@ -1763,15 +1889,11 @@ Then it fires and gives chase.")
 
 (define-method restart agent ()
   (let ((agent (clone =agent=)))
-    [say self "Restarting CONS..."]
-    (halt-sample t)
     (setf *player* agent)
     [destroy *universe*]
     [set-player *universe* agent]
-;;    [set-prompt *form* agent]
-    [set-character *status* agent]
-    [play *universe*
-          :address (list '=zeta-x= :sequence-number (genseq))]
+    (let ((mission (clone =enter-dvo-orbit=)))
+      [begin mission *player*])
     [loadout agent]))
 
 ;;; Player upgrade
@@ -1786,21 +1908,104 @@ Then it fires and gives chase.")
 (define-method call tail-defun (caller)
   [upgrade caller]
   [expend-item caller])
+(defvar *status* nil)
+  
+  (define-prototype status (:parent xe2:=formatter=)
+    (character :documentation "The character cell."))
+  
+  (define-method set-character status (character)
+    (setf <character> character))
+  
+  (define-method print-stat status (stat-name &key warn-below show-max label)
+    (let* ((stat (field-value stat-name <character>))
+           (value [stat-value <character> stat-name]))
+      (destructuring-bind (&key min max base delta unit) stat
+        (let ((color (if (and (numberp warn-below)
+                              (< value warn-below))
+                         ".red"
+                         ".black")))
+          [print self (or label (symbol-name stat-name))
+                 :foreground ".white"]
+          [print self ": "]
+          [print self (format nil "~S" value) 
+                 :foreground ".white"
+                 :background color]
+          (when show-max
+            [print self (format nil "/~S" max)
+                   :foreground ".white"
+                   :background color])
+          (when unit 
+            [print self " "]
+            [print self (symbol-name unit)])
+          [print self " "]
+          ))))
+  
+  (defparameter *status-bar-character* " ")
+  
+  (define-method print-stat-bar status (stat &key 
+                                             (color ".yellow")
+                                             (background-color ".gray18")
+                                             (divisor 1))
+    (let ((value (truncate (/ [stat-value <character> stat] divisor)))
+          (max (truncate (/ [stat-value <character> stat :max] divisor))))
+      (dotimes (i max)
+        [print self *status-bar-character*
+               :foreground ".yellow"
+               :background (if (< i value)
+                               color
+                             background-color)])))
+  
+(define-method print-item status (item)
+  [print self nil :image (field-value :tile item)]
+  [print self "  "]
+  [print self (get-some-object-name item)]
+  [print self "  "])
+  
+(define-method update status ()
+  (let* ((char <character>))
+    (when char
+      [clear-line self]
+      [print-stat self :hit-points :warn-below 7 :show-max t :label "S"]
+      [print-stat-bar self :hit-points :color ".blue"]
+      [space self]
+      [space self]
+      [print-stat self :energy :warn-below 10 :show-max t :label "E"]
+      [print-stat-bar self :energy :color ".yellow" :divisor 2]
+      [space self]
+      [space self]
+      (dolist (item (field-value :items char))
+        [print-item self item]))))
+   
+(define-method render status ()
+  ;; draw on viewport
+  (with-fields (x y current-line) self
+    (let ((image (field-value :image *viewport*))
+          (line (coerce current-line 'list)))
+      (when (plusp (length line))
+        (render-formatted-line line x y :destination image)))))
+
+(defparameter *status-height* 20)
+
 (defgame :void
     (:title "Void Mission"
-     :description "A sci-fi roguelike game in Common Lisp."
-     :creator "David T. O'Toole <dto@gnu.org>"
-     :screen-width *width*
-     :screen-height *height*
-     :timestep *timestep*
-     :physics-function #'void:physics)
+            :description "A sci-fi roguelike game in Common Lisp."
+            :creator "David T. O'Toole <dto@gnu.org>"
+            :screen-width *width*
+            :screen-height *height*
+            :timestep *timestep*
+            :physics-function #'void:physics)
   ;; create some objects
   (setf *prompt* (clone =void-prompt=))
   (setf *universe* (clone =universe=))
   (setf *player* (clone =agent=))
   (setf *narrator* (clone =narrator=))
+  (setf *status* (clone =status=))
   [set-player *universe* *player*]
   (setf *viewport* (clone =viewport=))
+  ;; status
+  [resize *status* :height *status-height* :width *width*]
+  [move *status* :x 8 :y (- *height* *status-height*)]
+  [hide *status*]
   ;; configure the view
   [resize *viewport* :height *height* :width *width*]
   [move *viewport* :x 0 :y 0]
@@ -1814,7 +2019,7 @@ Then it fires and gives chase.")
   [move *narrator* :x 0 :y (- *height* 80)]
   [set-verbosity *narrator* 0]
   [install-keybindings *prompt*]
-  (xe2:install-widgets *prompt* *viewport*)
+  (xe2:install-widgets *prompt* *viewport* *status*)
   (xe2:enable-classic-key-repeat 100 60)
   ;; now play!
   (let ((mission (clone =gather-cloud-data=)))
