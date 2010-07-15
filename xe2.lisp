@@ -132,6 +132,7 @@ genseq *zoom-factor* zoom-image is-zoomed-resource *timer-interval*
 save-modified-objects enable-timer disable-timer while
 enable-held-keys disable-held-keys do-cells draw-box *resizable*
 *resize-hook* draw-rectangle *quitting* *after-load-module-hook*
+local-variable-value set-local-variable-value with-locals with-mission-locals
 *module* quit reset))
 
 (in-package :xe2)

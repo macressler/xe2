@@ -9,10 +9,11 @@
 ** TODO Improve org babel lisp support
 *** TODO [#A] Block execution in sessions working
 *** TODO [#B] Auto insert new blocks
+*** TODO auto-complete and menu nav blocks/headings
 ** TODO left click on object shows bubble with name/desc
-** TODO Remove old bubble when emoting again, or move it upwards like a terminal.
-** TODO Allow clear bubbles with a line to the left flush showing blocks  
-** TODO bring narration back.
+** TODO [#C] Remove old bubble when emoting again, or move it upwards like a terminal.
+** TODO [#C] Allow clear bubbles with a line to the left flush showing blocks  
+** TODO bring narration back in some way.
 
 * Header
 
@@ -44,7 +45,7 @@
 #+property: results silent
 #+property: no-expand yes
 #+property: noweb yes
-#+startup: showall
+#+startup: hideblocks
 
 #+source: xe2-lisp-file
 #+begin_src lisp :tangle yes
@@ -94,155 +95,6 @@
   (defparameter *address* '(=cloud=))
   (defparameter *width* 1280)
   (defparameter *height* 720)
-#+end_src
-
-#+source: cloud-world
-#+begin_src lisp
-  (defparameter *default-navpoint-delay* 60)
-  
-  (defcell navpoint 
-    (name :initform "Navpoint")
-    (index :initform nil)
-    (tile :initform "navpoint-off")
-    (delay :initform *default-navpoint-delay*)
-    (clock :initform 0)
-    (trip :initform nil)
-    (auto-loadout :initform t)
-    (team :initform :neutral)
-    (state :initform nil)  
-    (speed :initform (make-stat :min 0 :base 10 :max 10))
-    (categories :initform '(:target :actor :navpoint)))
-  
-  (define-method initialize navpoint (index)
-    (assert (keywordp index))
-    (setf <index> index))
-    
-  (define-method loadout navpoint ()
-    [stop self])
-    
-  (define-method update-tile navpoint (&optional pulsing)
-    (setf <tile> (if pulsing "navpoint-on" "navpoint-off")))
-  
-  (define-method tap navpoint (delay)
-    (setf <delay> delay))
-  
-  (define-method activate navpoint (&optional delay)
-    (setf <clock> 0)
-    (when delay (setf <delay> delay))
-    (setf <state> t)
-    (setf <trip> nil)
-    [set-variable *world* :pulsing t]
-    (when (keywordp <index>)
-      [set-variable *world* <index> t])
-    [update-tile self])
-  
-  (define-method stop navpoint ()
-      (setf <state> nil)
-      [set-variable *world* :pulsing nil]
-      (when (keywordp <index>)
-        [set-variable *world* <index> nil])
-      [update-tile self]
-      (setf <clock> 0))
-  
-  (define-method run navpoint ()
-    [update-tile self]
-    (when <state>
-      (if (zerop <clock>)
-          (progn [play-sample self "pulse"]
-                 [update-tile self t]
-                 [set-variable *world* :pulsing t]
-                 (setf <trip> nil)
-                 (labels ((do-circle (image)
-                            (prog1 t
-                              (multiple-value-bind (x y) 
-                                  [image-coordinates self]
-                                (let ((x0 (+ x 8))
-                                      (y0 (+ y 8)))
-                                  (draw-circle x0 y0 40 :destination image)
-                                  (draw-circle x0 y0 35 :destination image))))))
-                   [>>add-overlay :viewport #'do-circle])
-                 (setf <clock> <delay>))
-          (progn (if <trip>
-                     [set-variable *world* :pulsing nil]
-                     (progn (setf <trip> t)
-                            [set-variable *world* :pulsing t]))
-                 (decf <clock>)))))
-    
-  (define-method step navpoint (stepper)
-    (unless <state>
-      (when [is-player stepper]
-        [emote stepper (format nil "Activated nav point ~A." <index>)]
-        [play-sample self "upwoop"]
-        [activate self])))
-  
-    (defcell vaccuum 
-      (tile :initform "vaccuum"))
-    
-    (defcell red-plasma
-      (tile :initform "red-plasma"))
-    
-    (defcell blue-plasma
-      (tile :initform "blue-plasma"))
-    
-    (defworld cloud
-      (name :initform "DVO UV Shield Cloud")
-      (scale :initform '(50 m))
-      (edge-condition :initform :block)
-      (background :initform "cloud")
-      (ambient-light :initform :total)
-      (description :initform "foo"))
-      
-    (define-method begin-ambient-loop cloud ()
-      (play-music "passageway" :loop t))
-      
-    (define-method drop-plasma cloud
-        (&optional &key (object =red-plasma=)
-                   distance 
-                   (row 0) (column 0)
-                   (graininess 0.3)
-                   (density 100)
-                   (cutoff 0))
-        (clon:with-field-values (height width) self
-          (let* ((h0 (or distance height))
-                 (w0 (or distance width))
-                 (r0 (- row (truncate (/ h0 2))))
-                 (c0 (- column (truncate (/ w0 2))))
-                 (plasma (xe2:render-plasma h0 w0 :graininess graininess))
-                 (value nil))
-            (dotimes (i h0)
-              (dotimes (j w0)
-                (setf value (aref plasma i j))
-                (when (< cutoff value)
-                  (when (or (null distance)
-                            (< (distance (+ j r0) (+ c0 i) row column) distance))
-                    (percent-of-time density
-                      [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
-      
-    (define-method generate cloud (&key (height 100)
-                                        (width 100)
-                                        (protostars 30)
-                                        (sequence-number (genseq)))
-      (setf <height> height <width> width)
-      [create-default-grid self]
-      (dotimes (i width)
-        (dotimes (j 8)
-          (percent-of-time 5
-            [drop-cell self (clone =shocker=) j i])))
-      ;;    [drop-plasma self]
-      ;; (dotimes (i protostars)
-      ;;   (let ((r (random height))
-      ;;      (c (random width)))
-      ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
-      ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
-      ;;     [drop-cell self (clone =protostar=) r c]))
-      (dotimes (n 3)
-        (let ((drone (clone =drone=)))
-          [add-sprite self drone]
-          [update-position drone (+ 20 (random 1500)) (+ 20 (random 400))]))
-      [drop-cell self (clone =navpoint= :alpha) 8 10]
-      [drop-cell self (clone =navpoint= :beta) 88 23]
-      [drop-cell self (clone =navpoint= :gamma) 18 90]
-      [drop-cell self (clone =launchpad=) 88 60])
 #+end_src
 
 #+source: player-definition
@@ -691,7 +543,7 @@ is polled every physics timestep. See the player's RUN method.
   ;;       (apply #'bind-key-to-prompt-insertion self k))))
 #+end_src
 
-** Joystick control
+** TODO Joystick control
 
 * The player 						 :Player:
 
@@ -759,7 +611,8 @@ Various kinds of bombs and mines also exist.
 
 #+source: things
 #+begin_src lisp
-(in-package :void)
+
+<<dust-particle>>
 
 (defun same-team (obj1 obj2)
   (eq (field-value :team obj1)
@@ -1795,13 +1648,281 @@ However, ammunition is unlimited, making BUSTER an old standby.")
               [die other]))))
 #+end_src 
 
+* Setting 						  :Story:
+
+It's 2061. If only there were enough endurium!
+
+It's been known for decades that Humanity's reach within the Milky Way
+is limited only by the supply of endurium, its rare and precious
+fuel. The energy crises of C.E. 2021 and C.E. 2027-2031 caused global
+economic, social, and environmental disruption, and with this
+disorganization came the concentration of wealth and power in the
+hands of the government and corporate elites.
+
+Early attempts at control and regulation of endurium met with initial
+success. The space-faring nations---Russia, China, India, Japan,
+Brazil, and the United States---along with the ESA (European Space
+Agency), could quite naturally claim endurium for themselves. But
+economies of scale and espionage in spaceflight technology eventually
+brought smaller deposits and endurium dust streams throughout the
+interstellar neighborhood within the reach of multinational
+corporations and various non-state actors. The largest of these formed
+what they called a "sovereign", open, and successful market in
+endurium, spaceflight technology, and various otherwise-controlled
+materials. The split between the Spacefaring Nations on the one hand,
+and the United Nations on the other, threatens to break into
+full-scale interstellar war; as Earth's environment continues to
+decay, the demand for endurium has reached a critical point.
+
+* Plot
+
+** Prologue
+
+A new high-powered telescope operated by Xiomacs Corporation detects a
+pattern of gas streamers radiating high in the ultraviolet, within a
+cavernous void in galactic space. Subsequent observations show that
+the streamers are emitted from a string of black holes. The
+scientists, seeing the pattern's obviously artificial nature, guess at
+a propulsion method being used to drive a spacecraft, and begin to
+look for something at the trail's leading edge. A year later the
+calculations fall into place: the source of the black holes is an
+object about as massive as Jupiter, but much smaller and far more
+dense. And it has been accelerating for 1.2 billion years by riding on
+streams of gas being ejected from the black holes at relativistic
+speeds. It is given the name DVO, for Deep Void Object.
+
+*** DONE Opening movie!
+CLOSED: [2010-07-13 Tue 05:24]
+**** TODO 3 cards progressive reveal of 3 short paragraphs, black screen white text.
+
+ It's A.D. 2061. Earth's resources are nearly exhausted. The
+ government/corporation complex elites now control humanity's only
+ remaining energy source, the rare material Endurium.
+ 
+**** TODO "freedom 0: the freedom to survive" propaganda poster 
+**** TODO false-color gas streamer images and fake data
+**** TODO slideshow of blurry diagrams filtered through xanalogtv
+
+** Episode 1
+
+A mysterious Xiomacs operative named Brennan stays in the Void Rider
+as mission commander, while you take off in an exosuit. Your mission
+is to rendezvous with the DVO and make initial discoveries.
+
+*** 1.1: Acquire cloud data
+
+The cloud obscuring the DVO is meant as a shield to protect it from
+the ultraviolet radiation caused by the black holes that propel it
+across the universe. Drop scanning devices at each of 3 nav points
+surrounding the cloud to complete this mission.
+**** DONE Cloud world
+
+#+source: cloud-world
+#+begin_src lisp
+
+<<navpoint>>
+
+    (defcell vaccuum 
+      (tile :initform "vaccuum"))
+    
+    (defcell red-plasma
+      (tile :initform "red-plasma"))
+    
+    (defcell blue-plasma
+      (tile :initform "blue-plasma"))
+    
+    (defworld cloud
+      (name :initform "DVO UV Shield Cloud")
+      (scale :initform '(50 m))
+      (edge-condition :initform :block)
+      (background :initform "cloud")
+      (ambient-light :initform :total)
+      (description :initform "foo"))
+      
+    (define-method begin-ambient-loop cloud ()
+      (play-music "passageway" :loop t))
+      
+    (define-method drop-plasma cloud
+        (&optional &key (object =red-plasma=)
+                   distance 
+                   (row 0) (column 0)
+                   (graininess 0.3)
+                   (density 100)
+                   (cutoff 0))
+        (clon:with-field-values (height width) self
+          (let* ((h0 (or distance height))
+                 (w0 (or distance width))
+                 (r0 (- row (truncate (/ h0 2))))
+                 (c0 (- column (truncate (/ w0 2))))
+                 (plasma (xe2:render-plasma h0 w0 :graininess graininess))
+                 (value nil))
+            (dotimes (i h0)
+              (dotimes (j w0)
+                (setf value (aref plasma i j))
+                (when (< cutoff value)
+                  (when (or (null distance)
+                            (< (distance (+ j r0) (+ c0 i) row column) distance))
+                    (percent-of-time density
+                      [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
+      
+    (define-method generate cloud (&key (height 100)
+                                        (width 100)
+                                        (protostars 30)
+                                        (sequence-number (genseq)))
+      (setf <height> height <width> width)
+      [create-default-grid self]
+      (dotimes (i width)
+        (dotimes (j 8)
+          (percent-of-time 5
+            [drop-cell self (clone =shocker=) j i])))
+      ;;    [drop-plasma self]
+      ;; (dotimes (i protostars)
+      ;;   (let ((r (random height))
+      ;;      (c (random width)))
+      ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
+      ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
+      ;;     [drop-cell self (clone =protostar=) r c]))
+      ;; space dust
+      (dotimes (n 100) 
+        (let ((dust (clone =dust-particle=)))
+          [add-sprite self dust]
+          [update-position dust (random 1590) (random 1590)]))
+      (dotimes (n 3)
+        (let ((drone (clone =drone=)))
+          [add-sprite self drone]
+          [update-position drone (+ 20 (random 1500)) (+ 20 (random 400))]))
+      [drop-cell self (clone =navpoint= :alpha) 8 10]
+      [drop-cell self (clone =navpoint= :beta) 88 23]
+      [drop-cell self (clone =navpoint= :gamma) 18 90]
+      [drop-cell self (clone =launchpad=) 88 60])
+#+end_src
+
+**** DONE [#C] Create basic Defgame macro and use it for voidmission
+CLOSED: [2010-07-13 Tue 05:24]
+**** TODO [#C] Occasional flashes of background moving cloud fragments in the dark
+***** TODO [#A] MACRO: WITH-LOCALS for world/mission local vars
+
+#+source: dust-particle
+#+begin_src lisp
+  (defparameter *dust-particle-sparkle-interval* 2000)
+  (defparameter *dust-particle-sparkle-time* 4)
+  
+  (defsprite dust-particle
+    (image :initform "dust-off")
+    (speed :initform (make-stat :min 0 :base 1))
+    (direction :initform (random-direction))
+    (interval-clock :initform (random *dust-particle-sparkle-interval*))
+    (sparkle-clock :initform 0))
+  
+  (define-method run dust-particle ()
+    (with-fields (interval-clock direction sparkle-clock image) self
+      (when (zerop interval-clock)
+        (setf direction (random-direction))
+        (setf sparkle-clock *dust-particle-sparkle-time*)
+        (setf interval-clock *dust-particle-sparkle-interval*))
+      (setf image
+            (if (plusp sparkle-clock)
+                (if (evenp sparkle-clock)
+                    "dust-white"
+                    "dust-cyan")
+                "dust-off"))
+      (decf interval-clock)
+      (decf sparkle-clock)
+      (percent-of-time 30 [move self direction 1])))
+#+end_src
+
+**** DONE [#A] Nav points 
+CLOSED: [2010-07-13 Tue 13:33]
+
+#+source: navpoint
+#+begin_src lisp
+  (defparameter *default-navpoint-delay* 60)
+  
+  (defcell navpoint 
+    (name :initform "Navpoint")
+    (index :initform nil)
+    (tile :initform "navpoint-off")
+    (delay :initform *default-navpoint-delay*)
+    (clock :initform 0)
+    (trip :initform nil)
+    (auto-loadout :initform t)
+    (team :initform :neutral)
+    (state :initform nil)  
+    (speed :initform (make-stat :min 0 :base 10 :max 10))
+    (categories :initform '(:target :actor :navpoint)))
+  
+  (define-method initialize navpoint (index)
+    (assert (keywordp index))
+    (setf <index> index))
+    
+  (define-method loadout navpoint ()
+    [stop self])
+    
+  (define-method update-tile navpoint (&optional pulsing)
+    (setf <tile> (if pulsing "navpoint-on" "navpoint-off")))
+  
+  (define-method tap navpoint (delay)
+    (setf <delay> delay))
+  
+  (define-method activate navpoint (&optional delay0)
+    (with-locals (pulsing)
+      (with-fields (clock delay state trip index) self
+        (setf pulsing t)
+        (setf clock 0)
+        (when delay0 (setf delay delay0))
+        (setf state t)
+        (setf trip nil)
+        (when (keywordp index)
+          [set-variable *world* index t])
+        [update-tile self])))
+  
+  (define-method stop navpoint ()
+    (with-locals (pulsing)
+      (with-fields (index clock state) self 
+        (setf state nil)
+        (setf pulsing nil)
+        (when (keywordp index)
+          [set-variable *world* index nil])
+        [update-tile self]
+        (setf clock 0))))
+  
+  (define-method run navpoint ()
+    [update-tile self]
+    (when <state>
+      (if (zerop <clock>)
+          (progn [play-sample self "pulse"]
+                 [update-tile self t]
+                 [set-variable *world* :pulsing t]
+                 (setf <trip> nil)
+                 (labels ((do-circle (image)
+                            (prog1 t
+                              (multiple-value-bind (x y) 
+                                  [image-coordinates self]
+                                (let ((x0 (+ x 8))
+                                      (y0 (+ y 8)))
+                                  (draw-circle x0 y0 40 :destination image)
+                                  (draw-circle x0 y0 35 :destination image))))))
+                   [>>add-overlay :viewport #'do-circle])
+                 (setf <clock> <delay>))
+          (progn (if <trip>
+                     [set-variable *world* :pulsing nil]
+                     (progn (setf <trip> t)
+                            [set-variable *world* :pulsing t]))
+                 (decf <clock>)))))
+    
+  (define-method step navpoint (stepper)
+    (unless <state>
+      (when [is-player stepper]
+        [emote stepper (format nil "Activated nav point ~A." <index>)]
+        [play-sample self "upwoop"]
+        [activate self])))
+#+end_src  
+
+**** DONE [#A] Shockers
+CLOSED: [2010-07-14 Wed 21:21]
+
 #+source: shocker
 #+begin_src lisp
-;;; Basic enemy
-
-;;; The sonic cannon
-
-;;; Sound waves
 
 (defparameter *waveforms* '(:sine :square :saw :bass))
 (defparameter *wave-colors* '(:yellow :cyan :magenta :green))
@@ -1968,86 +2089,8 @@ Then it fires and gives chase.")
   [parent>>die self])  
 #+end_src
 
-* Setting 						  :Story:
-
-It's 2061. If only there were enough endurium!
-
-It's been known for decades that Humanity's reach within the Milky Way
-is limited only by the supply of endurium, its rare and precious
-fuel. The energy crises of C.E. 2021 and C.E. 2027-2031 caused global
-economic, social, and environmental disruption, and with this
-disorganization came the concentration of wealth and power in the
-hands of the government and corporate elites.
-
-Early attempts at control and regulation of endurium met with initial
-success. The space-faring nations---Russia, China, India, Japan,
-Brazil, and the United States---along with the ESA (European Space
-Agency), could quite naturally claim endurium for themselves. But
-economies of scale and espionage in spaceflight technology eventually
-brought smaller deposits and endurium dust streams throughout the
-interstellar neighborhood within the reach of multinational
-corporations and various non-state actors. The largest of these formed
-what they called a "sovereign", open, and successful market in
-endurium, spaceflight technology, and various otherwise-controlled
-materials. The split between the Spacefaring Nations on the one hand,
-and the United Nations on the other, threatens to break into
-full-scale interstellar war; as Earth's environment continues to
-decay, the demand for endurium has reached a critical point.
-
-* Plot
-
-** Prologue
-
-A new high-powered telescope operated by Xiomacs Corporation detects a
-pattern of gas streamers radiating high in the ultraviolet, within a
-cavernous void in galactic space. Subsequent observations show that
-the streamers are emitted from a string of black holes. The
-scientists, seeing the pattern's obviously artificial nature, guess at
-a propulsion method being used to drive a spacecraft, and begin to
-look for something at the trail's leading edge. A year later one of
-the flare-ups is observed, and the calculations fall into place: the
-source of the black holes is an object about as massive as Jupiter,
-but much smaller and far more dense. And it has been accelerating for
-1.2 billion years by riding on streams of gas being ejected from the
-black holes at relativistic speeds. It is given the name DVO1, for
-Deep Void Object 1.
-
-*** DONE Opening movie!
-CLOSED: [2010-07-13 Tue 05:24]
-**** TODO 3 cards progressive reveal of 3 short paragraphs, black screen white text.
-
- It's A.D. 2061. Earth's resources are nearly exhausted. The
- government/corporation complex elites now control humanity's only
- remaining energy source, the rare material Endurium.
- 
-**** TODO "freedom 0: the freedom to survive" propaganda poster 
-**** TODO false-color gas streamer images and fake data
-**** TODO slideshow of blurry diagrams filtered through xanalogtv
-
-** Episode 1
-
-A mysterious Xiomacs operative named Brennan stays in the Void Rider
-as mission commander, while you take off in an exosuit. Your mission
-is to rendezvous with the DVO and make initial discoveries.
-
-*** 1.1: Acquire cloud data
-
-The cloud obscuring the DVO is meant as a shield to protect it from
-the ultraviolet radiation caused by the black holes that propel it
-across the universe. Drop scanning devices at each of 3 nav points
-surrounding the cloud to complete this mission.
-
-**** DONE [#C] Create basic Defgame macro and use it for voidmission
-CLOSED: [2010-07-13 Tue 05:24]
-**** TODO [#C] Occasional flashes of background moving cloud fragments in the dark
-**** TODO [#C] Tiny thunder particle/sparks whenever cloud fragments glow
-**** TODO [#C] Neon cloud pieces are irregular mostly-transparent pixel pngs that float along one another
-**** DONE [#A] Nav points 
-CLOSED: [2010-07-13 Tue 13:33]
-**** TODO [#A] Scanners
-**** TODO [#A] Macrovirii
-**** TODO [#B] Brainstorm dead simple log ui system
-**** TODO [#B] Dialogue and messages
+**** TODO [#B] Get to escape point, radar arrow overlay shows direction
+**** TODO [#B] Events
 
 A strange transmission burst is received after the 1st scanning device
 is placed. The game's first enemies strike after the 2nd scanning
@@ -2061,8 +2104,8 @@ DVO itself.
 *** 1.2: Enter DVO orbit
 
 **** TODO Corridor level
-**** TODO Black space with DVO visible at one edge as a curved planet surface (NASA)
-**** TODO Xianghua cruiser sprite
+**** TODO Purple space with DVO visible at one edge as a curved planet surface (NASA)
+**** TODO Dark neon Xianghua cruiser sprite
 
 Long, narrow northward corridor with cloud walls and enemies.
 

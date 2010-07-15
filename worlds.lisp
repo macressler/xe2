@@ -113,6 +113,21 @@ At the moment, only 0=off and 1=on are supported.")
 (define-method get-variable world (var)
   (gethash var <variables>))
 
+(defun local-variable-value (var-name)
+  [get-variable *world* var-name])
+
+(defun set-local-variable-value (var-name value)
+  [set-variable *world* var-name value])
+
+(defsetf local-variable-value set-local-variable-value)
+
+(defmacro with-locals (vars &rest body)
+  (labels ((make-clause (sym)
+	     `(,sym (local-variable-value ,(make-keyword sym)))))
+    (let* ((symbols (mapcar #'make-non-keyword vars))
+	   (clauses (mapcar #'make-clause symbols)))
+      `(symbol-macrolet ,clauses ,@body))))
+
 (define-method in-category world (category)
   "Returns non-nil when the cell SELF is in the category CATEGORY."
   (member category <categories>))

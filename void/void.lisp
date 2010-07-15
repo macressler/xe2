@@ -99,7 +99,31 @@
 ;;       (apply #'bind-key-to-prompt-insertion self k))))
 (defun physics (&rest ignore)
   (when *world* [run-cpu-phase *world* t]))
-(in-package :void)
+(defparameter *dust-particle-sparkle-interval* 2000)
+(defparameter *dust-particle-sparkle-time* 4)
+
+(defsprite dust-particle
+  (image :initform "dust-off")
+  (speed :initform (make-stat :min 0 :base 1))
+  (direction :initform (random-direction))
+  (interval-clock :initform (random *dust-particle-sparkle-interval*))
+  (sparkle-clock :initform 0))
+
+(define-method run dust-particle ()
+  (with-fields (interval-clock direction sparkle-clock image) self
+    (when (zerop interval-clock)
+      (setf direction (random-direction))
+      (setf sparkle-clock *dust-particle-sparkle-time*)
+      (setf interval-clock *dust-particle-sparkle-interval*))
+    (setf image
+          (if (plusp sparkle-clock)
+              (if (evenp sparkle-clock)
+                  "dust-white"
+                  "dust-cyan")
+              "dust-off"))
+    (decf interval-clock)
+    (decf sparkle-clock)
+    (percent-of-time 30 [move self direction 1])))
 
 (defun same-team (obj1 obj2)
   (eq (field-value :team obj1)
@@ -956,12 +980,6 @@ However, ammunition is unlimited, making BUSTER an old standby.")
 (define-prototype multi-missile-launcher (:parent =missile-launcher=)
   (ammo :initform =multi-missile=)
   (attack-cost :initform (make-stat :base 80)))
-;;; Basic enemy
-
-;;; The sonic cannon
-
-;;; Sound waves
-
 (defparameter *waveforms* '(:sine :square :saw :bass))
 (defparameter *wave-colors* '(:yellow :cyan :magenta :green))
 
@@ -1324,23 +1342,27 @@ Then it fires and gives chase.")
 (define-method tap navpoint (delay)
   (setf <delay> delay))
 
-(define-method activate navpoint (&optional delay)
-  (setf <clock> 0)
-  (when delay (setf <delay> delay))
-  (setf <state> t)
-  (setf <trip> nil)
-  [set-variable *world* :pulsing t]
-  (when (keywordp <index>)
-    [set-variable *world* <index> t])
-  [update-tile self])
+(define-method activate navpoint (&optional delay0)
+  (with-locals (pulsing)
+    (with-fields (clock delay state trip index) self
+      (setf pulsing t)
+      (setf clock 0)
+      (when delay0 (setf delay delay0))
+      (setf state t)
+      (setf trip nil)
+      (when (keywordp index)
+        [set-variable *world* index t])
+      [update-tile self])))
 
 (define-method stop navpoint ()
-    (setf <state> nil)
-    [set-variable *world* :pulsing nil]
-    (when (keywordp <index>)
-      [set-variable *world* <index> nil])
-    [update-tile self]
-    (setf <clock> 0))
+  (with-locals (pulsing)
+    (with-fields (index clock state) self 
+      (setf state nil)
+      (setf pulsing nil)
+      (when (keywordp index)
+        [set-variable *world* index nil])
+      [update-tile self]
+      (setf clock 0))))
 
 (define-method run navpoint ()
   [update-tile self]
@@ -1373,74 +1395,79 @@ Then it fires and gives chase.")
       [play-sample self "upwoop"]
       [activate self])))
 
-  (defcell vaccuum 
-    (tile :initform "vaccuum"))
-  
-  (defcell red-plasma
-    (tile :initform "red-plasma"))
-  
-  (defcell blue-plasma
-    (tile :initform "blue-plasma"))
-  
-  (defworld cloud
-    (name :initform "DVO UV Shield Cloud")
-    (scale :initform '(50 m))
-    (edge-condition :initform :block)
-    (background :initform "cloud")
-    (ambient-light :initform :total)
-    (description :initform "foo"))
+    (defcell vaccuum 
+      (tile :initform "vaccuum"))
     
-  (define-method begin-ambient-loop cloud ()
-    (play-music "passageway" :loop t))
+    (defcell red-plasma
+      (tile :initform "red-plasma"))
     
-  (define-method drop-plasma cloud
-      (&optional &key (object =red-plasma=)
-                 distance 
-                 (row 0) (column 0)
-                 (graininess 0.3)
-                 (density 100)
-                 (cutoff 0))
-      (clon:with-field-values (height width) self
-        (let* ((h0 (or distance height))
-               (w0 (or distance width))
-               (r0 (- row (truncate (/ h0 2))))
-               (c0 (- column (truncate (/ w0 2))))
-               (plasma (xe2:render-plasma h0 w0 :graininess graininess))
-               (value nil))
-          (dotimes (i h0)
-            (dotimes (j w0)
-              (setf value (aref plasma i j))
-              (when (< cutoff value)
-                (when (or (null distance)
-                          (< (distance (+ j r0) (+ c0 i) row column) distance))
-                  (percent-of-time density
-                    [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
+    (defcell blue-plasma
+      (tile :initform "blue-plasma"))
     
-  (define-method generate cloud (&key (height 100)
-                                      (width 100)
-                                      (protostars 30)
-                                      (sequence-number (genseq)))
-    (setf <height> height <width> width)
-    [create-default-grid self]
-    (dotimes (i width)
-      (dotimes (j 8)
-        (percent-of-time 5
-          [drop-cell self (clone =shocker=) j i])))
-    ;;    [drop-plasma self]
-    ;; (dotimes (i protostars)
-    ;;   (let ((r (random height))
-    ;;      (c (random width)))
-    ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
-    ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
-    ;;     [drop-cell self (clone =protostar=) r c]))
-    (dotimes (n 3)
-      (let ((drone (clone =drone=)))
-        [add-sprite self drone]
-        [update-position drone (+ 20 (random 1500)) (+ 20 (random 400))]))
-    [drop-cell self (clone =navpoint= :alpha) 8 10]
-    [drop-cell self (clone =navpoint= :beta) 88 23]
-    [drop-cell self (clone =navpoint= :gamma) 18 90]
-    [drop-cell self (clone =launchpad=) 88 60])
+    (defworld cloud
+      (name :initform "DVO UV Shield Cloud")
+      (scale :initform '(50 m))
+      (edge-condition :initform :block)
+      (background :initform "cloud")
+      (ambient-light :initform :total)
+      (description :initform "foo"))
+      
+    (define-method begin-ambient-loop cloud ()
+      (play-music "passageway" :loop t))
+      
+    (define-method drop-plasma cloud
+        (&optional &key (object =red-plasma=)
+                   distance 
+                   (row 0) (column 0)
+                   (graininess 0.3)
+                   (density 100)
+                   (cutoff 0))
+        (clon:with-field-values (height width) self
+          (let* ((h0 (or distance height))
+                 (w0 (or distance width))
+                 (r0 (- row (truncate (/ h0 2))))
+                 (c0 (- column (truncate (/ w0 2))))
+                 (plasma (xe2:render-plasma h0 w0 :graininess graininess))
+                 (value nil))
+            (dotimes (i h0)
+              (dotimes (j w0)
+                (setf value (aref plasma i j))
+                (when (< cutoff value)
+                  (when (or (null distance)
+                            (< (distance (+ j r0) (+ c0 i) row column) distance))
+                    (percent-of-time density
+                      [drop-cell self (clone object) (+ r0 i) (+ c0 j) :no-collisions t]))))))))
+      
+    (define-method generate cloud (&key (height 100)
+                                        (width 100)
+                                        (protostars 30)
+                                        (sequence-number (genseq)))
+      (setf <height> height <width> width)
+      [create-default-grid self]
+      (dotimes (i width)
+        (dotimes (j 8)
+          (percent-of-time 5
+            [drop-cell self (clone =shocker=) j i])))
+      ;;    [drop-plasma self]
+      ;; (dotimes (i protostars)
+      ;;   (let ((r (random height))
+      ;;      (c (random width)))
+      ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
+      ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
+      ;;     [drop-cell self (clone =protostar=) r c]))
+      ;; space dust
+      (dotimes (n 100) 
+        (let ((dust (clone =dust-particle=)))
+          [add-sprite self dust]
+          [update-position dust (random 1590) (random 1590)]))
+      (dotimes (n 3)
+        (let ((drone (clone =drone=)))
+          [add-sprite self drone]
+          [update-position drone (+ 20 (random 1500)) (+ 20 (random 400))]))
+      [drop-cell self (clone =navpoint= :alpha) 8 10]
+      [drop-cell self (clone =navpoint= :beta) 88 23]
+      [drop-cell self (clone =navpoint= :gamma) 18 90]
+      [drop-cell self (clone =launchpad=) 88 60])
 (defparameter *react-shield-time* 30)
 
 (defparameter *vox-warning-clock* 400)

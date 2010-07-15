@@ -758,8 +758,13 @@
  (:name "osc-sine-off" :type :image :file "osc-sine-off.png")
  (:name "osc-square-on" :type :image :file "osc-square-on.png")
  (:name "osc-square-off" :type :image :file "osc-square-off.png")
+
  (:name "osc-saw-on" :type :image :file "osc-saw-on.png")
  (:name "osc-saw-off" :type :image :file "osc-saw-off.png")
+
+ (:name "dust-white" :type :image :file "dust-white.png")
+ (:name "dust-cyan" :type :image :file "dust-cyan.png")
+ (:name "dust-off" :type :image :file "dust-off.png")
 
  (:name "tank-disabled" :type :image :file "tank-disabled.png")
  (:name "tank-north" :type :image :file "tank-north.png")
