@@ -29,23 +29,24 @@
 (defstruct goal 
   name 
   description
-  condition ;; either a symbol or a function, or a keyword (world var)
+  condition ;; either a symbol or a function
   state ; one of nil, :achieved, :failed
   prerequisites)
 
-(defun achieved-p (goal)
-  (or (eq :achieved (goal-state goal))
-      (check-condition goal)))
-
 (defun check-condition (goal)
-  (let ((condition (goal-condition goal))
-	(prerequisites (goal-prerequisites goal)))
-    (when (and (etypecase condition
-		 (symbol (symbol-value condition))
-		 (function (funcall condition)))
-	       (or (null prerequisites)
-		   (every #'achieved-p prerequisites)))
-      (setf (goal-state goal) :achieved))))
+  (message "checking goal condition: ~A" goal)
+  (etypecase goal
+    (keyword (check-condition (mission-variable-value goal)))
+    (goal (or (eq :achieved (goal-state goal))
+	      (let ((condition (goal-condition goal))
+		    (prerequisites (goal-prerequisites goal)))
+		(when (and (etypecase condition
+			     (symbol (symbol-value condition))
+			     (function (funcall condition)))
+			   (or (null prerequisites)
+			       (every #'check-condition prerequisites)))
+		  (message "ACHIEVED: ~S " (goal-name goal))
+		  (setf (goal-state goal) :achieved)))))))
 
 (defvar *mission* nil)
 
@@ -73,7 +74,7 @@
 
 (defmacro with-mission-locals (vars &rest body)
   (labels ((make-clause (sym)
-	     `(,sym (local-variable-value ,(make-keyword sym)))))
+	     `(,sym (mission-variable-value ,(make-keyword sym)))))
     (let* ((symbols (mapcar #'make-non-keyword vars))
 	   (clauses (mapcar #'make-clause symbols)))
       `(symbol-macrolet ,clauses ,@body))))
@@ -110,19 +111,21 @@
 
 (define-method end mission ())
 
+(define-method run mission ())
+
 (defmacro defmission (name (&key title description address)
 		      &rest goals)
   (let ((hash (gensym)))
     (labels ((set-goal (entry)
 	       (destructuring-bind (var-name &rest goal-props) entry
 		 `(setf (gethash ,(make-keyword var-name) ,hash) (make-goal ,@goal-props)))))
-    `(let ((,hash (make-hash-table)))
-       (progn ,@(mapcar #'set-goal goals))
-       (define-prototype ,name (:parent xe2:=mission=)
-	 (name :initform ,(make-keyword name))
-	 (description :initform ,description)
-	 (address :initform ,address)
-	 (variables :initform ,hash)
+      `(let ((,hash (make-hash-table)))
+	 (progn ,@(mapcar #'set-goal goals))
+	 (define-prototype ,name (:parent xe2:=mission=)
+	   (name :initform ,(make-keyword name))
+	   (description :initform ,description)
+	   (address :initform ,address)
+	   (variables :initform ,hash)
 	 (title :initform ,title))))))
 
 ;; The flow goes defmission, initialize, begin, win/lose, end

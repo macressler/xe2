@@ -730,6 +730,8 @@ realtime mode."
     (when phase-p
       (incf <phase-number>))
     (with-message-queue <message-queue> 
+    (when *mission*
+      [run *mission*])
       (let ((cell nil)
 	    (phase-number <phase-number>)
 	    (player <player>)

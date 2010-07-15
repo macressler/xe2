@@ -1323,7 +1323,17 @@ Then it fires and gives chase.")
    (:title "Gather cloud data"
     :address '(=cloud=))
   (:nav-points :name "Activate all three nav points."
-               :condition #'nav-points-completed-p))
+               :condition #'nav-points-completed-p
+               :prerequisites '(:pressed-button-1 :pressed-button-2))
+  (:pressed-button-1 :name "Press the B button."
+                     :condition #'(lambda () (mission-variable-value :pressed-b-yet)))
+  (:pressed-button-2 :name "Press the F button."
+                     :condition #'(lambda () (mission-variable-value :pressed-f-yet))))
+
+(define-method run gather-cloud-data ()
+  (maphash #'(lambda (k v)
+               (print (list k v)))
+           <variables>))
 (defparameter *default-navpoint-delay* 60)
 
 (defcell navpoint 
@@ -1454,26 +1464,19 @@ Then it fires and gives chase.")
                                         (sequence-number (genseq)))
       (setf <height> height <width> width)
       [create-default-grid self]
-      (dotimes (i width)
-        (dotimes (j 8)
-          (percent-of-time 5
-            [drop-cell self (clone =shocker=) j i])))
-      ;;    [drop-plasma self]
-      ;; (dotimes (i protostars)
-      ;;   (let ((r (random height))
-      ;;      (c (random width)))
-      ;;     [drop-plasma self :object =protogas= :distance 12 :row r :column c :graininess 0.3]
-      ;;     [drop-plasma self :object =crystal= :density 7 :distance 16 :row r :column c :graininess 0.3]
-      ;;     [drop-cell self (clone =protostar=) r c]))
       ;; space dust
       (dotimes (n 100) 
         (let ((dust (clone =dust-particle=)))
           [add-sprite self dust]
           [update-position dust (random 1590) (random 1590)]))
-      (dotimes (n 3)
-        (let ((drone (clone =drone=)))
-          [add-sprite self drone]
-          [update-position drone (+ 20 (random 1500)) (+ 20 (random 400))]))
+      ;; (dotimes (i width)
+      ;;   (dotimes (j 8)
+      ;;     (percent-of-time 5
+      ;;       [drop-cell self (clone =shocker=) j i])))
+      ;; (dotimes (n 3)
+      ;;   (let ((drone (clone =drone=)))
+      ;;     [add-sprite self drone]
+      ;;     [update-position drone (+ 20 (random 1500)) (+ 20 (random 400))]))
       [drop-cell self (clone =navpoint= :alpha) 8 10]
       [drop-cell self (clone =navpoint= :beta) 88 23]
       [drop-cell self (clone =navpoint= :gamma) 18 90]
@@ -1529,18 +1532,22 @@ Then it fires and gives chase.")
                 :timeout 10.0])
 
 (define-method blab agent ()
-  [emote self '((("I've got to drop sensors on all three nav points."))
-                (("Nav points look like this: ") (nil :image "navpoint-off"))
-                (("I'd better keep moving.")))
-                :timeout 10.0])
+  (with-mission-locals (pressed-b-yet)
+    (setf pressed-b-yet t)
+    [emote self '((("I've got to drop sensors on all three nav points."))
+                  (("Nav points look like this: ") (nil :image "navpoint-off"))
+                  (("I'd better keep moving.")))
+           :timeout 10.0]))
                
 (define-method freak agent ()
   [play-sample self "vox-brennan"]
-  [emote self '((("BRENNAN:"))
-                (("I'm getting some radiation. Watch your scanners,"))
-                (("and focus on reaching those nav points.")))
-                :timeout 10.0])
-
+  (with-mission-locals (pressed-f-yet)
+    (setf pressed-f-yet t)
+    [emote self '((("BRENNAN:"))
+                  (("I'm getting some radiation. Watch your scanners,"))
+                  (("and focus on reaching those nav points.")))
+           :timeout 10.0]))
+  
 (define-method alienate agent ()
   [play-sample self "vox-unidentified"]
   (play-music "neo-eof" :loop t)
