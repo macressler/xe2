@@ -37,10 +37,4 @@
      (setf xe2:*dt* ,timestep)
      ,@startup-forms))
 
-
-  
-  
-		   
-
-
 ;;; util.lisp ends here

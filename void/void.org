@@ -6,6 +6,7 @@
 
 * Plan
 
+** TODO 
 ** TODO Improve org babel lisp support
 *** TODO [#A] Block execution in sessions working
 *** TODO [#B] Auto insert new blocks
@@ -58,6 +59,7 @@
 <<things>>
 <<shocker>>
 <<drone>>
+<<cloud-mission>>
 <<cloud-world>>
 <<player-definition>>
 <<game-definition>>
@@ -432,12 +434,12 @@
     (xe2:install-widgets *prompt* *viewport*)
     (xe2:enable-classic-key-repeat 100 60)
     ;; now play!
-    [play *universe*
-          :player *player*
-          :narrator *narrator*
-          :address *address*
-          :prompt *prompt*
-          :viewport *viewport*]
+    (let ((mission (clone =gather-cloud-data=)))
+      [configure *universe*
+                 :narrator *narrator*
+                 :prompt *prompt*
+                 :viewport *viewport*]
+      [begin mission *player*])
     [loadout *player*])
 #+end_src
     
@@ -2100,6 +2102,21 @@ device is placed.
 
 The measurement data enable plotting a path through the cloud to the
 DVO itself.
+
+#+source: cloud-mission
+#+begin_src lisp
+  (defun nav-points-completed-p ()
+    (with-locals (alpha beta gamma)
+      (and alpha beta gamma)))
+  
+  (defmission gather-cloud-data 
+     (:title "Gather cloud data"
+      :address '(=cloud=))
+    (:nav-points (make-goal :name "Activate all three nav points."
+                            :condition #'nav-points-completed-p)))
+#+end_src
+
+
 
 *** 1.2: Enter DVO orbit
 

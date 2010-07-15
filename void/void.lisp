@@ -1314,6 +1314,15 @@ Then it fires and gives chase.")
             [damage self 2]
             [play-sample self "blaagh"]
             [die other]))))
+(defun nav-points-completed-p ()
+  (with-locals (alpha beta gamma)
+    (and alpha beta gamma)))
+
+(defmission gather-cloud-data 
+   (:title "Gather cloud data"
+    :address '(=cloud=))
+  (:nav-points (make-goal :name "Activate all three nav points."
+                          :condition #'nav-points-completed-p)))
 (defparameter *default-navpoint-delay* 60)
 
 (defcell navpoint 
@@ -1797,11 +1806,11 @@ Then it fires and gives chase.")
   (xe2:install-widgets *prompt* *viewport*)
   (xe2:enable-classic-key-repeat 100 60)
   ;; now play!
-  [play *universe*
-        :player *player*
-        :narrator *narrator*
-        :address *address*
-        :prompt *prompt*
-        :viewport *viewport*]
+  (let ((mission (clone =gather-cloud-data=)))
+    [configure *universe*
+               :narrator *narrator*
+               :prompt *prompt*
+               :viewport *viewport*]
+    [begin mission *player*])
   [loadout *player*])
 ;; xe2-lisp-file ends here

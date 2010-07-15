@@ -1171,17 +1171,24 @@ represents the z-axis of a euclidean 3-D space."))
 		       [generate-world self address])]
 	candidate)))
 
+(define-method configure universe (&key address player prompt narrator viewport)
+  (when address (setf <current-address> address))
+  (when player (setf <player> player))
+  (when prompt (setf <prompt> prompt))
+  (when narrator (setf <narrator> narrator))
+  (when viewport (setf <viewport> viewport)))
+
 (define-method play universe (&key address player prompt narrator viewport)
   "Prepare a universe for play at the world identified by ADDRESS with
 PLAYER as the player, PROMPT as the prompt, NARRATOR as the
 narrator, and VIEWPORT as the viewport."
-  (setf <current-address> address)
+  (when address (setf <current-address> address))
   (when player (setf <player> player))
   (when prompt (setf <prompt> prompt))
   (when narrator (setf <narrator> narrator))
   (when viewport (setf <viewport> viewport))
   (assert (and <prompt> <narrator>))
-  (let ((world [find-world self address])
+  (let ((world [find-world self <current-address>])
 	(player <player>)
 	(previous-world (car <stack>)))
     ;; make sure exit coordinates are saved, so we can go back to this point

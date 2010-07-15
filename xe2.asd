@@ -29,7 +29,7 @@
 	       (:file "cells")
 	       (:file "narration")
 	       (:file "browser")
-	       (:file "grammars")
+	       (:file "mission")
 	       (:file "worlds")
 	       (:file "path")
 	       (:file "util")

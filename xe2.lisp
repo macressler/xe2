@@ -129,9 +129,10 @@ set-field-option-value =pager= =pager-prompt= load-module
 *message-logging* overlay poll-joystick-axis reset-joystick
 set-screen-width =universe= *universe* *play-args* set-screen-height
 genseq *zoom-factor* zoom-image is-zoomed-resource *timer-interval*
-save-modified-objects enable-timer disable-timer while
+save-modified-objects enable-timer disable-timer while defmission
 enable-held-keys disable-held-keys do-cells draw-box *resizable*
-*resize-hook* draw-rectangle *quitting* *after-load-module-hook*
+*resize-hook* draw-rectangle *quitting* *after-load-module-hook* *mission*
+mission-variable-value set-mission-variable-value with-mission-locals =mission=
 local-variable-value set-local-variable-value with-locals with-mission-locals
 *module* quit reset))
 
