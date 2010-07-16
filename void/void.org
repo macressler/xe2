@@ -6,6 +6,20 @@
 
 * Plan
 
+** TODO don't crash when click background
+** TODO visual feedback on damage/destruction of macrovirii
+** TODO Events one-time triggered etc support in defmission
+** DONE smooth scrolling
+CLOSED: [2010-07-15 Thu 22:27]
+(09:44:39 AM) dto1138@gmail.com/52DC8FDC: right now, it checks to see whether the player has moved to a square that's out of a "comfort zone" in the middle
+(09:44:56 AM) dto1138@gmail.com/52DC8FDC: what do you mean smooth scrolling? 1 tile at a time, or 1 pixel?
+(09:45:25 AM) dto1138@gmail.com/52DC8FDC: my videos looking fucking cunting great
+(09:45:59 AM) Shawn Betts: smooth scrolling. < 1/2 a screen scrolling
+(09:46:05 AM) dto1138@gmail.com/52DC8FDC: har
+(09:46:05 AM) dto1138@gmail.com/52DC8FDC: ok
+(09:46:19 AM) dto1138@gmail.com/52DC8FDC: well, i could increase the size of the border.
+(09:46:36 AM) Shawn Betts: and you could theoretically add smooth movement without abandoning the "rogueness"
+(09:46:56 AM) dto1138@gmail.com/52DC8FDC: and add some "drag" in that when it jumps 8 tiles, it moves some smooth number of steps over a moment or two
 ** DONE finish HUD
 CLOSED: [2010-07-15 Thu 04:47]
 ** DONE inventory HUD
@@ -14,11 +28,11 @@ CLOSED: [2010-07-15 Thu 04:47]
 CLOSED: [2010-07-15 Thu 04:54]
 ** TODO Improve org babel lisp support
 *** TODO [#A] Block execution in sessions working
-*** TODO [#B] Auto insert new blocks
+*** DONE [#B] Auto insert new blocks and stuff with abbrevs
+CLOSED: [2010-07-15 Thu 22:27]
 *** TODO auto-complete and menu nav blocks/headings
 ** TODO [#C] Remove old bubble when emoting again, or move it upwards like a terminal.
 ** TODO [#C] Allow clear bubbles with a line to the left flush showing blocks  
-** TODO bring narration back in some way.
 
 * Header
 
@@ -154,11 +168,7 @@ CLOSED: [2010-07-15 Thu 04:54]
   
   (define-method loadout agent ()
     [set-character *status* self]
-    (push (clone =buster-defun=) <items>)
-    [emote self '((("I'd better get moving."))
-                  (("Use the arrow keys (or numpad)"))
-                  (("to move, and SHIFT to fire."))) 
-                  :timeout 10.0])
+    (push (clone =buster-defun=) <items>))
   
   (define-method blab agent ()
     [emote self '((("I've got to drop sensors on all three nav points."))
@@ -488,14 +498,14 @@ CLOSED: [2010-07-15 Thu 04:54]
   
   (defparameter *status-height* 20)
   
-  (defgame :void
-      (:title "Void Mission"
-              :description "A sci-fi roguelike game in Common Lisp."
-              :creator "David T. O'Toole <dto@gnu.org>"
-              :screen-width *width*
-              :screen-height *height*
-              :timestep *timestep*
-              :physics-function #'void:physics)
+(defgame :void
+    (:title "Void Mission"
+     :description "A sci-fi roguelike game in Common Lisp."
+     :creator "David T. O'Toole <dto@gnu.org>"
+     :screen-width *width*
+     :screen-height *height*
+     :timestep *timestep*
+     :physics-function #'void:physics)
     ;; create some objects
     (setf *prompt* (clone =void-prompt=))
     (setf *universe* (clone =universe=))
@@ -524,7 +534,8 @@ CLOSED: [2010-07-15 Thu 04:54]
     (xe2:install-widgets *prompt* *viewport* *status*)
     (xe2:enable-classic-key-repeat 100 60)
     ;; now play!
-    (let ((mission (clone =gather-cloud-data=)))
+    (let ((mission (clone =enter-dvo-orbit=)))
+    ;;(let ((mission (clone =gather-cloud-data=)))
       [configure *universe*
                  :narrator *narrator*
                  :prompt *prompt*

@@ -907,6 +907,8 @@ sources and ray casting."
     ;;   [show-location <player>])
     [after-start-method self]
     [process-messages self])
+  ;; get player onscreen
+  (when <viewport> [adjust <viewport> :snap])
   [begin-ambient-loop self])
 
 (define-method after-start-method world ()

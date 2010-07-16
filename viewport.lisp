@@ -39,7 +39,7 @@
   (use-overlays :initform t)
   (pending-draws :initform (make-array 100 :initial-element nil 
 				       :adjustable t :fill-pointer 0))
-  (margin :initform 6 :documentation "Scroll margin.")
+  (margin :initform 8 :documentation "Scroll margin.")
   (origin-x :initform 0 
 	    :documentation "The world x-coordinate of the tile at the viewport's origin.")
   (origin-y :initform 0 
@@ -217,7 +217,7 @@
 	<origin-width> width
 	<origin-height> height))
 
-(define-method adjust viewport ()
+(define-method adjust viewport (&optional snap)
   "Move the viewport's origin if required to keep the player onscreen."
   (let* ((world (or <world> *world*))
 	 (world-width (field-value :width world))
@@ -225,38 +225,41 @@
 	 (player (field-value :player world))
 	 (player-x [player-column world])
 	 (player-y [player-row world])
-	 (origin-x <origin-x>)
-	 (origin-y <origin-y>)
-	 (origin-height <origin-height>)
-	 (origin-width <origin-width>)
 	 (margin <margin>))
-    ;; are we outside the "comfort zone"?
-    (when (or 
-	   ;; too far left
-	   (> (+ origin-x margin) 
-	      player-x)
-	   ;; too far right
-	   (> player-x
-	      (- (+ origin-x origin-width)
-		 margin))
-	   ;; too far up
-	   (> (+ origin-y margin) 
-	      player-y)
-	   ;; too far down 
-	   (> player-y 
-	      (- (+ origin-y origin-height)
-		 margin)))
-      ;; yes. recenter.
-      (setf <origin-x> 
-	    (max 0
-		 (min (- world-width origin-width)
-		      (- player-x 
-			 (truncate (/ origin-width 2))))))
-      (setf <origin-y> 
-	    (max 0 
-		 (min (- world-height origin-height)
-		      (- player-y 
-			 (truncate (/ origin-height 2)))))))))
+    (with-fields (origin-x origin-y origin-height origin-width) self
+      ;; are we outside the "comfort zone"?
+      (when (or 
+	     ;; too far left
+	     (> (+ origin-x margin) 
+		player-x)
+	     ;; too far right
+	     (> player-x
+		(- (+ origin-x origin-width)
+		   margin))
+	     ;; too far up
+	     (> (+ origin-y margin) 
+		player-y)
+	     ;; too far down 
+	     (> player-y 
+		(- (+ origin-y origin-height)
+		   margin)))
+	;; yes. recenter.
+	(let ((new-x (max 0
+			  (min (- world-width origin-width)
+			       (- player-x 
+				  (truncate (/ origin-width 2))))))
+	      (new-y (max 0 
+			  (min (- world-height origin-height)
+			       (- player-y 
+				  (truncate (/ origin-height 2)))))))
+	  (if snap
+	      (setf origin-x new-x origin-y new-y)
+	      (progn (if (not (= origin-x new-x))
+			 (incf origin-x
+			       (if (> new-x origin-x) 1 -1)))
+		     (if (not (= origin-y new-y))
+			 (incf origin-y
+			       (if (> new-y origin-y) 1 -1))))))))))
 
 ;;; The minimap
 
