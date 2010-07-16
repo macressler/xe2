@@ -6,33 +6,42 @@
 
 * Plan
 
-** TODO don't crash when click background
-** TODO visual feedback on damage/destruction of macrovirii
-** TODO Events one-time triggered etc support in defmission
-** DONE smooth scrolling
-CLOSED: [2010-07-15 Thu 22:27]
-(09:44:39 AM) dto1138@gmail.com/52DC8FDC: right now, it checks to see whether the player has moved to a square that's out of a "comfort zone" in the middle
-(09:44:56 AM) dto1138@gmail.com/52DC8FDC: what do you mean smooth scrolling? 1 tile at a time, or 1 pixel?
-(09:45:25 AM) dto1138@gmail.com/52DC8FDC: my videos looking fucking cunting great
-(09:45:59 AM) Shawn Betts: smooth scrolling. < 1/2 a screen scrolling
-(09:46:05 AM) dto1138@gmail.com/52DC8FDC: har
-(09:46:05 AM) dto1138@gmail.com/52DC8FDC: ok
-(09:46:19 AM) dto1138@gmail.com/52DC8FDC: well, i could increase the size of the border.
-(09:46:36 AM) Shawn Betts: and you could theoretically add smooth movement without abandoning the "rogueness"
-(09:46:56 AM) dto1138@gmail.com/52DC8FDC: and add some "drag" in that when it jumps 8 tiles, it moves some smooth number of steps over a moment or two
-** DONE finish HUD
-CLOSED: [2010-07-15 Thu 04:47]
-** DONE inventory HUD
-CLOSED: [2010-07-15 Thu 04:47]
-** DONE left click on object shows bubble with name/desc
-CLOSED: [2010-07-15 Thu 04:54]
+
+
+** TODO ensure adequate playtime
+** TODO autosave before missions
 ** TODO Improve org babel lisp support
 *** TODO [#A] Block execution in sessions working
-*** DONE [#B] Auto insert new blocks and stuff with abbrevs
-CLOSED: [2010-07-15 Thu 22:27]
 *** TODO auto-complete and menu nav blocks/headings
-** TODO [#C] Remove old bubble when emoting again, or move it upwards like a terminal.
-** TODO [#C] Allow clear bubbles with a line to the left flush showing blocks  
+*** TODO what to do about archiving entries w attachments??
+
+* Schedule
+
+** TODO test release missions 1.1 and 1.2 on linux/windows
+SCHEDULED: <2010-07-16 Fri>
+*** TODO [#A] opening screen with theme3 and "here i am, use arrow keys"
+*** TODO Xioceptor ship interior
+*** TODO [#A] "mission complete" with Vixon.ogg
+*** TODO [#A] Events one-time triggered etc support in defmission
+*** TODO [#A] F1 help bubble
+*** TODO [#A] don't crash when click background
+*** TODO [#A] visual feedback on damage/destruction of macrovirii
+*** TODO [#B] Remove old bubble when emoting again, or move it upwards like a terminal.
+*** TODO [#B] Allow clear bubbles with a line to the left flush showing blocks  
+
+** TODO [#B] add mission 1.4 with story teaser cliffhanger
+
+** TODO RELEASE EPISODE 1
+
+DEADLINE: <2010-08-10 Tue>
+*** Notebook page
+*** USENET postings
+*** Tigforum page
+*** Planet lisp 
+*** free gamer
+*** roguelike
+*** russian roguelike site
+*** playthisthing + other blogs
 
 * Header
 
@@ -81,6 +90,8 @@ CLOSED: [2010-07-15 Thu 22:27]
 <<cloud-mission>>
 <<cloud-world>>
 <<dvo-world>>
+<<title-screen>>
+<<xioceptor>>
 <<player-definition>>
 <<game-definition>>
 #+end_src
@@ -534,7 +545,7 @@ CLOSED: [2010-07-15 Thu 22:27]
     (xe2:install-widgets *prompt* *viewport* *status*)
     (xe2:enable-classic-key-repeat 100 60)
     ;; now play!
-    (let ((mission (clone =enter-dvo-orbit=)))
+    (let ((mission (clone =start-game=)))
     ;;(let ((mission (clone =gather-cloud-data=)))
       [configure *universe*
                  :narrator *narrator*
@@ -562,6 +573,29 @@ and firing, and the player can only carry or use a few (i.e. between 1
 and 5) items at a time. The player also has fewer stats than in a
 typical roguelike, but various upgrades make sure that character
 development is still central.
+
+* Title screen
+
+#+source: title-screen
+#+begin_src lisp
+  (defworld title-screen
+    (edge-condition :initform :block)
+    (title-screen :initform t)
+    (background :initform "title")
+    (ambient-light :initform :total)
+    (description :initform "foo"))
+  
+  (define-method begin-ambient-loop title-screen ()
+    (play-music "theme" :loop t))
+  
+  (define-method generate title-screen (&rest args)
+    [resize-to-background self]
+    [drop-cell self (clone =launchpad=) 10 10])
+  
+  (defmission start-game
+      (:address '(=title-screen=)))
+#+end_src 
+
 
 * Controls					       :Controls:
 
@@ -1814,6 +1848,21 @@ A mysterious Xiomacs operative named Brennan stays in the Void Rider
 as mission commander, while you take off in an exosuit. Your mission
 is to rendezvous with the DVO and make initial discoveries.
 
+*** Xioceptor ship interior
+
+This is home base.
+
+#+source: xioceptor
+#+begin_src lisp
+  (defworld xioceptor
+    (name :initform "Xiomacs Interceptor")
+    (scale :initform '(2 m))
+    (edge-condition :initform :block)
+    (background :initform "xioceptor")
+    (ambient-light :initform :total)
+    (description :initform "foo"))
+#+end_src 
+
 *** 1.1: Acquire cloud data
 
 The cloud obscuring the DVO is meant as a shield to protect it from
@@ -2190,10 +2239,6 @@ Then it fires and gives chase.")
 **** TODO [#B] Get to escape point, radar arrow overlay shows direction
 **** TODO [#B] Events
 
-A strange transmission burst is received after the 1st scanning device
-is placed. The game's first enemies strike after the 2nd scanning
-device is placed.
-
 ** TODO Burst sound and text
 
 The measurement data enable plotting a path through the cloud to the
@@ -2201,22 +2246,14 @@ DVO itself.
 
 #+source: cloud-mission
 #+begin_src lisp
-  (defun nav-points-completed-p ()
-    (message "Checking nav points...")
-    (with-locals (alpha beta gamma)
-      (and alpha beta gamma)))
-  
   (defmission gather-cloud-data 
      (:title "Gather cloud data"
       :address '(=cloud=))
-    (:nav-points :name "Activate all three nav points."
-                 :condition #'nav-points-completed-p
-                 :prerequisites '(:pressed-button-1 :pressed-button-2))
-    (:pressed-button-1 :name "Press the B button."
-                       :condition #'(lambda () (mission-variable-value :pressed-b-yet)))
-    (:pressed-button-2 :name "Press the F button."
-                       :condition #'(lambda () (mission-variable-value :pressed-f-yet))))
-  
+    (:activate-nav-points :name "Activate all three nav points."
+                 :condition #'(lambda ()
+                                (with-locals (alpha beta gamma)
+                                  (and alpha beta gamma))))
+    (:return-to-base :name "Return to the Xioceptor."))
 #+end_src
 
 *** 1.2: Enter DVO orbit
@@ -2376,7 +2413,6 @@ hulk with no energy or life signs. At this point it becomes obvious
 that you are not the first human to visit the DVO, and that at least
 one other Corporation has reached orbit and possibly the DVO itself.
 
-
 *** 1.3: Retrieve memory card
 
 **** TODO High-tech interior
@@ -2503,4 +2539,61 @@ You enter a stasis chamber and launch yourself back along the trail of
 black holes, slingshotting from one event horizon to another, and
 arrive in an unknown area.
 
+
+
+* Archived Entries
+** DONE [#B] Auto insert new blocks and stuff with abbrevs
+CLOSED: [2010-07-15 Thu 22:27]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-16 Fri 15:51
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Plan/Improve org babel lisp support
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:END:
+** DONE left click on object shows bubble with name/desc
+CLOSED: [2010-07-15 Thu 04:54]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-16 Fri 15:51
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Plan
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:END:
+** DONE inventory HUD
+CLOSED: [2010-07-15 Thu 04:47]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-16 Fri 15:51
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Plan
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:END:
+** DONE finish HUD
+CLOSED: [2010-07-15 Thu 04:47]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-16 Fri 15:51
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Plan
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:END:
+** DONE smooth scrolling
+CLOSED: [2010-07-15 Thu 22:27]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-16 Fri 15:51
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Plan
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:END:
+(09:44:39 AM) dto1138@gmail.com/52DC8FDC: right now, it checks to see whether the player has moved to a square that's out of a "comfort zone" in the middle
+(09:44:56 AM) dto1138@gmail.com/52DC8FDC: what do you mean smooth scrolling? 1 tile at a time, or 1 pixel?
+(09:45:25 AM) dto1138@gmail.com/52DC8FDC: my videos looking fucking cunting great
+(09:45:59 AM) Shawn Betts: smooth scrolling. < 1/2 a screen scrolling
+(09:46:05 AM) dto1138@gmail.com/52DC8FDC: har
+(09:46:05 AM) dto1138@gmail.com/52DC8FDC: ok
+(09:46:19 AM) dto1138@gmail.com/52DC8FDC: well, i could increase the size of the border.
+(09:46:36 AM) Shawn Betts: and you could theoretically add smooth movement without abandoning the "rogueness"
+(09:46:56 AM) dto1138@gmail.com/52DC8FDC: and add some "drag" in that when it jumps 8 tiles, it moves some smooth number of steps over a moment or two
 

@@ -1426,21 +1426,14 @@ Then it fires and gives chase.")
   (let ((player [get-player *world*]))
     [play-sample self "munch2"]
     [damage player 3]))
-(defun nav-points-completed-p ()
-  (message "Checking nav points...")
-  (with-locals (alpha beta gamma)
-    (and alpha beta gamma)))
-
 (defmission gather-cloud-data 
    (:title "Gather cloud data"
     :address '(=cloud=))
-  (:nav-points :name "Activate all three nav points."
-               :condition #'nav-points-completed-p
-               :prerequisites '(:pressed-button-1 :pressed-button-2))
-  (:pressed-button-1 :name "Press the B button."
-                     :condition #'(lambda () (mission-variable-value :pressed-b-yet)))
-  (:pressed-button-2 :name "Press the F button."
-                     :condition #'(lambda () (mission-variable-value :pressed-f-yet))))
+  (:activate-nav-points :name "Activate all three nav points."
+               :condition #'(lambda ()
+                              (with-locals (alpha beta gamma)
+                                (and alpha beta gamma))))
+  (:return-to-base :name "Return to the Xioceptor."))
 (defparameter *default-navpoint-delay* 60)
 
 (defcell navpoint 
@@ -1611,6 +1604,29 @@ Then it fires and gives chase.")
 
 (defmission enter-dvo-orbit (:title "Enter DVO orbit."
                                     :address '(=dvo-orbit=)))
+(defworld title-screen
+  (edge-condition :initform :block)
+  (title-screen :initform t)
+  (background :initform "title")
+  (ambient-light :initform :total)
+  (description :initform "foo"))
+
+(define-method begin-ambient-loop title-screen ()
+  (play-music "theme" :loop t))
+
+(define-method generate title-screen (&rest args)
+  [resize-to-background self]
+  [drop-cell self (clone =launchpad=) 10 10])
+
+(defmission start-game
+    (:address '(=title-screen=)))
+(defworld xioceptor
+  (name :initform "Xiomacs Interceptor")
+  (scale :initform '(2 m))
+  (edge-condition :initform :block)
+  (background :initform "xioceptor")
+  (ambient-light :initform :total)
+  (description :initform "foo"))
 (defparameter *react-shield-time* 30)
 
 (defparameter *vox-warning-clock* 400)
@@ -2018,7 +2034,7 @@ Then it fires and gives chase.")
     (xe2:install-widgets *prompt* *viewport* *status*)
     (xe2:enable-classic-key-repeat 100 60)
     ;; now play!
-    (let ((mission (clone =enter-dvo-orbit=)))
+    (let ((mission (clone =start-game=)))
     ;;(let ((mission (clone =gather-cloud-data=)))
       [configure *universe*
                  :narrator *narrator*

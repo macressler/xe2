@@ -249,6 +249,14 @@ initialize the arrays for a world of the size specified there."
       [create-grid self :width <width> :height <height>]
       (error "Cannot create default grid without height and width set.")))
 
+(define-method resize-to-background world ()
+  (with-fields (background tile-size height width) self
+    (assert (stringp background))
+    (let ((image (find-resource-object background)))
+      (prog1 (values (setf height (truncate (/ (image-height image) tile-size)))
+		     (setf width (truncate (/ (image-width image) tile-size))))
+	[create-default-grid self]))))
+
 (define-method location-name world ()
   "Return the location name."
   <name>)

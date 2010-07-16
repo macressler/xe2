@@ -436,6 +436,7 @@
  (:name "death-alien-short" :type :sample :file "death-alien-short.wav" :properties (:volume 60))
  (:name "powerup" :type :sample :file "powerup.wav" :properties (:volume 40))
 
+ (:name "title" :type :image :file "title.png")
  (:name "crate" :type :image :file "tech-box.png")
  (:name "crate-special" :type :image :file "tech-box-special.png")
  (:name "archive-crate" :type :image :file "archive-crate.png")
@@ -448,7 +449,7 @@
  (:name "tech-orangemetal" :type :image :file "techorangemetal.png")
 
  (:name "technogirl" :type :music :file "technogirl-x.ogg")
- (:name "theme" :type :music :file "theme3.ogg":properties (:volume 7))
+ (:name "theme" :type :music :file "theme3.ogg":properties (:volume 70))
  (:name "crisis" :type :music :file "crisis.ogg" :properties (:volume 30))
  (:name "raid" :type :music :file "raid.ogg" :properties (:volume 8))
  (:name "xiomacs" :type :music :file "xiomacs.ogg")

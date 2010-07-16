@@ -29,7 +29,7 @@
 (defstruct goal 
   name 
   description
-  condition ;; either a symbol or a function
+  condition ;; either a symbol or a function (or nil)
   state ; one of nil, :achieved, :failed
   prerequisites)
 
@@ -45,6 +45,11 @@
 			   (or (null prerequisites)
 			       (every #'check-condition prerequisites)))
 		  (setf (goal-state goal) :achieved)))))))
+
+(defun achieve (goal &optional force)
+  (let ((prerequisites (goal-prerequisites goal)))
+    (when (or force (every #'check-condition prerequisites))
+      (setf (goal-state goal) t))))
 
 (defvar *mission* nil)
 
