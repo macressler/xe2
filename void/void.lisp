@@ -72,9 +72,8 @@
             ("C" nil "pop .")
             ("0" (:control) "do-exit .")
             ;;
-            ("B" nil "blab .")
-            ("F" nil "freak .")
-            ("A" nil "alienate .")
+            ("F1" nil "help .")
+            ("H" (:control) "help .")
             ("P" (:control) "pause .")
             ("PAUSE" nil "pause .")
             ("ESCAPE" nil "restart .")
@@ -1615,8 +1614,17 @@ Then it fires and gives chase.")
   (play-music "theme" :loop t))
 
 (define-method generate title-screen (&rest args)
-  [resize-to-background self]
-  [drop-cell self (clone =launchpad=) 10 10])
+  (let ((g1 (clone =gateway= :destination '=gather-cloud-data=))
+        (g2 (clone =gateway= :destination '=enter-dvo-orbit=))
+        (g3 (clone =gateway= :destination '=prologue=)))
+    [resize-to-background self]
+    [drop-cell self g1 30 20]
+    [emote g1 "Mission 1.1: Gather cloud data" :timeout nil]
+    [drop-cell self g2 35 32]
+    [emote g2 "Mission 1.2: Enter DVO orbit" :timeout nil]
+    [drop-cell self g3 40 40]
+    [emote g3 "Xioceptor home base" :timeout nil]
+    [drop-cell self (clone =launchpad=) 18 18]))
 
 (defmission start-game
     (:address '(=title-screen=)))
@@ -1626,7 +1634,12 @@ Then it fires and gives chase.")
   (edge-condition :initform :block)
   (background :initform "xioceptor")
   (ambient-light :initform :total)
+  (height :initform 45) 
+  (width :initform 80)
   (description :initform "foo"))
+
+(defmission prologue  
+  (:title "Xioceptor test" :address '(=xioceptor=)))
 (defparameter *react-shield-time* 30)
 
 (defparameter *vox-warning-clock* 400)
@@ -1670,8 +1683,16 @@ Then it fires and gives chase.")
              [play-sample self "vox-shield"]))
          (setf vox-warning-clock 0)))))
 
+(define-method help agent ()
+  [emote self (find-resource-object "quickhelp")])
+
 (define-method loadout agent ()
   [set-character *status* self]
+  [emote self '((("\\--- YOU ARE HERE." :foreground ".red"))
+                (("Use the arrow keys (or numpad) to move."))
+                (("Press SHIFT-direction to shoot."))
+                (("Press F1 for help.")))
+         :timeout 10.0]
   (push (clone =buster-defun=) <items>))
 
 (define-method blab agent ()
@@ -1882,17 +1903,9 @@ Then it fires and gives chase.")
 (define-method do-exit agent ()
   [exit *universe*])
 
-(define-method exit agent ()
-  (dolist (segment <segments>)
-    [die segment])
-  (setf <segments> nil))
-
 (define-method die agent ()
       (unless <dead>
     (setf <tile> "agent-disabled")
-    ;; (dolist (segment <segments>)
-    ;;   [die segment])
-    ;; (setf <segments> nil)
     (dotimes (n 30)
       [drop self (clone =explosion=)])
     [play-sample self "gameover"]
@@ -1904,7 +1917,7 @@ Then it fires and gives chase.")
     (setf *player* agent)
     [destroy *universe*]
     [set-player *universe* agent]
-    (let ((mission (clone =enter-dvo-orbit=)))
+    (let ((mission (clone =start-game=)))
       [begin mission *player*])
     [loadout agent]))
 
@@ -1977,11 +1990,12 @@ Then it fires and gives chase.")
     (let* ((char <character>))
       (when char
         [clear-line self]
-        [print-stat self :hit-points :warn-below 7 :show-max t :label "S"]
+        [print self " PRESS F1 FOR HELP       "]
+        [print-stat self :hit-points :warn-below 7 :show-max t :label "SHIELD"]
         [print-stat-bar self :hit-points :color ".blue"]
         [space self]
         [space self]
-        [print-stat self :energy :warn-below 10 :show-max t :label "E"]
+        [print-stat self :energy :warn-below 10 :show-max t :label "ENERGY"]
         [print-stat-bar self :energy :color ".yellow" :divisor 2]
         [space self]
         [space self]

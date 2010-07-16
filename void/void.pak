@@ -798,7 +798,7 @@
  (:name "buzzfan" :type :sample :file "buzzfan.wav" :properties (:volume 40))
  (:name "xiocond" :type :image :file "xiocond.png")
 
- (:name "quickhelp-message" :type :formatted-text :file "quickhelp.text")
+ (:name "quickhelp" :type :formatted-text :file "quickhelp.text")
  (:name "help-message" :type :formatted-text :file "README")
  (:name "launchpad" :type :image :file "launchpad.png")
 

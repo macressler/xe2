@@ -253,9 +253,9 @@ initialize the arrays for a world of the size specified there."
   (with-fields (background tile-size height width) self
     (assert (stringp background))
     (let ((image (find-resource-object background)))
-      (prog1 (values (setf height (truncate (/ (image-height image) tile-size)))
-		     (setf width (truncate (/ (image-width image) tile-size))))
-	[create-default-grid self]))))
+      (setf height (truncate (/ (image-height background) tile-size)))
+      (setf width (truncate (/ (image-width background) tile-size))))
+    [create-default-grid self]))
 
 (define-method location-name world ()
   "Return the location name."
@@ -1237,17 +1237,22 @@ narrator, and VIEWPORT as the viewport."
 (defcell gateway
   (tile :initform "gateway")
   (name :initform "Gateway")
-  (categories :initform '(:gateway :exclusive))
-  (address :initform nil))
+  (categories :initform '(:gateway))
+  (destination :initform nil))
 
-(define-method initialize gateway (&key address tile name)
+(define-method initialize gateway (&key destination tile name)
   (when tile (setf <tile> tile))
-  (when address (setf <address> address))
-  (when name (setf <name> name)))
+  (when name (setf <name> name))
+  (when destination (setf <destination> destination)))
 
 (define-method activate gateway ()
-  [play *universe* :address <address> :player [get-player *world*]])
-
+  (with-fields (destination) self
+    (etypecase destination
+      ;; it's an address.
+      (list [play *universe* :address destination])
+      ;; it's a mission name
+      (symbol [begin (symbol-value destination) [get-player *world*]]))))
+	 
 (define-prototype launchpad (:parent =gateway=)
   (tile :initform "launchpad")
   (categories :initform '(:gateway :player-entry-point))
