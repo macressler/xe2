@@ -24,7 +24,6 @@
 (in-package :void)
 (defparameter *timestep* 20)
 (defparameter *grid-size* 16)
-(defparameter *address* '(=cloud=))
 (defparameter *width* 1280)
 (defparameter *height* 720)
 (defvar *form*)
@@ -1933,85 +1932,6 @@ Then it fires and gives chase.")
 (define-method call tail-defun (caller)
   [upgrade caller]
   [expend-item caller])
-(defvar *status* nil)
-    
-    (define-prototype status (:parent xe2:=formatter=)
-      (character :documentation "The character cell."))
-    
-    (define-method set-character status (character)
-      (setf <character> character))
-    
-    (define-method print-stat status (stat-name &key warn-below show-max label)
-      (let* ((stat (field-value stat-name <character>))
-             (value [stat-value <character> stat-name]))
-        (destructuring-bind (&key min max base delta unit) stat
-          (let ((color (if (and (numberp warn-below)
-                                (< value warn-below))
-                           ".red"
-                           ".black")))
-            [print self (or label (symbol-name stat-name))
-                   :foreground ".white"]
-            [print self ": "]
-            [print self (format nil "~S" value) 
-                   :foreground ".white"
-                   :background color]
-            (when show-max
-              [print self (format nil "/~S" max)
-                     :foreground ".white"
-                     :background color])
-            (when unit 
-              [print self " "]
-              [print self (symbol-name unit)])
-            [print self " "]
-            ))))
-    
-    (defparameter *status-bar-character* " ")
-    
-    (define-method print-stat-bar status (stat &key 
-                                               (color ".yellow")
-                                               (background-color ".gray18")
-                                               (divisor 1))
-      (let ((value (truncate (/ [stat-value <character> stat] divisor)))
-            (max (truncate (/ [stat-value <character> stat :max] divisor))))
-        (dotimes (i max)
-          [print self *status-bar-character*
-                 :foreground ".yellow"
-                 :background (if (< i value)
-                                 color
-                               background-color)])))
-    
-  (define-method print-item status (item)
-    [print self nil :image (field-value :tile item)]
-    [print self "  "]
-    [print self (get-some-object-name item)]
-    [print self "  "])
-    
-  (define-method update status ()
-    (let* ((char <character>))
-      (when char
-        [clear-line self]
-        [print self " PRESS F1 FOR HELP       "]
-        [print-stat self :hit-points :warn-below 7 :show-max t :label "SHIELD"]
-        [print-stat-bar self :hit-points :color ".blue"]
-        [space self]
-        [space self]
-        [print-stat self :energy :warn-below 10 :show-max t :label "ENERGY"]
-        [print-stat-bar self :energy :color ".yellow" :divisor 2]
-        [space self]
-        [space self]
-        (dolist (item (field-value :items char))
-          [print-item self item]))))
-     
-  (define-method render status ()
-    ;; draw on viewport
-    (with-fields (x y current-line) self
-      (let ((image (field-value :image *viewport*))
-            (line (coerce current-line 'list)))
-        (when (plusp (length line))
-          (render-formatted-line line x y :destination image)))))
-  
-  (defparameter *status-height* 20)
-  
 (defgame :void
     (:title "Void Mission"
      :description "A sci-fi roguelike game in Common Lisp."

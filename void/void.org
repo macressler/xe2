@@ -8,15 +8,12 @@
 
 ** TODO test release missions 1.1 and 1.2 on linux/windows
 SCHEDULED: <2010-07-16 Fri>
-*** TODO [#A] opening screen with theme3 and "here i am, use arrow keys"
-*** TODO Xioceptor ship interior
 *** TODO [#A] "mission complete" with Vixon.ogg
 *** TODO [#A] Events one-time triggered etc support in defmission
-*** TODO [#A] F1 help bubble
 *** TODO [#A] don't crash when click background
 *** TODO [#A] visual feedback on damage/destruction of macrovirii
 *** TODO [#B] Remove old bubble when emoting again, or move it upwards like a terminal.
-*** TODO [#B] Allow clear bubbles with a line to the left flush showing blocks  
+**** TODO [#B] Allow clear bubbles with a line to the left flush showing blocks  
 
 ** TODO [#B] add mission 1.4 with story teaser cliffhanger
 
@@ -123,7 +120,6 @@ DEADLINE: <2010-08-10 Tue>
 #+begin_src lisp
   (defparameter *timestep* 20)
   (defparameter *grid-size* 16)
-  (defparameter *address* '(=cloud=))
   (defparameter *width* 1280)
   (defparameter *height* 720)
 #+end_src
@@ -425,10 +421,12 @@ DEADLINE: <2010-08-10 Tue>
     [expend-item caller])
 #+end_src
 
-#+source: game-definition
-#+begin_src lisp 
+#+source: status-display
+#+begin_src lisp
       (defvar *status* nil)
-      
+      (defparameter *status-height* 20)
+      (defparameter *status-bar-character* " ")
+            
       (define-prototype status (:parent xe2:=formatter=)
         (character :documentation "The character cell."))
       
@@ -458,8 +456,6 @@ DEADLINE: <2010-08-10 Tue>
                 [print self (symbol-name unit)])
               [print self " "]
               ))))
-      
-      (defparameter *status-bar-character* " ")
       
       (define-method print-stat-bar status (stat &key 
                                                  (color ".yellow")
@@ -503,9 +499,10 @@ DEADLINE: <2010-08-10 Tue>
               (line (coerce current-line 'list)))
           (when (plusp (length line))
             (render-formatted-line line x y :destination image)))))
-    
-    (defparameter *status-height* 20)
-    
+#+end_src 
+
+#+source: game-definition
+#+begin_src lisp 
   (defgame :void
       (:title "Void Mission"
        :description "A sci-fi roguelike game in Common Lisp."
@@ -601,7 +598,6 @@ development is still central.
   (defmission start-game
       (:address '(=title-screen=)))
 #+end_src 
-
 
 * Controls					       :Controls:
 
@@ -714,12 +710,6 @@ so on.
 Gameplay is mission-based, with one mission leading to others in a
 branching fashion. Each mission is self contained, and the player and
 his inventory are all that survive a mission.
-
-** DONE Define lisp mission structure
-CLOSED: [2010-07-15 Thu 01:02]
-
- - http://norvig.com/ltd/test/micro-tale-spin.lisp
-
 
 * The game world 				    :Environment:
 
@@ -2607,4 +2597,44 @@ CLOSED: [2010-07-15 Thu 22:27]
 (09:46:19 AM) dto1138@gmail.com/52DC8FDC: well, i could increase the size of the border.
 (09:46:36 AM) Shawn Betts: and you could theoretically add smooth movement without abandoning the "rogueness"
 (09:46:56 AM) dto1138@gmail.com/52DC8FDC: and add some "drag" in that when it jumps 8 tiles, it moves some smooth number of steps over a moment or two
+** DONE [#A] opening screen with theme3 and "here i am, use arrow keys"
+CLOSED: [2010-07-17 Sat 04:57]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-17 Sat 04:57
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Schedule/test release missions 1.1 and 1.2 on linux/windows
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:END:
+** DONE Xioceptor ship interior
+CLOSED: [2010-07-17 Sat 04:57]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-17 Sat 04:57
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Schedule/test release missions 1.1 and 1.2 on linux/windows
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:END:
+** DONE [#A] F1 help bubble
+CLOSED: [2010-07-17 Sat 04:57]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-17 Sat 04:57
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Schedule/test release missions 1.1 and 1.2 on linux/windows
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:END:
+
+** DONE Define lisp mission structure
+CLOSED: [2010-07-15 Thu 01:02]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-07-17 Sat 05:06
+:ARCHIVE_FILE: ~/xe2/void/void.org
+:ARCHIVE_OLPATH: Mission structure
+:ARCHIVE_CATEGORY: void
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: Structure
+:END:
+
+ - http://norvig.com/ltd/test/micro-tale-spin.lisp
 
