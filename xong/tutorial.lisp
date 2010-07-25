@@ -14,7 +14,7 @@
   (setf <style> style)
   (setf <timeout> (if (floatp timeout)
 		      ;; specify in (roughly) seconds if floating
-		      (truncate (* 15 timeout))
+		      (truncate (* 35 timeout))
 		      ;; leave as frames if integer
 		      timeout)))
   

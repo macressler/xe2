@@ -110,7 +110,6 @@
   (declare (optimize (speed 3)))
   (when <visible>
     [adjust self] ;; hehe
-    [set-tile-size self]
     (let* ((world (or <world> *world*))
            (origin-width <origin-width>)
            (origin-height <origin-height>)

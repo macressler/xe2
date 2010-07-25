@@ -19,7 +19,9 @@
 
 (in-package :xong)
 
-(setf xe2:*dt* 30)
+(setf xe2:*dt* 60)
+
+(defparameter *remix-tile* 18)
 
 ;;; Controlling the game
 
@@ -242,6 +244,7 @@
 ;;	       (xe2:enable-held-keys 1 3)
 	       ;;
 	       (setf xe2:*physics-function* #'(lambda (&rest ignore)
+						(when *viewport* [set-tile-size *viewport* *remix-tile*])
 						(when *world* [run-cpu-phase *world* :timer])))
 	       [set-player universe player]
 	       [play universe
@@ -253,13 +256,13 @@
 	       ;;
 	       [set-character *status* player]
 	       ;;
-	       [set-tile-size viewport 16]
+	       [set-tile-size viewport *remix-tile*]
 	       (setf (field-value :use-overlays viewport) t)
 	       [resize viewport :height 470 :width *xong-window-width*]
 	       [move viewport :x 0 :y 0]
 	       [set-origin viewport :x 0 :y 0 
-			   :height (truncate (/ (- *xong-window-height* 130) 16))
-			   :width (truncate (/ *xong-window-width* 16))]
+			   :height (truncate (/ (- *xong-window-height* 130) *remix-tile*))
+			   :width (truncate (/ *xong-window-width* *remix-tile*))]
 	       [adjust viewport]))
       (setf *space-bar-function* #'spacebar))
     ;;
