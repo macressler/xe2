@@ -1,4 +1,4 @@
-(in-package :xong)
+(in-package :superxong)
 
 ;;; Colors
 
@@ -135,7 +135,7 @@
 (define-prototype xong (:parent xe2:=world=)
   (name :initform "Xong board")
   (description :initform 
-	       '((("Welcome to Xong." :foreground ".white" :background ".blue")
+	       '((("Welcome to Super Xong." :foreground ".white" :background ".blue")
 		  ("Press F1 for general help" :foreground ".white" :background ".red")
 		  (", or click any object." :foreground ".white" :background ".blue"))))
   (edge-condition :initform :block)
@@ -323,7 +323,7 @@
 	[drop-cell self (clone =mystery-box=) r c]))))
 
 (define-method begin-ambient-loop xong ()  
-  (play-music (car (one-of '("voronoia" "invierov"))) :loop t))
+  (play-music (car (one-of '("voronoia" "invierov" "dvo" "ancients"))) :loop t))
 ;  (play-music (car (one-of '("flyby" "sparqq" "synthy" "neon" "phong" "xong-theme" "pensive" "toybox"))) :loop t))
 
 ;;; Other level gates

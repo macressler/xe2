@@ -1,9 +1,9 @@
-(defpackage :xong
-  (:documentation "XONG is a colorful puzzle game in Common Lisp.")
+(defpackage :superxong
+  (:documentation "SUPERXONG is a colorful puzzle game in Common Lisp.")
   (:use :xe2 :common-lisp)
-  (:export xong))
+  (:export superxong))
 
-(in-package :xong)
+(in-package :superxong)
 
 (setf xe2:*dt* 40)
 

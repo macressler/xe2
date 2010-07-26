@@ -1,4 +1,4 @@
-;;; xong.lisp --- hockey paintball snake pong
+;;; superxong.lisp --- hockey paintball snake pong
 
 ;; Copyright (C) 2009  David O'Toole
 
@@ -17,7 +17,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(in-package :xong)
+(in-package :superxong)
 
 (setf xe2:*dt* 60)
 
@@ -25,7 +25,7 @@
 
 ;;; Controlling the game
 
-(define-prototype xong-prompt (:parent xe2:=prompt=))
+(define-prototype superxong-prompt (:parent xe2:=prompt=))
 
 (defparameter *numpad-keybindings* 
   '(("KP8" nil "move :north .")
@@ -95,7 +95,7 @@
 	    ("ESCAPE" nil "restart .")
 	    ("Q" (:control) "quit ."))))
   
-(define-method install-keybindings xong-prompt ()
+(define-method install-keybindings superxong-prompt ()
   (dolist (k *qwerty-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
   ;; ;; we also want to respond to timer events. this is how. 
@@ -192,19 +192,19 @@
 
 ;;; Main program. 
 
-(defparameter *xong-window-width* 800)
-(defparameter *xong-window-height* 600)
+(defparameter *superxong-window-width* 800)
+(defparameter *superxong-window-height* 600)
 
 (defvar *viewport*)
 
-(defun xong ()
-  (xe2:message "Initializing Xong...")
-  (setf xe2:*window-title* "Xong")
+(defun superxong ()
+  (xe2:message "Initializing Superxong...")
+  (setf xe2:*window-title* "Superxong")
   (setf clon:*send-parent-depth* 2) 
-  (xe2:set-screen-height *xong-window-height*)
-  (xe2:set-screen-width *xong-window-width*)
+  (xe2:set-screen-height *superxong-window-height*)
+  (xe2:set-screen-width *superxong-window-width*)
   ;; go!
-  (let* ((prompt (clone =xong-prompt=))
+  (let* ((prompt (clone =superxong-prompt=))
 	 (universe (clone =universe=))
 	 (narrator (clone =narrator=))
 	 (player (clone =player=))
@@ -220,14 +220,14 @@
     (setf *viewport* viewport)
     (setf *status* status)
     ;;
-    [resize splash :height (- *xong-window-height* 20) :width *xong-window-width*]
+    [resize splash :height (- *superxong-window-height* 20) :width *superxong-window-width*]
     [move splash :x 0 :y 0]
     [resize splash-prompt :width 10 :height 10]
     [move splash-prompt :x 0 :y 0]
     [hide splash-prompt]
     [set-receiver splash-prompt splash]
     ;;
-    [resize *status* :height 20 :width *xong-window-width*]
+    [resize *status* :height 20 :width *superxong-window-width*]
     [move *status* :x 0 :y 0]
     ;;
     [resize prompt :height 20 :width 100]
@@ -258,11 +258,11 @@
 	       ;;
 	       [set-tile-size viewport *remix-tile*]
 	       (setf (field-value :use-overlays viewport) t)
-	       [resize viewport :height 470 :width *xong-window-width*]
+	       [resize viewport :height 470 :width *superxong-window-width*]
 	       [move viewport :x 0 :y 0]
 	       [set-origin viewport :x 0 :y 0 
-			   :height (truncate (/ (- *xong-window-height* 130) *remix-tile*))
-			   :width (truncate (/ *xong-window-width* *remix-tile*))]
+			   :height (truncate (/ (- *superxong-window-height* 130) *remix-tile*))
+			   :width (truncate (/ *superxong-window-width* *remix-tile*))]
 	       [adjust viewport]))
       (setf *space-bar-function* #'spacebar))
     ;;
@@ -275,22 +275,22 @@
 	[newline help]))
     ;;
     [resize quickhelp :height 85 :width 250] 
-    [move quickhelp :y (- *xong-window-height* 130) :x (- *xong-window-width* 250)]
+    [move quickhelp :y (- *superxong-window-height* 130) :x (- *superxong-window-width* 250)]
     (let ((text	(find-resource-object "quickhelp-message")))
       (dolist (line text)
 	(dolist (string line)
 	  (funcall #'send nil :print-formatted-string quickhelp string))
 	[newline quickhelp]))
     ;;
-    (play-music "techworld" :loop t)
+    (play-music "vomac" :loop t)
     (set-music-volume 255)	       
     ;;
-    [resize stack :width *xong-window-width* :height (- *xong-window-height* 20)]
+    [resize stack :width *superxong-window-width* :height (- *superxong-window-height* 20)]
     [move stack :x 0 :y 0]
     [set-children stack (list viewport terminal status)]
     ;;
-    [resize terminal :height 80 :width *xong-window-width*]
-    [move terminal :x 0 :y (- *xong-window-height* 80)]
+    [resize terminal :height 80 :width *superxong-window-width*]
+    [move terminal :x 0 :y (- *superxong-window-height* 80)]
     [set-verbosity terminal 0]
     ;;
     ;; HACK
@@ -313,4 +313,4 @@
     [add-page *pager* :game (list prompt stack viewport terminal *status* quickhelp)]
     [add-page *pager* :help (list help)]))
 
-(xong)
+(superxong)

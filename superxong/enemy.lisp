@@ -1,4 +1,4 @@
-(in-package :xong)
+(in-package :superxong)
 
 ;;; Counting enemies
 
@@ -10,6 +10,7 @@
 (defcell macrovirus 
   (tile :initform "macro1")
   (team :initform :enemy)
+  (dead :initform nil)
   (generation :initform 0)
   (hit-points :initform (make-stat :base 4 :max 7 :min 0))
   (speed :initform (make-stat :base 1))
@@ -20,12 +21,12 @@
   (direction :initform (random-direction))
   (categories :initform '(:actor :obstacle :enemy :target)))
 
-(define-method divide macrovirus ()
-  [play-sample self "munch1"]
-  [stat-effect self :hit-points 3]
-  (dotimes (i (if (zerop (random 17))
-                  2 1))
-    [drop self (clone =macrovirus=)]))
+(define-method divide macrovirus ())
+  ;; [play-sample self "munch1"]
+  ;; [stat-effect self :hit-points 3]
+  ;; (dotimes (i (if (zerop (random 17))
+  ;;                 2 1))
+  ;;   [drop self (clone =macrovirus=)]))
 
 (define-method hit macrovirus (&optional other)
   (when (and other [in-category other :particle])
@@ -34,9 +35,10 @@
 
 (define-method die macrovirus ()
   [play-sample self "biodeath"]
+  (setf <dead> t)
   (dotimes (n 5)
     [drop self (clone =psi=)])
-  [parent>>die self])
+  [delete-from-world self])
 
 (define-method grow macrovirus ()
   [expend-action-points self 100]
@@ -60,23 +62,16 @@
         [grow self]))))
 
 (define-method run macrovirus ()
-  [move self (random-direction)]
-  (percent-of-time 10 [grow self])
-  (percent-of-time 35 (let ((direction (car (one-of (list :east :west)))))
-                        (let ((muon (clone =muon-particle=)))
-                          [drop self muon]
-                          [impel muon direction])))
-  (if (< [distance-to-player self] 6)
-      (progn [move self [direction-to-player self]]
-             (if [adjacent-to-player self]
-                 [attack self [direction-to-player self]]))
-
-    ;; otherwise look for food
-      (block searching
-        (dolist (dir xe2:*compass-directions*)
-          (when (or [in-category self :dead]
-                    [find-food self dir])
-            (return-from searching))))))
+  (unless <dead>
+    (if (< [distance-to-player self] 13)
+	(let ((muon (clone =muon-particle=)))
+	  [move self [direction-to-player self]]
+	  [drop self muon]
+	  [impel muon [direction-to-player self]]
+	  [expend-action-points self 10])
+	(progn 
+	  [move self (random-direction)]
+	  (percent-of-time 10 [grow self])))))
   
 (define-method attack macrovirus (direction)
   (let ((player [get-player *world*]))
@@ -137,6 +132,7 @@
 (defcell wire 
   (categories :initform '(:actor :damaging))
   (stepping :initform t)
+  (team :initform :enemy)
   (speed :initform (make-stat :base 1))
   (movement-cost :initform (make-stat :base 10))
   (clock :initform 4000)
@@ -173,8 +169,9 @@
 (defcell tracer 
   (tile :initform "tracer-north")
   (categories :initform '(:actor :target :obstacle 
-			  :opaque :exclusive :enemy :equipper :puck :tailed :tracer))
+			  :opaque :enemy :equipper :puck :tailed :tracer :target))
   (dead :initform nil)
+  (team :initform :enemy)
   (speed :initform (make-stat :base 5 :min 1))
   (max-items :initform (make-stat :base 3))
   (movement-cost :initform (make-stat :base 3))
@@ -233,7 +230,8 @@ Use chevrons to direct tracers into Black Holes."))
   (tile :initform "monitor")
   (name :initform "Monitor")
   (categories :initform '(:obstacle :actor :equipper :opaque 
-			  :exclusive :enemy :target :puck :monitor))
+			   :enemy :target :puck :monitor))
+  (team :initform :enemy)
   (direction :initform nil)
   (speed :initform (make-stat :base 2))
   (movement-cost :initform (make-stat :base 8))
@@ -420,6 +418,7 @@ explode with deadly plasma radiation!"))
 (defcell snake 
   (tile :initform "snake-white")
   (smashed :initform nil)
+  (team :initform :enemy)
   (speed :initform (make-stat :base 2))
   (movement-cost :initform (make-stat :base 60))
   (escape-clock :initform 0)
@@ -427,7 +426,7 @@ explode with deadly plasma radiation!"))
   (behind :initform nil)
   (color :initform :white)
   (direction :initform :south)
-  (categories :initform '(:obstacle :exclusive :paintable :actor :snake))
+  (categories :initform '(:obstacle  :paintable :actor :snake :target))
   (description :initform "The deadly Snake's body segments must be painted to defeat it."))
 
 (define-method set-color snake (c)
@@ -542,7 +541,7 @@ explode with deadly plasma radiation!"))
 
 (defcell muon-trail
   (categories :initform '(:actor))
-  (clock :initform 20)
+  (clock :initform 40)
   (speed :initform (make-stat :base 5))
   (default-cost :initform (make-stat :base 10))
   (tile :initform ".gear")
@@ -569,6 +568,7 @@ explode with deadly plasma radiation!"))
   (movement-cost :initform (make-stat :base 20))
   (attack-power :initform 5)
   (tile :initform "muon")
+  (team :initform :enemy)
   (name :initform "Muon particle")
   (firing-sound :initform "muon-fire")
   (direction :initform :here)
@@ -589,7 +589,7 @@ explode with deadly plasma radiation!"))
   (let ((target [category-in-direction-p *world* 
 					 <row> <column> <direction>
 					 '(:obstacle :target)]))
-    (if target
+    (if (and target (not (eq :enemy (field-value :team target))))
 	(progn
 	  [>>move self <direction>]
 	  [>>expend-default-action-points self]

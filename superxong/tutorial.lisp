@@ -1,4 +1,4 @@
-(in-package :xong)
+(in-package :superxong)
 
 ;;; Text labels
 
@@ -14,7 +14,7 @@
   (setf <style> style)
   (setf <timeout> (if (floatp timeout)
 		      ;; specify in (roughly) seconds if floating
-		      (truncate (* 35 timeout))
+		      (truncate (* 80 timeout))
 		      ;; leave as frames if integer
 		      timeout)))
   

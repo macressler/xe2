@@ -181,7 +181,7 @@
     [set-player *universe* player]
     [set-character *status* player]
     [play *universe*
-	  :address '(=menu-world=)]
+	  :address '(make-level-address 1)]
     [loadout player]
     [play-sample self "go"]))
 

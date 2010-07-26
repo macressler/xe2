@@ -1,4 +1,4 @@
-(in-package :xong)
+(in-package :superxong)
 
 ;;; Scoring points
 
@@ -110,7 +110,7 @@
   (dexterity :initform (make-stat :base 13))
   (defense :initform (make-stat :base 15))
   (equipment-slots :initform '(:left-hand :right-hand))
-  (hearing-range :initform 1000)
+  (hearing-range :initform 12)
   (hit-points :initform (make-stat :base 1 :min 0 :max 2))
   (movement-cost :initform (make-stat :base 10))
   (max-items :initform (make-stat :base 2))
@@ -181,7 +181,7 @@
     [set-player *universe* player]
     [set-character *status* player]
     [play *universe*
-	  :address '(=menu-world=)]
+	  :address (generate-level-address 1)]
     [loadout player]
     [play-sample self "go"]))
 
@@ -260,11 +260,15 @@
   (setf <direction> direction))
 
 (define-method bounce puck ()
-  (setf <direction> (opposite-direction <direction>))
-  [play-sample self "bounce"])
+  (multiple-value-bind (row column)
+      [grid-coordinates [get-player *world*]]
+      (if (and (= <row> row) (= <column> column))
+	  [grab [get-player *world*] self]))
+	  (progn (setf <direction> (opposite-direction <direction>))
+		 [play-sample self "bounce"]))
+	  
   ;; ;; check player collision; this happens when shooting an adjacent wall
   ;; (when [category-at-p *world* <row> <column> :player]
-  ;;   [grab [get-player *world*] self]))
 
 (define-method paint puck (color)
   (setf <color> color)

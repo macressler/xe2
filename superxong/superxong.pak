@@ -107,6 +107,9 @@
  (:name "tail-southeast" :type :alias :data ":rotate 90:tail-northeast")
 
  (:name "toybox" :type :music :file "toybox.ogg")
+ (:name "ancients" :type :music :file "ancients.ogg")
+ (:name "dvo" :type :music :file "dvo.ogg")
+ (:name "vomac" :type :music :file "vomac.ogg")
  (:name "metro" :type :music :file "metro.ogg" :properties (:volume 12))
  (:name "synthy" :type :music :file "synthy.ogg" :properties (:volume 25))
  (:name "flyby" :type :music :file "flyby.ogg" :properties (:volume 90))
@@ -145,9 +148,9 @@
  (:name "bullet-trail-end-southwest" :type :alias :data ":rotate 180:bullet-trail-end-northeast")
  (:name "bullet-trail-end-northwest" :type :alias :data ":rotate 270:bullet-trail-end-northeast")
 
- (:name "blurp" :type :sample :file "blurp.wav" :properties (:volume 15))
- (:name "blurp2" :type :sample :file "blurp2.wav" :properties (:volume 15))
- (:name "blop" :type :sample :file "blop.wav" :properties (:volume 10))
+ (:name "blurp" :type :sample :file "blurp.wav" :properties (:volume 3))
+ (:name "blurp2" :type :sample :file "blurp2.wav" :properties (:volume 3))
+ (:name "blop" :type :sample :file "blop.wav" :properties (:volume 5))
  (:name "bloup" :type :sample :file "bloup.wav" :properties (:volume 30))
  (:name "bleep" :type :sample :file "bleep.wav" :properties (:volume 20))
 

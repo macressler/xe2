@@ -1,4 +1,4 @@
-(in-package :xong)
+(in-package :superxong)
 
 (defvar *alive* t)
 
@@ -280,7 +280,7 @@
   (if (> 0 <clock>)
       [die self]
       (progn (setf <tile> (nth (truncate (/ <clock> 2)) *psi-tiles*))
-	     [play-sample self (car (one-of <samples>))]
+	     (percent-of-time 20 [play-sample self (car (one-of <samples>))])
 	     [move self <direction>])))
 
 (define-method die psi ()
