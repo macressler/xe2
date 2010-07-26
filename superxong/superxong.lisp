@@ -1,6 +1,6 @@
-;;; cons.lisp --- a game about lisp
+;;; xong.lisp --- hockey paintball snake pong
 
-;; Copyright (C) 2010  David O'Toole
+;; Copyright (C) 2009  David O'Toole
 
 ;; Author: David O'Toole <dto@gnu.org>
 ;; Keywords: games
@@ -14,12 +14,94 @@
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(in-package :cons-game)
-(setf xe2:*dt* 20)
+(in-package :xong)
+
+(setf xe2:*dt* 60)
+
+(defparameter *remix-tile* 16)
+
+;;; Controlling the game
+
+(define-prototype xong-prompt (:parent xe2:=prompt=))
+
+(defparameter *numpad-keybindings* 
+  '(("KP8" nil "move :north .")
+    ("KP4" nil "move :west .")
+    ("KP6" nil "move :east .")
+    ("KP2" nil "move :south .")
+    ;;
+    ("KP8" (:control) "throw :north .")
+    ("KP4" (:control) "throw :west .")
+    ("KP6" (:control) "throw :east .")
+    ("KP2" (:control) "throw :south .")
+    ;;
+    ("KP8" (:alt) "drop-chevron :north .")
+    ("KP4" (:alt) "drop-chevron :west .")
+    ("KP6" (:alt) "drop-chevron :east .")
+    ("KP2" (:alt) "drop-chevron :south .")
+    ;;
+    ("KP8" (:meta) "drop-chevron :north .")
+    ("KP4" (:meta) "drop-chevron :west .")
+    ("KP6" (:meta) "drop-chevron :east .")
+    ("KP2" (:meta) "drop-chevron :south .")
+    ;; arrows
+    ("UP" nil "move :north .")
+    ("LEFT" nil "move :west .")
+    ("RIGHT" nil "move :east .")
+    ("DOWN" nil "move :south .")
+    ;;
+    ("UP" (:control) "throw :north .")
+    ("LEFT" (:control) "throw :west .")
+    ("RIGHT" (:control) "throw :east .")
+    ("DOWN" (:control) "throw :south .")
+    ;;
+    ("UP" (:alt) "drop-chevron :north .")
+    ("LEFT" (:alt) "drop-chevron :west .")
+    ("RIGHT" (:alt) "drop-chevron :east .")
+    ("DOWN" (:alt) "drop-chevron :south .")
+    ;;
+    ("UP" (:meta) "drop-chevron :north .")
+    ("LEFT" (:meta) "drop-chevron :west .")
+    ("RIGHT" (:meta) "drop-chevron :east .")
+    ("DOWN" (:meta) "drop-chevron :south .")))
+
+(defparameter *qwerty-keybindings*
+  (append *numpad-keybindings*
+	  '(("K" nil "move :north .")
+	    ("H" nil "move :west .")
+	    ("L" nil "move :east .")
+	    ("J" nil "move :south .")
+	    ;;
+	    ("K" (:control) "throw :north .")
+	    ("H" (:control) "throw :west .")
+	    ("L" (:control) "throw :east .")
+	    ("J" (:control) "throw :south .")
+	    ;;
+	    ("K" (:alt) "drop-chevron :north .")
+	    ("H" (:alt) "drop-chevron :west .")
+	    ("L" (:alt) "drop-chevron :east .")
+	    ("J" (:alt) "drop-chevron :south .")
+	    ;;
+	    ("K" (:meta) "drop-chevron :north .")
+	    ("H" (:meta) "drop-chevron :west .")
+	    ("L" (:meta) "drop-chevron :east .")
+	    ("J" (:meta) "drop-chevron :south .")
+	    ;;
+	    ("P" (:control) "pause .")
+	    ("PAUSE" nil "pause .")
+	    ("ESCAPE" nil "restart .")
+	    ("Q" (:control) "quit ."))))
+  
+(define-method install-keybindings xong-prompt ()
+  (dolist (k *qwerty-keybindings*)
+      (apply #'bind-key-to-prompt-insertion self k)))
+  ;; ;; we also want to respond to timer events. this is how. 
+  ;; [define-key self nil '(:timer) (lambda ()
+  ;; 				   [run-cpu-phase *world* :timer])])
+
 
 ;;; Splash screen
   
@@ -37,82 +119,11 @@
   [select *pager* :game]
   (when (functionp *space-bar-function*)
     (funcall *space-bar-function*))
+  ;; TODO ugh this is a hack!
   (xe2:show-widgets))
 
 (define-prototype splash-prompt (:parent =prompt=)
   (default-keybindings :initform '(("SPACE" nil "dismiss ."))))
-
-;;; Key bindings
-
-;; The shift-direction to CALL stuff is not actually triggered by the
-;; keybindings. Instead, to obtain satisfactory behavior, the shift
-;; key is polled every physics timestep. See the RUN method in
-;; player.lisp
-
-(defparameter *numpad-keybindings* 
-  '(("KP8" nil "move :north .")
-    ("KP4" nil "move :west .")
-    ("KP6" nil "move :east .")
-    ("KP2" nil "move :south .")
-    ;; arrows
-    ("UP" nil "move :north .")
-    ("LEFT" nil "move :west .")
-    ("RIGHT" nil "move :east .")
-    ("DOWN" nil "move :south .")
-    ;; call without moving
-    ("KP8" (:shift) "move :north .")
-    ("KP4" (:shift) "move :west .")
-    ("KP6" (:shift) "move :east .")
-    ("KP2" (:shift) "move :south .")
-    ;; arrows call without moving
-    ("UP" (:shift) "move :north .")
-    ("LEFT" (:shift) "move :west .")
-    ("RIGHT" (:shift) "move :east .")
-    ("DOWN" (:shift) "move :south .")))
-
-(defparameter *qwerty-keybindings*
-  (append *numpad-keybindings*
-	  '(("K" nil "move :north .")
-	    ("H" nil "move :west .")
-	    ("L" nil "move :east .")
-	    ("J" nil "move :south .")
-	    
- 	    ("K" (:shift) "move :north .")
-	    ("H" (:shift) "move :west .")
-	    ("L" (:shift) "move :east .")
-	    ("J" (:shift) "move :south .")
-	    
-	    ("Z" nil "rotate .")
-	    ("X" nil "act .")
-	    ("C" nil "pop .")
-	    ("0" (:control) "do-exit .")
-	    ;;
-	    ("P" (:control) "pause .")
-	    ("PAUSE" nil "pause .")
-	    ("ESCAPE" nil "restart .")
-	    ("Q" (:control) "quit ."))))
-  
-(define-prototype cons-prompt (:parent xe2:=prompt=))
-
-(define-method install-keybindings cons-prompt ()
-  (dolist (k *qwerty-keybindings*)
-    (apply #'bind-key-to-prompt-insertion self k)))
-
-;; (define-method install-keybindings cons-prompt ()
-;;   (let ((keys (ecase xe2:*user-keyboard-layout* 
-;; 		(:qwerty *qwerty-keybindings*)
-;; 		(:alternate-qwerty *alternate-qwerty-keybindings*)
-;; 		(:dvorak *dvorak-keybindings*))))
-;;     (dolist (k keys)
-;;       (apply #'bind-key-to-prompt-insertion self k))))
-
-;;; Custom formatter pauses when shown; it's the help screen
-
-(define-prototype cons-formatter (:parent xe2:=formatter=))
-
-(define-method render cons-formatter ()
-  [pause *world* :always]
-  [parent>>render self])
 
 ;;; Player status
 
@@ -152,10 +163,9 @@
 
 (define-method print-stat-bar status (stat &key 
 					   (color ".yellow")
-					   (background-color ".gray40")
-					   (divisor 1))
-  (let ((value (truncate (/ [stat-value <character> stat] divisor)))
-	(max (truncate (/ [stat-value <character> stat :max] divisor))))
+					   (background-color ".gray40"))
+  (let ((value (truncate [stat-value <character> stat]))
+	(max (truncate [stat-value <character> stat :max])))
     (dotimes (i max)
       [print self *status-bar-character*
 	     :foreground ".yellow"
@@ -167,172 +177,92 @@
   [delete-all-lines self]
   (let* ((char <character>))
     (when char
-	[print-stat self :hit-points :warn-below 7 :show-max t]
-	[print-stat-bar self :hit-points :color ".red"]
+	[print-stat self :chevrons :warn-below 3 :show-max t]
+	[print-stat-bar self :chevrons :color ".yellow"]
 	[space self]
-	[print-stat self :energy :warn-below 10 :show-max t]
-	[print-stat-bar self :energy :color ".yellow" :divisor 2]
+	[print self (format nil "   LEVEL:~S" (field-value :level *world*))]
+	[print self (format nil "   ENEMIES:~S" *enemies*)]
+	[print self "     HOLDING:"]
+	(if (field-value :puck char)
+	    [print self nil :image (field-value :tile
+						(field-value :puck char))]
+	    [print self nil :image "hole-closed"])
+	[print self (format nil "   SCORE:~S" [stat-value char :score])]
 	[newline self])))
 
-;;; Custom bordered viewport
+;;; Main program. 
 
-(define-prototype view (:parent xe2:=viewport=))
+(defparameter *xong-window-width* 800)
+(defparameter *xong-window-height* 600)
 
 (defvar *viewport*)
 
-(define-method render view ()
-  [parent>>render self]
-  (xe2:draw-rectangle 0 0 
-		      <width>
-		      <height>
-		      :color ".blue" :destination <image>))
-
-;;; Joystick screen.
-
-(defvar *form*)
-  
-(defparameter *default-commands*
-  '(("move :north ." "UP")
-    ("move :south ." "DOWN")
-    ("move :east ." "RIGHT")
-    ("move :west ." "LEFT")
-    ("call :north ." "UP" :shift)
-    ("call :south ." "DOWN" :shift)
-    ("call :east ." "RIGHT" :shift)
-    ("call :west ." "LEFT" :shift)
-    ("do-action ." "Z")
-    ("rotate ." "X")
-    ("quit ." "Q" :control)
-    ("pause ." "P" :control)))
-
-(define-prototype joystick-world (:parent =world=)
-  (height :initform 18)
-  (width :initform 4)
-  (prompt :initform nil))
-
-(define-method set-prompt joystick-world (prompt)
-  (setf <prompt> prompt))
-
-(define-method configure-keybindings joystick-world ()
-  (clon:with-field-values (prompt variables) self
-    (assert (hash-table-p variables))
-    [clear-keymap prompt]
-    (labels ((install (command event)
-	       (destructuring-bind (key &rest modifiers) event
-		 (message "Installing ~S" event)
-		 (bind-key-to-prompt-insertion prompt key modifiers command))))
-      (message "Configuring ~S keybindings." (hash-table-count variables))
-      (maphash #'install variables))))
-
-(define-method generate joystick-world ()
-  [create-default-grid self]
-  ;; todo write 
-  (let ((row 1))
-    (labels ((drop-config-row (command event)
-	       (let ((event-cell (clone =event-cell=))
-		     (var-cell (clone =var-cell= command)))
-		 [drop-cell self event-cell row 1]
-		 [set event-cell event]
-		 [drop-cell self var-cell row 2])
-	       (incf row)))
-      (let ((c1 (clone =comment-cell= "Keypress"))
-	    (c2 (clone =comment-cell= "Resulting action")))
-	[drop-cell self c1 row 1]
-	[drop-cell self c2 row 2]
-	(incf row))
-      (dolist (command *default-commands*)
-	(destructuring-bind (command-string &rest event) command
-	  (drop-config-row command-string event)))
-      (incf row)
-      [drop-cell self (clone =button-cell= 
-			     :closure #'(lambda () 
-					  [configure-keybindings self])
-			     :text "  APPLY  ")
-		 row 2])))
-			
-;;; Main program. 
-
-(defparameter *cons-window-width* 800)
-(defparameter *cons-window-height* 600)
-
-(defun cons-game ()
-  (setf xe2:*world* nil)
-  (xe2:message "Initializing CONS...")
-  (setf xe2:*window-title* "CONS")
-  (clon:initialize)
-  (xe2:set-screen-height *cons-window-height*)
-  (xe2:set-screen-width *cons-window-width*)
-  (let* ((prompt (clone =cons-prompt=))
+(defun xong ()
+  (xe2:message "Initializing Xong...")
+  (setf xe2:*window-title* "Xong")
+  (setf clon:*send-parent-depth* 2) 
+  (xe2:set-screen-height *xong-window-height*)
+  (xe2:set-screen-width *xong-window-width*)
+  ;; go!
+  (let* ((prompt (clone =xong-prompt=))
 	 (universe (clone =universe=))
 	 (narrator (clone =narrator=))
-	 (player (clone =agent=))
+	 (player (clone =player=))
 	 (splash (clone =splash=))
-	 (help (clone =cons-formatter=))
+	 (help (clone =formatter=))
 	 (quickhelp (clone =formatter=))
-	 ;; (form (clone =form=))
-	 ;; (form2 (clone =form=))
-	 (viewport (clone =view=))
-	 (textbox (clone =textbox=))
+	 (viewport (clone =viewport=))
 	 (status (clone =status=))
-	 ;; (form-prompt (clone =prompt=))
 	 (splash-prompt (clone =splash-prompt=))
 	 (terminal (clone =narrator=))
 	 (stack (clone =stack=)))
     ;;
-;;    (setf *form* form)
     (setf *viewport* viewport)
     (setf *status* status)
-;;    (setf xe2:*workbook* nil)
     ;;
-    [resize splash :height (- *cons-window-height* 20) :width *cons-window-width*]
+    [resize splash :height (- *xong-window-height* 20) :width *xong-window-width*]
     [move splash :x 0 :y 0]
     [resize splash-prompt :width 10 :height 10]
     [move splash-prompt :x 0 :y 0]
     [hide splash-prompt]
     [set-receiver splash-prompt splash]
     ;;
-    [resize *status* :height 20 :width *cons-window-width*]
+    [resize *status* :height 20 :width *xong-window-width*]
     [move *status* :x 0 :y 0]
     ;;
     [resize prompt :height 20 :width 100]
     [move prompt :x 0 :y 0]
     [hide prompt]
     [install-keybindings prompt]
-    ;; 
-    ;; [resize form :height 500 :width 800]
-    ;; [move form :x 0 :y 0]
-    ;;
-    ;; [resize form-prompt :height 20 :width *cons-window-width*]
-    ;; [move form-prompt :x 0 :y (- *cons-window-height* 20)]
-    ;; [show form-prompt]
-    ;; [install-keybindings form-prompt]
-    ;; [set-receiver form-prompt form]
     ;;
     (labels ((spacebar ()
 	       ;;
-	       (xe2:halt-music 1000)
+	       ;; enable pseudo timing
+	       ;; (xe2:enable-timer)
+	       ;; (xe2:set-frame-rate 30)
+	       ;; (xe2:set-timer-interval 1)
+;;	       (xe2:enable-held-keys 1 3)
+	       ;;
 	       (setf xe2:*physics-function* #'(lambda (&rest ignore)
+						(when *viewport* [set-tile-size *viewport* *remix-tile*])
 						(when *world* [run-cpu-phase *world* :timer])))
 	       [set-player universe player]
-	       (setf *player* player)
 	       [play universe
-;;	       	     :address (list '=breakworld707= :sequence-number (genseq))
-	       	     :address (list '=zeta-x= :sequence-number (genseq))
+	       	     :address  (generate-level-address 1)
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]
 	       [loadout player]
-	       ;; (let ((config-screen (clone =joystick-world=)))
-	       ;; 	 [generate config-screen]
-	       ;; 	 [set-prompt config-screen prompt]
-	       ;; 	 [visit form config-screen])
 	       ;;
 	       [set-character *status* player]
-	       [resize viewport :height 470 :width *cons-window-width*]
+	       ;;
+	       [set-tile-size viewport *remix-tile*]
+	       (setf (field-value :use-overlays viewport) t)
+	       [resize viewport :height 470 :width *xong-window-width*]
 	       [move viewport :x 0 :y 0]
 	       [set-origin viewport :x 0 :y 0 
-			   :height (truncate (/ (- *cons-window-height* 130) 16))
-			   :width (truncate (/ *cons-window-width* 16))]
+			   :height (truncate (/ (- *xong-window-height* 130) *remix-tile*))
+			   :width (truncate (/ *xong-window-width* *remix-tile*))]
 	       [adjust viewport]))
       (setf *space-bar-function* #'spacebar))
     ;;
@@ -340,60 +270,47 @@
     [move help :x 0 :y 0]
     (let ((text	(find-resource-object "help-message")))
       (dolist (line text)
-    	(dolist (string line)
-    	  (funcall #'send nil :print-formatted-string help string))
-    	[newline help]))
+	(dolist (string line)
+	  (funcall #'send nil :print-formatted-string help string))
+	[newline help]))
     ;;
-    [resize quickhelp :height 72 :width 250] 
-    [move quickhelp :y (- *cons-window-height* 130) :x (- *cons-window-width* 250)]
+    [resize quickhelp :height 85 :width 250] 
+    [move quickhelp :y (- *xong-window-height* 130) :x (- *xong-window-width* 250)]
     (let ((text	(find-resource-object "quickhelp-message")))
       (dolist (line text)
-    	(dolist (string line)
-    	  (funcall #'send nil :print-formatted-string quickhelp string))
-    	[newline quickhelp]))
+	(dolist (string line)
+	  (funcall #'send nil :print-formatted-string quickhelp string))
+	[newline quickhelp]))
     ;;
-    (play-music "reprise" :loop t)
+    (play-music "techworld" :loop t)
     (set-music-volume 255)	       
     ;;
-    [resize stack :width *cons-window-width* :height (- *cons-window-height* 20)]
+    [resize stack :width *xong-window-width* :height (- *xong-window-height* 20)]
     [move stack :x 0 :y 0]
     [set-children stack (list viewport terminal status)]
     ;;
-    [resize terminal :height 80 :width *cons-window-width*]
-    [move terminal :x 0 :y (- *cons-window-height* 80)]
+    [resize terminal :height 80 :width *xong-window-width*]
+    [move terminal :x 0 :y (- *xong-window-height* 80)]
     [set-verbosity terminal 0]
     ;;
-    [resize textbox :height 200 :width 500]
-    [move textbox :x 0 :y 0]
-    ;;
-    ;; [resize form2 :height 500 :width 800]
-    ;; [move form2 :x 0 :y 0]
-    ;;
+    ;; HACK
+    (labels ((light-hack (sr sc r c &optional (color ".white"))
+    	       (labels ((hack-overlay (image)
+    			  (multiple-value-bind (sx sy)
+    			      [get-viewport-coordinates *viewport* sr sc]
+    			    (multiple-value-bind (x y)
+    				[get-viewport-coordinates *viewport* r c]
+    			      (draw-line x y sx sy :destination image
+    					 :color color)
+			      (draw-circle x y 5 :destination image)))))
+    		 [add-overlay *viewport* #'hack-overlay]))))
+;;      (setf xe2::*lighting-hack-function* #'light-hack))
+    ;; END HACK
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     (xe2:install-widgets splash-prompt splash)
-    ;;
-    [add-page *pager* :game (list prompt stack viewport terminal quickhelp *status*)]
-    (xe2:enable-classic-key-repeat 100 60)
-    ;; [set-page-property *pager* :game :held-keys t]
-    [add-page *pager* :help (list help)]
+    (xe2:enable-classic-key-repeat 100 100)
+    [add-page *pager* :game (list prompt stack viewport terminal *status* quickhelp)]
+    [add-page *pager* :help (list help)]))
 
-    ;; (labels ((light-hack (sr sc r c &optional (color ".white"))
-    ;; 	       (labels ((hack-overlay (image)
-    ;; 			  (multiple-value-bind (sx sy)
-    ;; 			      [get-screen-coordinates *viewport* sr sc]
-    ;; 			    (multiple-value-bind (x y)
-    ;; 				[get-screen-coordinates *viewport* r c]
-    ;; 			      (draw-line x y sx sy :destination image
-    ;; 					 :color color)
-    ;; 			      (draw-circle x y 5 :destination image)))))
-    ;; 		 [add-overlay *viewport* #'hack-overlay])))
-    ;;   (setf xe2::*lighting-hack-function* #'light-hack))
-
-))
-
-
-(cons-game)
-
-
-;;; cons.lisp ends here
+(xong)

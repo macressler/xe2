@@ -9,7 +9,7 @@
 
 (defcell tail 
   (categories :initform '(:actor))
-  (clock :initform 4))
+  (clock :initform 20))
   
 (define-method initialize tail (&key direction clock)
   (setf <clock> clock)
@@ -249,8 +249,8 @@
   (tile :initform "puck")
   (description :initform "A frictionless paint-absorbent hockey puck.")
   (categories :initform '(:puck :obstacle :target :actor :paintable :item))
-  (speed :initform (make-stat :base 4))
-  (movement-cost :initform (make-stat :base 8))
+  (speed :initform (make-stat :base 6))
+  (movement-cost :initform (make-stat :base 6))
   (direction :initform :here)
   (stepping :initform t)
   (color :initform :white))
@@ -283,8 +283,12 @@
 	      (progn 
 		(when [in-category obstacle :paintable]
 		  [paint obstacle <color>])
+		(when (clon:has-field :hit-points obstacle)
+		  [damage obstacle 10])
 		(when [in-category obstacle :breakable]
 		  [die obstacle])
+		(when [in-category obstacle :brick]
+		  [hit obstacle])
 		(when [in-category obstacle :wall]
 		  [paint self (field-value :color obstacle)]
 		  [die obstacle]

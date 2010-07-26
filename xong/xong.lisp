@@ -21,7 +21,7 @@
 
 (setf xe2:*dt* 60)
 
-(defparameter *remix-tile* 18)
+(defparameter *remix-tile* 16)
 
 ;;; Controlling the game
 
@@ -248,7 +248,7 @@
 						(when *world* [run-cpu-phase *world* :timer])))
 	       [set-player universe player]
 	       [play universe
-	       	     :address '(=menu-world=)
+	       	     :address  (generate-level-address 1)
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]

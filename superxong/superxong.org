@@ -1,12 +1,17 @@
 # Lines beginning with a "#" sign are comments.
 # Special comments begin with "#+" and are used to control document settings.
 
-#+title: 
+#+title: Super Xong
 #+author: 
 
 * Tasks
 
+** TODO Keep macrovirii from shooting each other
+
+* Ideas
+
 ** TODO NEVERENDING PUZZLE GAME with infinite level generator, like original XONG
+** TODO different PNG backgrounds
 ** TODO 1280x720 window
 ** TODO continuously falling blocks through some vertical band of varying width/pos
 ** TODO no mans land
@@ -16,21 +21,42 @@
 ** TODO 8-way breakout firing
 ** TODO SKINS to create and share, skin determines BPM and audiovisual aspects
 ** TODO DANCE MODE
-
 ** TODO breakout world
-
 ** TODO desctructible bricks for control rods.
-
 ** TODO clickable popup help and descriptions on everything
 
 * Overview
+
+SUPER XONG is a fast-moving procedurally-generated puzzle combat game
+presented in 720p High Definition for your PC or Mac. You control
+Puck, a pong paddle pilot waking up to life outside the screen. Armed
+only with your wits and a bouncing, color-changing ball, you rebel
+against the System Overlords and attempt escape to the place known as
+Outside.
+
+Each level fills the entire screen and no more; all enemies and
+objects are visible at all times.
+
+You can move and fire the ball in any of the 8 numeric keypad
+directions. The ball damages enemies, but you must catch the ball in
+order to use it again. If the ball is destroyed or eaten by an enemy,
+you have to find a new one.
+
+There are no hit points and there is no save function. Any hit kills
+you instantly, and completely ends your game. 
+
+There is no win condition; you simply encounter levels of increasing
+difficulty until you die.
+
+The enemies from original Xong are here with tweaked behaviors, plus 2
+new enemy types.
 
 
 * Header
 
 #+source: copyright-notice
 #+begin_src lisp
-;; Copyright (C) 2010  David O'Toole
+;; Copyright (C) 2010 David O'Toole
 
 ;; Author: David O'Toole <dto@gnu.org>
 ;; Keywords: 
@@ -56,7 +82,7 @@
 #+property: results silent
 #+property: no-expand yes
 #+property: noweb yes
-#+startup: hideblocks
+#+startup: showall
 # #+startup: showall
 
 #+source: xe2-lisp-file
@@ -74,11 +100,11 @@
 
 #+source: package-definition
 #+begin_src lisp 
-  (defpackage :void
+  (defpackage :superxong
     (:use :xe2 :common-lisp)
     (:export physics))
   
-  (in-package :void)
+  (in-package :superxong)
 #+end_src
 
 #+source: global-objects
@@ -192,16 +218,16 @@
 
 #+source: game-definition
 #+begin_src lisp 
-  (defgame :void
-      (:title "Void Mission"
+  (defgame :superxong
+      (:title "Superxong Mission"
        :description "A sci-fi roguelike game in Common Lisp."
        :creator "David T. O'Toole <dto@gnu.org>"
        :screen-width *width*
        :screen-height *height*
        :timestep *timestep*
-       :physics-function #'void:physics)
+       :physics-function #'superxong:physics)
       ;; create some objects
-      (setf *prompt* (clone =void-prompt=))
+      (setf *prompt* (clone =superxong-prompt=))
       (setf *universe* (clone =universe=))
       (setf *player* (clone =agent=))
       (setf *narrator* (clone =narrator=))
@@ -331,18 +357,18 @@ is polled every physics timestep. See the player's RUN method.
               ("ESCAPE" nil "restart .")
               ("Q" (:control) "quit ."))))
     
-  (define-prototype void-prompt (:parent xe2:=prompt=))
+  (define-prototype superxong-prompt (:parent xe2:=prompt=))
   
-  (define-method install-keybindings void-prompt ()
+  (define-method install-keybindings superxong-prompt ()
   (message "installing keybindings...")
     (dolist (k *qwerty-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
   
-  ;; (define-method handle-key void-prompt (keylist)
+  ;; (define-method handle-key superxong-prompt (keylist)
   ;;   (message "handling ~S" keylist)
   ;;   [parent>>handle-key self keylist])
   
-  ;; (define-method install-keybindings void-prompt ()
+  ;; (define-method install-keybindings superxong-prompt ()
   ;;   (let ((keys (ecase xe2:*user-keyboard-layout* 
   ;;              (:qwerty *qwerty-keybindings*)
   ;;              (:alternate-qwerty *alternate-qwerty-keybindings*)

@@ -1,401 +1,423 @@
-(in-package :cons-game)
+(in-package :xong)
 
-;;; List body segments
+;;; Scoring points
 
-(defcell segment 
-  (tile :initform "segment")
-  (item-tile :initform nil :documentation "When non-nil, superimpose this tile.")
-  (description :initform "List snake body segment.")
-  (direction :initform nil :documentation "When non-nil, move once in this direction.")
-  (last-direction :initform :north)
-  (movement-cost :initform (make-stat :base 10))
-  (speed :initform (make-stat :base 10 :min 0 :max 10))
-  (categories :initform '(:actor :opaque :target :segment :drawn))
-  (team :initform :player))
+(defun score (points)
+  [score-points [get-player *world*] points])
 
-(define-method run segment ()
-  (when <direction>
-    [move self <direction>]
-    (setf <direction> nil)))
+;;; The player's tail
 
-(define-method damage segment (points)
-  [damage [get-player *world*] points])
+(defcell tail 
+  (categories :initform '(:actor))
+  (clock :initform 20))
+  
+(define-method initialize tail (&key direction clock)
+  (setf <clock> clock)
+  (setf <tile> (ecase direction
+		 (:north "tail-north")
+		 (:south "tail-south")
+		 (:east "tail-east")
+		 (:west "tail-west"))))
 
-(define-method hit segment (&optional other)
-  [hit [get-player *world*]])
+(define-method run tail ()
+  [expend-action-points self 10]
+  (decf <clock>)
+  (when (< <clock> 0) (setf <clock> 0))
+  (when (zerop <clock>)
+    [die self]))
 
-(define-method move segment (direction)
-  (setf <last-direction> direction)
-  [parent>>move self direction :ignore-obstacles])
+;; (define-method step tail (stepper)
+;;   (when [in-category stepper :puck]
 
-(define-method queue-move segment (direction)
+;;; A tail extender powerup
+
+(defcell extender 
+  (tile :initform "plus")
+  (description :initform 
+"This powerup extends your trail."))	      
+
+(define-method step extender (stepper)
+  (when [in-category stepper :tailed]
+    [play-sample self "worp"]
+    [stat-effect stepper :tail-length 7]
+    [stat-effect stepper :score 2000]
+    [die self]))
+
+;;; Chevrons change the direction of the puck
+
+(defcell chevron
+  (tile :initform "chevron-east")
+  (categories :initform '(:chevron))
+  (description :initform 
+"Chevrons change the direction of the puck and certain enemies."))
+
+(defvar *chevron-tiles* '(:north "chevron-north"
+			  :south "chevron-south"
+			  :east "chevron-east"
+			  :west "chevron-west"))
+
+(define-method orient chevron (direction)
+  (assert (member direction '(:north :south :east :west)))
+  (setf <tile> (getf *chevron-tiles* direction))
   (setf <direction> direction))
 
-(define-method show-item segment (item-tile)
-  (setf <item-tile> item-tile))
+(define-method step chevron (stepper)
+  (when [in-category stepper :puck]
+    [play-sample self "chevron"]
+    [kick stepper <direction>]))
 
-(define-method draw segment (x y image)
-  (draw-resource-image <tile> x y :destination image)
-  (when <item-tile>
-    (draw-resource-image <item-tile> x y :destination image)))
+;;; Diamond pickup replenishes chevrons
 
-;;; Agent: the player
+(defcell diamond 
+  (tile :initform "chevron-pickup")
+  (name :initform "Chevron pack")
+  (categories :initform '())
+  (description :initform "Adds five chevrons to your inventory."))
 
-(defparameter *react-shield-time* 30)
+(define-method step diamond (stepper)
+  (when [in-category stepper :pointer]
+    [stat-effect stepper :chevrons 5]
+    [play-sample self "worp"]
+    (score 1000)
+    [die self]))
 
-(defparameter *energy-recovery-interval* 200)
+;;; Our hero, the player
 
-(defcell agent 
-  (tile :initform "agent-north")
-  (description :initform "You are a sentient warrior cons cell.")
-  (tail-length :initform 3)
-  (segments :initform nil)
-  (firing :initform nil)
-  (items :initform nil)
-  (direction :initform :north)
-  (last-direction :initform :north :documentation "Last direction actually moved.")
+(defvar *player-tiles* '(:purple "player-purple"
+			:black "player-black"
+			:red "player-red"
+			:blue "player-blue"
+			:orange "player-orange"
+			:green "player-green"
+			:white "player-white"
+			:yellow "player-yellow"
+			 :other "player-other"))
+
+(defparameter *shield-time* 70)
+
+(defcell player 
+  (tile :initform "player")
+  (name :initform "Player")
+  (score :initform (make-stat :base 0 :min 0))
+  (shield-clock :initform 0)
+  (last-direction :initform :north)
   (dead :initform nil)
-  (last-turn-moved :initform 0)
-  (team :initform :player)
-  (call-clock :initform 0)
-  (call-interval :initform 7)
-  (input-phase :initform 0)
-  (hit-points :initform (make-stat :base 20 :min 0 :max 20))
-  (energy :initform (make-stat :base 80 :min 0 :max 80))
+  (puck :initform nil)
+  (chevrons :initform (make-stat :base 5 :min 0 :max 10))
+  (speed :initform (make-stat :base 10 :min 0 :max 10))
+  (strength :initform (make-stat :base 13))
+  (tail-length :initform (make-stat :base 20 :min 0))
+  (dexterity :initform (make-stat :base 13))
+  (defense :initform (make-stat :base 15))
+  (equipment-slots :initform '(:left-hand :right-hand))
+  (hearing-range :initform 1000)
+  (hit-points :initform (make-stat :base 1 :min 0 :max 2))
   (movement-cost :initform (make-stat :base 10))
-  (speed :initform (make-stat :base 10 :min 0 :max 25))
-  (strength :initform (make-stat :base 10))
-  (defense :initform (make-stat :base 10))
-  (hearing-range :initform 25)
-  (movement-cost :initform (make-stat :base 10))
+  (max-items :initform (make-stat :base 2))
   (stepping :initform t)
-  (light-radius :initform 7)
-  (first-start :initform nil)
-  (react-shield-clock :initform 0)
-  (energy-clock :initform *energy-recovery-interval*)
-  (categories :initform '(:actor :obstacle :player :target :container :light-source))
-  (excluded-fields :initform '(:segments)))
+  (attacking-with :initform :right-hand)
+  (light-radius :initform 3)
+  (categories :initform '(:actor :tailed :player :target :above
+			  :container :light-source :pointer))
+  (description :initform "This is you! Move with the arrow keys or numeric keypad."))
 
-(define-method loadout agent ()
-  [emote self '((("I'd better get moving."))
-		(("Use the arrow keys (or numpad)"))
-		(("to move, and SHIFT to fire.")))]
-  ;; (push (clone =lepton-defun=) <items>)
-  ;; (push (clone =energy=) <items>)
-  (push (clone =buster-defun=) <items>))
-
-(define-method start agent ()
-  (clon:with-fields (segments) self
-    (setf <direction> :north)
-    (setf <last-direction> :north)
-    (if (field-value :overworld *world*)
-	(progn (setf <tile> "player32")
-	       (unless <first-start>
-		 (setf <first-start> t)
-		 ;; enter the first room on the map. FIXME
-		 [act self]))
-	(clon:with-field-values (row column) self
-	  (setf <tile> "agent-north")
-	  [make-segments self]))))
-
-(define-method expend-energy agent (points)
-  (if (>= [stat-value self :energy] points)
-      (prog1 t [stat-effect self :energy (- points)])
-      (prog1 nil 
-	[say self "Insufficient energy."]
-	[play-sample self "error"])))
-
-(define-method make-segments agent ()
-  (setf <direction> :north)
-  (setf <last-direction> :north)
-  (clon:with-field-values (tail-length row column segments) self
-    (dolist (segment segments)
-      [die segment])
-    (setf segments nil)
-    (dotimes (n tail-length)
-      [add-segment self (- (+ row tail-length) n) column])))
-
-(define-method upgrade agent ()
-  (incf <tail-length>)
-  [make-segments self])
-
-(define-method hit agent (&optional object)
-  [play-sample self "ouch"]
-  [damage self 1])
-
-(define-method damage agent (points)
-  (if (zerop <react-shield-clock>)
-      (labels ((do-circle (image)
-		 (prog1 t
-		   (multiple-value-bind (x y) 
-		       [image-coordinates self]
-		     (let ((x0 (+ x 8))
-			   (y0 (+ y 8)))
-		       (draw-circle x0 y0 25 :destination image)
-		       (draw-circle x0 y0 30 :destination image)
-		       (draw-circle x0 y0 35 :destination image)
-		       (draw-circle x0 y0 40 :destination image))))))
-	(setf <react-shield-clock> *react-shield-time*)
-	[play-sample self "shield-warning"]
-	[>>add-overlay :viewport #'do-circle]
-	[parent>>damage self points])
-      [play-sample self "ice"]))
-  
-(define-method pause agent ()
-  [pause *world*])
-
-(defparameter *agent-tiles* '(:north "agent-north"
-			     :south "agent-south"
-			     :east "agent-east"
-			     :west "agent-west"))
-
-(define-method aim agent (direction)
-  (setf <direction> direction)
-  (setf <tile> (getf *agent-tiles* direction)))
-
-(define-method move agent (&optional direction)
+(define-method run player ()
   (unless <dead>
-    (let ((phase (field-value :phase-number *world*))
-	  (dir (or direction <direction>)))
-      (unless (= <last-turn-moved> phase)
-	(setf <last-turn-moved> phase)
-	[aim self dir]
-	(when [parent>>move self dir]
-	  [move-segments self]
-	  (setf <last-direction> dir))))))
+    (setf <tile> (if (null <puck>)
+		     "player-empty"
+		     (getf *player-tiles* (if (has-field :color <puck>)
+					      (field-value :color <puck>)
+					      :other))))
+    [run-shield self]
+    [step-on-current-square self]))
 
-(define-method move-segments agent ()
-  (clon:with-field-values (items last-direction segments) self
-    (let ((next-dir last-direction))
-      (dolist (segment segments)
-	[queue-move segment next-dir]
-	(setf next-dir (field-value :last-direction segment))))))
-
-(define-method in-overworld agent ()
-  (field-value :overworld *world*))
-
-(define-method update-tiles agent ()
-  (if [in-overworld self]
-      (setf <tile> "player32")
-      (clon:with-field-values (items segments) self
-	(let ((n 0)
-	      (num-items (length items)))
-	  (dolist (segment segments)
-	    [show-item segment (when (< n num-items)
-				 (field-value :tile (nth n items)))]
-	    (incf n))))))
-
-(define-method add-segment agent (&optional force-row force-column)
-  (clon:with-fields (segments) self
-    (multiple-value-bind (row column)
-	(if (or (null segments) (or force-row force-column))
-	    (step-in-direction <row> <column> (opposite-direction <last-direction>))
-	    (when (and (consp segments)
-		       (consp (last segments))
-		       (clon:object-p (car (last segments))))
-	      (clon:with-field-values (row column last-direction) (car (last segments))
-		(step-in-direction row column (opposite-direction last-direction)))))
-      (message "ADD-SEGMENT: ~S" (list force-row force-column row column (null segments)))
-      (let ((segment (clone =segment=)))
-	[drop-cell *world* segment (or force-row) (or force-column column)]
-	(push segment segments)))))
-
-(define-method space-at-head agent ()
-  (values <row> <column>))
-
-(define-method category-at-head agent (category)
-  (multiple-value-bind (row column) 
-      [space-at-head self]
-    [category-at-p *world* row column category]))
-
-(define-method item-at-head agent ()
-  [category-at-head self :item])
-
-(define-method obstacle-at-head agent ()
-  [category-at-head self :obstacle])
-  
-(define-method push agent () 
-  (unless <dead>
-    (if (= (length <items>) <tail-length>)
-	(progn 
-	  [say self "Maximum capacity reached."]
-	  [play-sample self "error"])
-	(let ((item [item-at-head self]))
-	  (if item
-	      (progn (setf <items> (append <items> (list item)))
-		     [play-sample self "doorbell"]
-		     [print-items self]
-		     [delete-from-world item])
-	      [say self "Nothing to push."])))))
+(define-method run-shield player (&optional clock)
+  (clon:with-fields (shield-clock row column) self
+    (when clock (setf shield-clock clock))
+    (decf shield-clock)
+    ;; warning when about to expire
+    (when (= 10 shield-clock)
+      [play-sample self "shield-warning"])
+    (if (plusp shield-clock)
+	(labels ((draw-shield (image)
+		   (prog1 t (multiple-value-bind (x y)
+				[viewport-coordinates self]
+			      (let ((circles (1+ (truncate (/ shield-clock 5))))
+				    (radius 16))
+				(dotimes (n circles)
+				  (draw-circle (+ x 8) (+ y 8) radius :color ".cyan" :destination image)
+				  (incf radius 2)))))))
+	  [play-sample self "shield-sound"]
+	  [>>add-overlay :viewport #'draw-shield]))))
 	
-(define-method pop agent ()
-  (unless (or <dead> [in-overworld self])
-    (clon:with-fields (items) self
-      (multiple-value-bind (row column)
-	  [space-at-head self]
-	(let ((item (car items)))
-	  (if (clon:object-p item)
-	      (progn (setf items (delete item items))
-		     [play-sample self "doorbell2"]
-		     [drop-cell *world* item row column]
-		     [print-items self])
-	      [say self "Nothing to drop."]))))))
-  
-(define-method act agent ()
-  (unless <dead>
-    (let ((gateway [category-at-p *world* <row> <column> :gateway]))
-      (if (clon:object-p gateway)
-	  [activate gateway]
-	  (cond ([category-at-head self :action]
-		 [do-action [category-at-head self :action]])
-		([category-at-head self :item]
-		 [push self])
-		(t 
-		 [play-sample self "error"]
-		 [say self "Nothing to do here."]))))))
+(define-method damage player (points)
+  (when (not (plusp <shield-clock>))
+    [parent>>damage self points]))
+   
+(define-method score-points player (points)
+  [stat-effect self :score points]
+  [>>narrateln :narrator (format nil "Scored ~S points." points)])
 
-(define-method expend-item agent ()
-  (pop <items>)
-  [print-items self])
-
-(define-method rotate agent () 
-  (unless <dead>
-    (clon:with-fields (items) self
-      (if items
-	  (let ((tail (car (last items)))
-		(newlist (butlast items)))
-	    [play-sample self "doorbell3"]
-	    (setf items (cons tail newlist))
-	    [print-items self])
-	  (progn 
-	    [play-sample self "error"]
-	    [say self "Cannot rotate empty list."])))))
-
-(define-method call agent (&optional direction)
-  (unless <dead>
-    (when (zerop <call-clock>)
-      (when direction
-	[aim self direction])
-      (let ((item (car <items>)))
-	(if (and item [in-category item :item]
-		 (clon:has-method :call item))
-	    (progn 
-	      (when [expend-energy self (field-value :energy-cost item)]
-		[call item self]
-		(setf <call-clock> (field-value :call-interval item))))
-	    [say self "Cannot call."])))))
-
-(define-method print-items agent ()
-  (labels ((print-item (item)
-	     [>>print :narrator nil :image (field-value :tile item)]
-	     [>>print :narrator "  "]
-	     [>>print :narrator (get-some-object-name item)]
-	     [>>print :narrator "  "])
-	   (newline ()
-	     [>>newline :narrator]))
-    [>>print :narrator " ITEMS: "]
-    (dolist (item <items>)
-      (print-item item))
-    (newline)))
-      
-(define-method run agent () 
-  [update-tiles self]
-  (when (plusp <call-clock>)
-    (decf <call-clock>))
-  (when (plusp <energy-clock>)
-    (decf <energy-clock>))
-  (when (zerop <energy-clock>)
-    (setf <energy-clock> *energy-recovery-interval*)
-    [stat-effect self :energy 1])
-  (when (plusp <react-shield-clock>)
-    (decf <react-shield-clock>)
-    [play-sample self "shield-sound"]
-    (labels ((do-circle (image)
-	       (prog1 t
-		 (multiple-value-bind (x y) 
-		     [image-coordinates self]
-		   (let ((x0 (+ x 8))
-			 (y0 (+ y 8)))
-		     (draw-circle x0 y0 (+ 25 (random 3)) :destination image :color (car (one-of (list ".cyan" ".hot pink" ".white"))))
-		     (draw-circle x0 y0 (+ 30 (random 3))  :destination image :color (car (one-of (list ".cyan" ".hot pink" ".white")))))))))
-      [>>add-overlay :viewport #'do-circle]))
-  (when (or (keyboard-modifier-down-p :lshift)
-	    (keyboard-modifier-down-p :rshift))
-    [call self <direction>])
-  (dolist (item <items>)
-    (when [in-category item :actor]
-      [run item])))
-
-(define-method quit agent ()
+(define-method quit player ()
   (xe2:quit :shutdown))
 
-(define-method do-exit agent ()
-  [exit *universe*])
+(define-method pause player ()
+  [pause *world*])
+ 
+(define-method step player (stepper)
+  (when [in-category stepper :item]
+    [grab self stepper])
+  (when [in-category stepper :snake]
+    [damage self 1]))
 
-(define-method exit agent ()
-  (dolist (segment <segments>)
-    [die segment])
-  (setf <segments> nil))
+(define-method drop-tail player ()
+  [drop self (clone =tail= 
+		    :direction <last-direction> 
+		    :clock [stat-value self :tail-length])])
 
-(define-method do-keys agent ()
-  (let (firing)
-    (multiple-value-bind (keys mods) (xe2:get-keys)
-      (labels ((move (dir)
-		 [move self dir]
-		 (when firing [call self dir])))
-	(dolist (mod mods)
-	  (case mod
-	    (:LSHIFT (setf firing t))
-	    (:RSHIFT (setf firing t))
-	    (otherwise nil)))
-	(dolist (key keys)
-	  (case key
-	    (:KP8 (move :north))
-	    (:KP4 (move :west))
-	    (:KP6 (move :east))
-	    (:KP2 (move :south))
-	    (:UP (move :north))
-	    (:LEFT (move :west))
-	    (:RIGHT (move :east))
-	    (:DOWN (move :south))
-	    (:Z [act self])
-	    (:X [rotate self])
-	    (:C [pop self])))))))
-    
-(define-method die agent ()
-      (unless <dead>
-    (setf <tile> "agent-disabled")
-    (dolist (segment <segments>)
-      [die segment])
-    (setf <segments> nil)
-    (dotimes (n 30)
-      [drop self (clone =explosion=)])
-    [play-sample self "gameover"]
-    [say self "You died. Press escape to reset."]
+(define-method restart player ()
+  (let ((player (clone =player=)))
+    [destroy *universe*]
+    [set-player *universe* player]
+    [set-character *status* player]
+    [play *universe*
+	  :address '(=menu-world=)]
+    [loadout player]
+    [play-sample self "go"]))
+
+(define-method drop-chevron player (direction)
+  (unless <dead>
+    (if (zerop [stat-value self :chevrons])
+	(progn [play-sample self "error"]
+	       [say self "You don't have any chevrons to drop."])
+	(if [category-at-p *world* <row> <column> :chevron]
+	    (progn [play-sample self "error"]
+		   [say self "You can't drop a chevron on top of another chevron."])
+	    (let ((chevron (clone =chevron=)))
+	      [drop self chevron]
+	      [play-sample self "powerup"]
+	      [stat-effect self :chevrons -1]
+	      [orient chevron direction])))))
+
+(define-method move player (direction)
+  (unless <dead>
+    (setf <last-direction> direction)
+    [drop-tail self]
+    [parent>>move self direction]))
+  
+(define-method loadout player ()
+  (setf <puck> (clone =puck=)))
+
+(define-method throw player (direction)
+  (assert (member direction '(:north :south :east :west)))
+  (unless <dead>
+    (clon:with-fields (puck) self
+      (when puck
+	[drop-cell *world* puck <row> <column> :no-stepping t]
+	[kick puck direction]
+	(setf puck nil)
+	[play-sample self "serve"]))))
+
+(define-method grab player (puck)
+  (assert [in-category puck :puck])
+  (setf <puck> puck)
+  [delete-from-world puck]
+  [play-sample self "grab"])
+
+(define-method pause player ()
+  [pause *world*])
+
+(define-method die player ()
+  (unless <dead>
+    (setf <tile> "skull")
+    [play-sample self "death"]
+    [say self "You died. Press ESCAPE to try again."]
     (setf <dead> t)))
 
-(define-method restart agent ()
-  (let ((agent (clone =agent=)))
-    [say self "Restarting CONS..."]
-    (halt-sample t)
-    (setf *player* agent)
-    [destroy *universe*]
-    [set-player *universe* agent]
-;;    [set-prompt *form* agent]
-    [set-character *status* agent]
-    [play *universe*
-	  :address (list '=zeta-x= :sequence-number (genseq))]
-    [loadout agent]))
+;;; The puck
 
-;;; Player upgrade
+(defvar *puck-tiles* '(:purple "puck-purple"
+			:black "puck-black"
+			:red "puck-red"
+			:blue "puck-blue"
+			:orange "puck-orange"
+			:green "puck-green"
+			:white "puck-white"
+			:yellow "puck-yellow"))
 
-(defcell tail-defun 
-  (name :initform "Body Extender Segment")
-  (tile :initform "tail-defun")
-  (call-interval :initform 20)
-  (energy-cost :initform 0)
-  (categories :initform '(:item :target :defun)))
+(defcell puck
+  (tile :initform "puck")
+  (description :initform "A frictionless paint-absorbent hockey puck.")
+  (categories :initform '(:puck :obstacle :target :actor :paintable :item))
+  (speed :initform (make-stat :base 6))
+  (movement-cost :initform (make-stat :base 6))
+  (direction :initform :here)
+  (stepping :initform t)
+  (color :initform :white))
 
-(define-method call tail-defun (caller)
-  [upgrade caller]
-  [expend-item caller])
+(define-method kick puck (direction)
+  (setf <phase-number> 0)
+  (setf <direction> direction))
+
+(define-method bounce puck ()
+  (setf <direction> (opposite-direction <direction>))
+  [play-sample self "bounce"])
+  ;; ;; check player collision; this happens when shooting an adjacent wall
+  ;; (when [category-at-p *world* <row> <column> :player]
+  ;;   [grab [get-player *world*] self]))
+
+(define-method paint puck (color)
+  (setf <color> color)
+  (setf <tile> (getf *puck-tiles* color)))
+
+(define-method move puck (direction)
+  (multiple-value-bind (r c) 
+      (step-in-direction <row> <column> direction)
+    (let ((obstacle [obstacle-at-p *world* r c]))
+      (when obstacle
+	[bounce self]
+	(when (clon:object-p obstacle)
+	  (if [is-player obstacle]
+	      [grab obstacle self]
+	      ;; it's not the player. see if we can color, or get paint
+	      (progn 
+		(when [in-category obstacle :paintable]
+		  [paint obstacle <color>])
+		(when (clon:has-field :hit-points obstacle)
+		  [damage obstacle 10])
+		(when [in-category obstacle :breakable]
+		  [die obstacle])
+		(when [in-category obstacle :brick]
+		  [hit obstacle])
+		(when [in-category obstacle :wall]
+		  [paint self (field-value :color obstacle)]
+		  [die obstacle]
+		  [parent>>move self direction])
+		(when [in-category obstacle :gate]
+		  [open obstacle]
+		  (when [category-at-p *world* <row> <column> :player]
+		    [parent>>move self direction]))
+		(when [in-category obstacle :bulkhead]
+		  [parent>>move self direction :ignore-obstacles]))))))
+    (when [is-located self]
+      [parent>>move self <direction>])))
+
+(define-method run puck ()
+  ;; pucks don't stop moving.
+  (if (eq :here <direction>)
+      [die self]
+      [move self <direction>]))
+
+(define-method die puck ()
+  [say self "You lost your puck!"]
+  [play-sample self "buzz"]
+  [parent>>die self])
+
+;;; Powerup mystery box
+
+(defcell mystery-box
+  (name :initform "Mystery box")
+  (tile :initform "mystery-box")
+  (categories :initform '(:target :obstacle :breakable))
+  (description :initform  "Break it open to find a surprise inside!"))
+
+(define-method die mystery-box ()
+  (let ((item (clone (car (one-of (list =snowflake= =shield=))))))
+    [drop self item]
+    [parent>>die self]))
+
+;;; Special puck: snowflake
+
+(defcell snowflake
+  (tile :initform "snowflake")
+  ;; not paintable
+  (categories :initform '(:puck :target :actor :item :snowflake))
+  (description :initform 
+"A puck that freezes enemies for a brief time.
+You must drop any other puck in order to pick this up.")
+  (speed :initform (make-stat :base 10))
+  (movement-cost :initform (make-stat :base 10))
+  (direction :initform :here)
+  (stepping :initform t))
+
+(define-method bounce snowflake ()
+  (setf <direction> (opposite-direction <direction>))
+  [play-sample self "bounce"])
+
+(define-method move snowflake (direction)
+  (multiple-value-bind (r c) 
+      (step-in-direction <row> <column> direction)
+    (let ((obstacle [obstacle-at-p *world* r c]))
+      (when obstacle
+	[bounce self]
+	(when (clon:object-p obstacle)
+	  (if [is-player obstacle]
+	      [grab obstacle self]
+	      ;; if it's an enemy or puck, freeze it!
+	      (progn 
+		(when (or [in-category obstacle :puck]
+			  [in-category obstacle :enemy])
+		  [freeze self obstacle])
+		(when [in-category obstacle :gate]
+		  [open obstacle])))))
+      (when [is-located self]
+	[parent>>move self <direction>]))))
+
+(define-method kick snowflake (direction)
+  (setf <direction> direction)
+  (when [category-at-p *world* <row> <column> :player]
+    [move self direction]))
+
+(define-method freeze snowflake (enemy)
+  [play-sample self "freeze"]
+  [expend-action-points enemy 100 -100])
+
+(define-method paint snowflake (color)
+  nil)
+
+(define-method step snowflake (stepper)
+  (if (and [is-player stepper]
+	   (null (field-value :puck stepper)))
+      (progn (score 1000)
+	     [grab stepper self])
+      (when [in-category stepper :enemy]
+	[bounce self]
+	[freeze self stepper])))
+
+(define-method run snowflake ()
+  (unless (eq :here <direction>)
+    [move self <direction>]))
+
+(define-method die snowflake ()
+  [say self "The snowflake was destroyed."]
+  [play-sample self "buzz"]
+  [parent>>die self])
+
+;;; Special puck: shield
+
+(defcell shield
+  (tile :initform "shield")
+  ;; not paintable
+  (categories :initform '(:puck :target :item :shield))
+  (player :initform nil)
+  (description :initform 
+"A puck that creates a shield around you when fired.
+You must drop any other puck in order to pick this up.")
+  (speed :initform (make-stat :base 10))
+  (movement-cost :initform (make-stat :base 10))
+  (direction :initform :here)
+  (stepping :initform t))
+
+(define-method kick shield (direction)
+  (when <player>
+    [run-shield <player> *shield-time*]
+    [die self]))
+
+(define-method step shield (stepper)
+  (if (and [is-player stepper]
+	   (null (field-value :puck stepper)))
+      (progn (score 1000)
+	     [grab stepper self]
+	     (setf <player> stepper)
+	     [say self "You picked up the shield puck. Fire it to become invulnerable!"])))
+
