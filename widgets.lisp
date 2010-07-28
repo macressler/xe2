@@ -364,7 +364,7 @@ line."
   [delete-line self (fill-pointer <lines>)])
 
 (define-method initialize formatter ()
-  [reset-lines self]
+  (>reset-lines self)
   [newline self])
 
 (define-method update formatter ()
