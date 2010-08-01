@@ -1,9 +1,9 @@
-;;; example.lisp --- simple xe2 example game
 
-;; Copyright (C) 2009  David O'Toole
+
+;; Copyright (C) 2010  David O'Toole
 
 ;; Author: David O'Toole <dto@gnu.org>
-;; Keywords: games
+;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -14,175 +14,22 @@
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
+
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary 
-
-;; See also http://dto.github.com/notebook/developers-guide.html
-
-;;; Packaging
-
 (defpackage :xe2-example
-  (:documentation "Example xe2 game.")
   (:use :xe2 :common-lisp)
-  (:export xe2-example))
+  (:export physics))
 
 (in-package :xe2-example)
-
-;;; Turn on timing after SDL init
-
-(add-hook 'xe2:*initialization-hook*
-	  #'(lambda ()
-	      (xe2:enable-timer)
-	      (xe2:set-frame-rate 30)
-	      (xe2:set-timer-interval 1)
-	      (xe2:enable-held-keys 1 3)))
-
-;;; Floor tiles
-
-(defcell floor 
-  (tile :initform "floor"))
-
-;;; Walls
-
-(defcell wall 
-  (tile :initform "wall")
-  (categories :initform '(:obstacle :opaque :exclusive :wall))
-  (hit-points :initform (make-stat :base 1 :min 0))) 
-  
-(define-method hit wall ()
-  (setf <tile> "debris")
-  [delete-category self :obstacle]
-  [delete-category self :wall])
-
-;;; The bouncing ball
-
-(defcell ball 
-  (tile :initform "ball")
-  (categories :initform '(:actor))
-  (direction :initform (xe2:random-direction))
-  (hit-points :initform (make-stat :base 5 :min 0)))
-
-(define-method serve ball (direction)
-  [play-sample self "serve"]
-  (setf <direction> direction))
-
-(define-method run ball ()
-  (when (eq <direction> :here) (setf <direction> (random-direction)))
-  (clon:with-fields (direction row column) self
-    (multiple-value-bind (r c) (xe2:step-in-direction row column direction)
-      (if [obstacle-at-p *world* r c]
-	  (progn 
-	    ;; is it a wall or character? then hit it
-	    (let ((object [category-at-p *world* r c '(:wall :person)]))
-	      (when object
-		[hit object]
-		[damage self 1]))
-	    ;; bounce
-	    [play-sample self "bip"]
-	    (setf direction (xe2:random-direction)))
-	  ;; move along
-	  [move self direction]))))
-
-;;; The player
-
-(defcell player 
-  (tile :initform "player")
-  (name :initform "Player")
-  (speed :initform (make-stat :base 10 :min 0 :max 10))
-  (movement-cost :initform (make-stat :base 10))
-  (stepping :initform t)
-  (categories :initform '(:actor :player :obstacle)))
-
-(define-method quit player ()
-  (xe2:quit :shutdown))
-
-(define-method run player ()
-  ;; if you are in category :actor, this is called every turn
-  nil)
-
-(define-method serve-ball player (direction)
-  (let ((ball (clone =ball=)))
-    [drop self ball]
-    [serve ball direction]))
-  
-;;; Non player characters who wander around
-
-(defcell person 
-  (tile :initform (car (one-of '("character" "character-pink"))))
-  (speed :initform (make-stat :base 3))
-  (movement-cost :initform (make-stat :base 30))
-  (categories :initform '(:actor :obstacle :person)))
-
-(define-method run person ()
-  [move self (random-direction)])
-
-(define-method hit person ()
-  [play-sample self "ouch"])
-
-;;; The example room
-
-(defcell drop-point 
-  (categories :initform '(:player-entry-point))
-  (tile :initform "floor"))
-
-(defparameter *room-size* 40)
-
-(define-prototype room (:parent xe2:=world=)
-  (height :initform *room-size*)
-  (width :initform *room-size*)
-  (edge-condition :initform :block))
-
-(define-method drop-floor room ()
-  (clon:with-field-values (height width) self
-    (dotimes (i height)
-      (dotimes (j width)
-	[drop-cell self (clone =floor=) i j]))))
-
-(define-method drop-people room ()
-  (clon:with-field-values (height width) self
-    (dotimes (i 10)
-      [drop-cell self (clone =person=) (random height) (random width)])))
-
-(define-method drop-wall room (r0 c0 r1 c1)
-  (trace-line #'(lambda (x y)
-		  (prog1 nil
-		      (when [drop-cell self (clone =wall=) y x])))
-	      c0 r0 c1 r1))
-
-(define-method generate room (&key (height *room-size*)
-				   (width *room-size*))
-  (setf <height> height)
-  (setf <width> width)
-  [create-default-grid self]
-  [drop-floor self]
-  [drop-people self]
-  (dotimes (i 20)
-    (let ((column (1+ (random *room-size*)))
-	  (row (1+ (random *room-size*)))
-	  (len (random (truncate (/ *room-size* 2))))
-	  (len2 (random (truncate (/ *room-size* 4)))))
-      (progn 
-	[drop-wall self row column 
-		   (min (- height 1)
-			(+ row len))
-		   (min (- width 1)
-			column)]
-	(destructuring-bind (r c)
-	    (midpoint (list row column)
-		      (list (+ row len) column))
-	  [drop-wall self r c r (+ column len)]))))
-  [drop-cell self (clone =drop-point=) 
-	     (1+ (random 10)) 
-	     (1+ (random 10))
-	     :exclusive t :probe t])
-
-(define-method begin-ambient-loop room ()
-  (play-music "frantix" :loop t))
-
-;;; Controlling the game
-
+(defparameter *timestep* 20)
+(defparameter *grid-size* 16)
+(defparameter *width* 800)
+(defparameter *height* 600)
+(defvar *narrator*)
+(defvar *prompt*)
+(defvar *player*)
+(defvar *viewport*)
 (define-prototype room-prompt (:parent xe2:=prompt=))
 
 (defparameter *numpad-keybindings* 
@@ -206,74 +53,156 @@
 
 (defparameter *qwerty-keybindings*
   (append *numpad-keybindings*
-	  '(("Y" nil "move :northwest .")
-	    ("K" nil "move :north .")
-	    ("U" nil "move :northeast .")
-	    ("H" nil "move :west .")
-	    ("L" nil "move :east .")
-	    ("B" nil "move :southwest .")
-	    ("J" nil "move :south .")
-	    ("N" nil "move :southeast .")
-	    ;;
-	    ("Y" (:control) "serve-ball :northwest .")
-	    ("K" (:control) "serve-ball :north .")
-	    ("U" (:control) "serve-ball :northeast .")
-	    ("H" (:control) "serve-ball :west .")
-	    ("L" (:control) "serve-ball :east .")
-	    ("B" (:control) "serve-ball :southwest .")
-	    ("J" (:control) "serve-ball :south .")
-	    ("N" (:control) "serve-ball :southeast .")
-	    ;;
-	    ("Q" (:control) "quit ."))))
+          '(("Y" nil "move :northwest .")
+            ("K" nil "move :north .")
+            ("U" nil "move :northeast .")
+            ("H" nil "move :west .")
+            ("L" nil "move :east .")
+            ("B" nil "move :southwest .")
+            ("J" nil "move :south .")
+            ("N" nil "move :southeast .")
+            ;;
+            ("Y" (:control) "serve-ball :northwest .")
+            ("K" (:control) "serve-ball :north .")
+            ("U" (:control) "serve-ball :northeast .")
+            ("H" (:control) "serve-ball :west .")
+            ("L" (:control) "serve-ball :east .")
+            ("B" (:control) "serve-ball :southwest .")
+            ("J" (:control) "serve-ball :south .")
+            ("N" (:control) "serve-ball :southeast .")
+            ;;
+            ("Q" (:control) "quit ."))))
 
 (define-method install-keybindings room-prompt ()
   (dolist (k (append *numpad-keybindings* *qwerty-keybindings*))
     (apply #'bind-key-to-prompt-insertion self k))
   ;; we also want to respond to timer events. this is how. 
   [define-key self nil '(:timer) (lambda ()
-				   [run-cpu-phase *world* :timer])])
+                                   [run-cpu-phase *world* :timer])])
+(defun physics (&rest ignore)
+  (when *world* [run-cpu-phase *world* t]))
 
-;;; Main program. 
+(defcell player 
+  (tile :initform "player")
+  (name :initform "Player")
+  (speed :initform (make-stat :base 10 :min 0 :max 10))
+  (movement-cost :initform (make-stat :base 10))
+  (stepping :initform t)
+  (categories :initform '(:actor :player :obstacle)))
 
-(defparameter *room-window-width* 800)
-(defparameter *room-window-height* 600)
+(define-method quit player ()
+  (xe2:quit :shutdown))
 
-(defun init-example ()
-  (xe2:message "Initializing Example...")
-  (clon:initialize)
-  (xe2:set-screen-height *room-window-height*)
-  (xe2:set-screen-width *room-window-width*)
-  (let* ((prompt (clone =room-prompt=))
-	 (universe (clone =universe=))
-	 (narrator (clone =narrator=))
-	 (player (clone =player=))
-	 (viewport (clone =viewport=)))
-    ;;
-    [resize prompt :height 20 :width 100]
-    [move prompt :x 0 :y 0]
-    [hide prompt]
-    [install-keybindings prompt]
-    ;;
-    [resize narrator :height 80 :width *room-window-width*]
-    [move narrator :x 0 :y (- *room-window-height* 80)]
-    [set-verbosity narrator 0]
-    ;;
-    [play universe
-	  :address '(=room=)
-	  :player player
-	  :narrator narrator
-	  :prompt prompt
-	  :viewport viewport]
-    [set-tile-size viewport 32]
-    [resize viewport :height 470 :width *room-window-width*]
-    [move viewport :x 0 :y 0]
-    [set-origin viewport :x 0 :y 0 
-		:height (truncate (/ (- *room-window-height* 130) 32))
-		:width (truncate (/ *room-window-width* 32))]
-    [adjust viewport] 
-    [narrateln narrator "You are the green guy."]
-    [narrateln narrator "Use the numpad or nethack keys to move; Control-direction to fire."]
-   ;;
-    (xe2:install-widgets prompt viewport narrator)))
+(define-method run player ()
+  ;; if you are in category :actor, this is called every turn
+  nil)
 
-(init-example)
+(define-method serve-ball player (direction)
+  (let ((ball (clone =ball=)))
+    [drop self ball]
+    [serve ball direction]))
+(defcell person 
+  (tile :initform (car (one-of '("character" "character-pink"))))
+  (speed :initform (make-stat :base 3))
+  (movement-cost :initform (make-stat :base 30))
+  (categories :initform '(:actor :obstacle :person)))
+
+(define-method run person ()
+  [move self (random-direction)])
+
+(define-method hit person ()
+  [play-sample self "ouch"])
+(defcell drop-point 
+  (categories :initform '(:player-entry-point))
+  (tile :initform "floor"))
+
+(defparameter *room-size* 40)
+
+(define-prototype room (:parent xe2:=world=)
+  (height :initform *room-size*)
+  (width :initform *room-size*)
+  (edge-condition :initform :block))
+
+(define-method drop-floor room ()
+  (clon:with-field-values (height width) self
+    (dotimes (i height)
+      (dotimes (j width)
+        [drop-cell self (clone =floor=) i j]))))
+
+(define-method drop-people room ()
+  (clon:with-field-values (height width) self
+    (dotimes (i 10)
+      [drop-cell self (clone =person=) (random height) (random width)])))
+
+(define-method drop-wall room (r0 c0 r1 c1)
+  (trace-line #'(lambda (x y)
+                  (prog1 nil
+                      (when [drop-cell self (clone =wall=) y x])))
+              c0 r0 c1 r1))
+
+(define-method generate room (&key (height *room-size*)
+                                   (width *room-size*))
+  (setf <height> height)
+  (setf <width> width)
+  [create-default-grid self]
+  [drop-floor self]
+  [drop-people self]
+  (dotimes (i 20)
+    (let ((column (1+ (random *room-size*)))
+          (row (1+ (random *room-size*)))
+          (len (random (truncate (/ *room-size* 2))))
+          (len2 (random (truncate (/ *room-size* 4)))))
+      (progn 
+        [drop-wall self row column 
+                   (min (- height 1)
+                        (+ row len))
+                   (min (- width 1)
+                        column)]
+        (destructuring-bind (r c)
+            (midpoint (list row column)
+                      (list (+ row len) column))
+          [drop-wall self r c r (+ column len)]))))
+  [drop-cell self (clone =drop-point=) 
+             (1+ (random 10)) 
+             (1+ (random 10))
+             :exclusive t :probe t])
+
+(define-method begin-ambient-loop room ()
+  (play-music "frantix" :loop t))
+(defgame :example
+    (:title "Example"
+     :description "A simple XE2 example game."
+     :creator "David T. O'Toole <dto@gnu.org>"
+     :screen-width *width*
+     :screen-height *height*
+     :timestep *timestep*
+     :physics-function #'xe2-example:physics)
+    ;; create some objects
+    (setf *prompt* (clone =example-prompt=))
+    (setf *universe* (clone =universe=))
+    (setf *player* (clone =agent=))
+    (setf *narrator* (clone =narrator=))
+    [set-player *universe* *player*]
+    (setf *viewport* (clone =viewport=))
+    ;; configure the view
+    [resize *viewport* :height *height* :width *width*]
+    [move *viewport* :x 0 :y 0]
+    [set-origin *viewport* :x 0 :y 0 
+                :height (truncate (/ *height* *grid-size*))
+                :width (truncate (/ *width* *grid-size*))]
+    [resize *prompt* :height 20 :width 100]
+    [move *prompt* :x 0 :y 0]
+    [hide *prompt*]
+    [resize *narrator* :height 80 :width *width*]
+    [move *narrator* :x 0 :y (- *height* 80)]
+    [set-verbosity *narrator* 0]
+    [install-keybindings *prompt*]
+    (xe2:install-widgets *prompt* *viewport*)
+    (xe2:enable-classic-key-repeat 100 60)
+    ;; now play!
+    [configure *universe*
+               :narrator *narrator*
+               :prompt *prompt*
+               :viewport *viewport*]
+    [play *universe* :player *player* :address '(=room=)]
+    [loadout *player*])
