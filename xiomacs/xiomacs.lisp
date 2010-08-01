@@ -47,8 +47,8 @@
 
 (defun handle-xiomacs-command (command)
   (assert (stringp command))
-  [insert *prompt* command]
-  [execute *prompt*])
+  (/insert *prompt* command)
+  (/execute *prompt*))
 
 (setf xe2:*form-command-handler-function* #'handle-xiomacs-command)
 
@@ -59,15 +59,15 @@
 (define-prototype help-textbox (:parent =textbox=))
 
 (define-method render help-textbox ()
-  [parent>>render self]
-  [message *pager* 
+  (/parent>>render self)
+  (/message *pager* 
 	   (list (format nil " --- Showing lines ~A-~A of ~A. Use PAGE UP and PAGE DOWN to scroll the text." 
-			 <point-row> (+ <point-row> <max-displayed-rows>) (length <buffer>)))])
+			 <point-row> (+ <point-row> <max-displayed-rows>) (length <buffer>)))))
 
 (add-hook '*after-load-module-hook* (lambda ()
-				      [message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*))]
+				      (/message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*)))
 				      (when (string= *module* "xiomacs")
-					[visit *form* "FrontPage"])))
+					(/visit *form* "FrontPage"))))
 
 (define-prototype xiomacs-prompt (:parent xe2:=prompt=))
 
@@ -75,17 +75,17 @@
   (apply #'send nil :say *terminal* args))
 
 (define-method goto xiomacs-prompt ()
-  [unfocus [left-form *forms*]]
-  [unfocus [right-form *forms*]]
+  (/unfocus (/left-form *forms*))
+  (/unfocus (/right-form *forms*))
   (setf <mode> :direct))
 
 (define-method do-after-execute xiomacs-prompt ()
-  [clear-line self]  
+  (/clear-line self)  
   (setf <mode> :forward))
 
 (define-method exit xiomacs-prompt ()
-  [parent>>exit self]
-  [refocus *forms*])
+  (/parent>>exit self)
+  (/refocus *forms*))
 
 (define-prototype xiomacs-split (:parent xe2:=split=))
 
@@ -149,7 +149,7 @@
   (dolist (binding (case *user-keyboard-layout*
 		     (:qwerty *qwerty-keybindings*)
 		     (otherwise *qwerty-keybindings*)))
-    [generic-keybind self binding]))
+    (/generic-keybind self binding)))
 
 (define-method left-form xiomacs-split ()
   (nth 0 <children>))
@@ -159,84 +159,84 @@
 
 (define-method other-form xiomacs-split ()
   (ecase <focus>
-    (0 [right-form self])
-    (1 [left-form self])))
+    (0 (/right-form self))
+    (1 (/left-form self))))
 
 (define-method left-world xiomacs-split ()
-  (field-value :world [left-form self]))
+  (field-value :world (/left-form self)))
 
 (define-method right-world xiomacs-split ()
-  (field-value :world [right-form self]))
+  (field-value :world (/right-form self)))
 
 (define-method selected-form xiomacs-split ()
   (nth <focus> <children>))
 
 (define-method left-selected-data xiomacs-split ()
-  [get-selected-cell-data [left-form self]])
+  (/get-selected-cell-data (/left-form self)))
 
 (define-method right-selected-data xiomacs-split ()
-  [get-selected-cell-data [right-form self]])
+  (/get-selected-cell-data (/right-form self)))
 
 (define-method focus-left xiomacs-split ()
-  [focus [left-form self]]
-  [unfocus [right-form self]])
+  (/focus (/left-form self))
+  (/unfocus (/right-form self)))
 
 (define-method focus-right xiomacs-split ()
-  [focus [right-form self]]
-  [unfocus [left-form self]])
+  (/focus (/right-form self))
+  (/unfocus (/left-form self)))
 
 (define-method refocus xiomacs-split ()
   (ecase <focus>
-    (0 [focus-left self])
-    (1 [focus-right self])))
+    (0 (/focus-left self))
+    (1 (/focus-right self))))
 
 (define-method left-pane xiomacs-split ()
   "Select the left spreadsheet pane."
-  [say self "Selecting left pane."]
-  [focus-left self]
+  (/say self "Selecting left pane.")
+  (/focus-left self)
   (setf <focus> 0))
 
 (define-method right-pane xiomacs-split ()
   "Select the right spreadsheet pane."
-  [say self "Selecting right pane."]
-  [focus-right self]
+  (/say self "Selecting right pane.")
+  (/focus-right self)
   (setf <focus> 1))
 
 (define-method switch-panes xiomacs-split ()
   (let ((newpos (mod (1+ <focus>) (length <children>))))
     (setf <focus> newpos)
     (ecase newpos
-      (0 [left-pane self])
-      (1 [right-pane self]))))
+      (0 (/left-pane self))
+      (1 (/right-pane self)))))
 
 (define-method apply-left xiomacs-split ()
   "Move data LEFTWARD from right pane to left pane, applying current
 left side tool to the right side data."
-  (let* ((form [left-form self])
+  (let* ((form (/left-form self))
 	 (tool (field-value :tool form))
-	 (data [right-selected-data self]))
-    [say self (format nil "Applying LEFT tool ~S to data ~S in LEFT form." tool data)]
-    [apply-tool form data]))
+	 (data (/right-selected-data self)))
+    (/say self (format nil "Applying LEFT tool ~S to data ~S in LEFT form." tool data))
+    (/apply-tool form data)))
 
 (define-method apply-right xiomacs-split ()
   "Move data RIGHTWARD from left pane to right pane, applying current
 right side tool to the left side data."
-  (let* ((form [right-form self])
+  (let* ((form (/right-form self))
 	 (tool (field-value :tool form))
-	 (data [left-selected-data self]))
-    [say self (format nil "Applying RIGHT tool ~S to data ~S in RIGHT form." tool data)]
-    [apply-tool form data]))
+	 (data (/left-selected-data self)))
+    (/say self (format nil "Applying RIGHT tool ~S to data ~S in RIGHT form." tool data))
+    (/apply-tool form data)))
 
 (define-method paste xiomacs-split (&optional page)
   (let ((source (if page 
 		    (find-page page)
-		    (field-value :world [other-form self])))
-	(destination (field-value :world [selected-form self])))
-    (multiple-value-bind (top left bottom right) [mark-region [selected-form self]]
-      (multiple-value-bind (top0 left0 bottom0 right0) [mark-region [other-form self]]
+		    (field-value :world (/other-form self))))
+	(destination (field-value :world (/selected-form self))))
+    (multiple-value-bind (top left bottom right) (/mark-region (/selected-form self))
+      (multiple-value-bind (top0 left0 bottom0 right0) (/mark-region (/other-form self))
 	(let ((source-height (field-value :height source))
 	      (source-width (field-value :width source)))
-	  (with-fields (cursor-row cursor-column) [selected-form self]
+	  (with-fields (cursor-row cursor-column) (/selected-form self)
 	    (let* ((height (or (when top (- bottom top))
 			       (when top0 (- bottom0 top0))
 			       source-height))
@@ -249,7 +249,7 @@ right side tool to the left side data."
 		   (c1 (or right (- width 1)))
 		   (sr (or top0 0))
 		   (sc (or left0 0)))
-	      [paste-region destination source r0 c0 sr sc height width])))))))
+	      (/paste-region destination source r0 c0 sr sc height width))))))))
   
 (define-method commands xiomacs-split ()
   "Syntax: command-name arg1 arg2 ...
@@ -282,94 +282,94 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     (setf *terminal* terminal)
     (setf *forms* split)
     (labels ((resize-widgets ()
-	       [say terminal "Resizing to ~S" (list :width *screen-width* :height *screen-height*)]
-	       [resize prompt :height *prompt-height* :width *screen-width*]
-	       [resize form :height (- *screen-height* *terminal-height* 
+	       (/say terminal "Resizing to ~S" (list :width *screen-width* :height *screen-height*))
+	       (/resize prompt :height *prompt-height* :width *screen-width*)
+	       (/resize form :height (- *screen-height* *terminal-height* 
 				       *prompt-height* *pager-height*) 
-		       :width (- *screen-width* *sidebar-width* 2)]
-	       [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width (- *sidebar-width* 2)]
-	       [resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*]
-	       [resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*)]
-	       [resize split :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*)]
-	       [resize terminal :height *terminal-height* :width *screen-width*]
-	       [resize quickhelp :height *quickhelp-height* :width *quickhelp-width*]
-	       [move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*)]
-	       [auto-position *pager*]))
+		       :width (- *screen-width* *sidebar-width* 2))
+	       (/resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width (- *sidebar-width* 2))
+	       (/resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*)
+	       (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
+	       (/resize split :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*))
+	       (/resize terminal :height *terminal-height* :width *screen-width*)
+	       (/resize quickhelp :height *quickhelp-height* :width *quickhelp-width*)
+	       (/move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*))
+	       (/auto-position *pager*)))
       (add-hook 'xe2:*resize-hook* #'resize-widgets))
     ;;
-    [resize prompt :height *prompt-height* :width *screen-width*]
-    [move prompt :x 0 :y 0]
-    [show prompt]
-    [install-keybindings prompt]
-    [install-keybindings split]
-    [say prompt "Welcome to XIOMACS. Press ALT-X to enter command mode, or F1 for help."]
-    [set-mode prompt :forward] ;; don't start with prompt on
-    [set-receiver prompt split]
+    (/resize prompt :height *prompt-height* :width *screen-width*)
+    (/move prompt :x 0 :y 0)
+    (/show prompt)
+    (/install-keybindings prompt)
+    (/install-keybindings split)
+    (/say prompt "Welcome to XIOMACS. Press ALT-X to enter command mode, or F1 for help.")
+    (/set-mode prompt :forward) ;; don't start with prompt on
+    (/set-receiver prompt split)
     ;; 
-    [resize form :height (- *screen-height* *terminal-height* 
+    (/resize form :height (- *screen-height* *terminal-height* 
 			    *prompt-height* *pager-height*) 
-	    :width (- *screen-width* *sidebar-width*)]
-    [move form :x 0 :y 0]
-    [set-prompt form prompt]
-    [set-narrator form terminal]
+	    :width (- *screen-width* *sidebar-width*))
+    (/move form :x 0 :y 0)
+    (/set-prompt form prompt)
+    (/set-narrator form terminal)
     ;;
-    [resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*]
-    [move help :x 0 :y 0]
+    (/resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*)
+    (/move help :x 0 :y 0)
     (setf (field-value :read-only help) t)
     (let ((text	(find-resource-object "xiomacs-help-message")))
-      [set-buffer help text])
+      (/set-buffer help text))
     ;;
-    [resize help-prompt :width 10 :height 10]
-    [move help-prompt :x 0 :y 0]
-    [hide help-prompt]
-    [set-receiver help-prompt help]
+    (/resize help-prompt :width 10 :height 10)
+    (/move help-prompt :x 0 :y 0)
+    (/hide help-prompt)
+    (/set-receiver help-prompt help)
 
     ;;
-    [resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *sidebar-width*]
-    [move form2 :x 0 :y 0]
+    (/resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *sidebar-width*)
+    (/move form2 :x 0 :y 0)
     (setf (field-value :header-style form2) nil)
-    [set-prompt form2 prompt]
-    [set-narrator form2 terminal]
+    (/set-prompt form2 prompt)
+    (/set-narrator form2 terminal)
     ;;
     (xe2:halt-music 1000)
     ;;
-    ;; [resize help :height 540 :width 800] 
-    ;; [move help :x 0 :y 0]
-    [resize-to-scroll help :height 540 :width 800] 
-    [move help :x 0 :y 0]
+    ;; (/resize help :height 540 :width 800) 
+    ;; (/move help :x 0 :y 0)
+    (/resize-to-scroll help :height 540 :width 800) 
+    (/move help :x 0 :y 0)
     (let ((text	(find-resource-object "xiomacs-help-message")))
-      [set-buffer help text])
+      (/set-buffer help text))
     ;;
-    [resize quickhelp :height *quickhelp-height* :width *quickhelp-width*]
-    [move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*)]
+    (/resize quickhelp :height *quickhelp-height* :width *quickhelp-width*)
+    (/move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*))
     (let ((text	(find-resource-object "xiomacs-quickhelp-message")))
       (dolist (line text)
     	(dolist (string line)
     	  (funcall #'send nil :print-formatted-string quickhelp string))
-    	[newline quickhelp]))
+    	(/newline quickhelp)))
     ;;
-    [resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*)]
-    [move stack :x 0 :y 0]
-    [set-children stack (list split terminal prompt)]
+    (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
+    (/move stack :x 0 :y 0)
+    (/set-children stack (list split terminal prompt))
     ;;
-    [resize split :width *screen-width* :height (- *screen-height* *pager-height* *terminal-height* *prompt-height*)]
-    [move split :x 0 :y 0]
-    [set-children split (list form form2)]
+    (/resize split :width *screen-width* :height (- *screen-height* *pager-height* *terminal-height* *prompt-height*))
+    (/move split :x 0 :y 0)
+    (/set-children split (list form form2))
     ;;
-    [resize terminal :height *terminal-height* :width *screen-width*]
-    [move terminal :x 0 :y (- *screen-height* *terminal-height*)]
-    [set-verbosity terminal 0]
+    (/resize terminal :height *terminal-height* :width *screen-width*)
+    (/move terminal :x 0 :y (- *screen-height* *terminal-height*))
+    (/set-verbosity terminal 0)
     ;;
     ;;
     (setf *pager* (clone =pager=))
-    [auto-position *pager*]
+    (/auto-position *pager*)
     ;;
-    [add-page *pager* :edit (list prompt stack split terminal quickhelp)]
-    [add-page *pager* :help (list help-prompt help)]
-    [select *pager* :edit]
+    (/add-page *pager* :edit (list prompt stack split terminal quickhelp))
+    (/add-page *pager* :help (list help-prompt help))
+    (/select *pager* :edit)
     (xe2:enable-classic-key-repeat 100 100)
     (in-package :xe2)
-    [focus-left *forms*]
+    (/focus-left *forms*)
 ;;    (run-hook 'xe2:*resize-hook*)
 ))
 

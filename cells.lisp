@@ -152,12 +152,12 @@ When nil, the method DRAW is invoked instead of using a tile.")
 (define-method form-width cell () 
   (if <widget>
       (image-width (field-value :image <widget>))
-      (formatted-line-width [form-label self])))
+      (formatted-line-width (/form-label self))))
 
 (define-method form-height cell ()
   (if <widget>
       (image-height (field-value :image <widget>))
-      (formatted-line-height [form-label self])))
+      (formatted-line-height (/form-label self))))
     
 (define-method set cell (data)
   nil)
@@ -174,10 +174,10 @@ When nil, the method DRAW is invoked instead of using a tile.")
 (define-method form-render cell (image x y width)
   (let ((widget <widget>))
     (if widget 
-	(progn [render widget]
+	(progn (/render widget)
 	       (draw-image (field-value :image widget)
 			   x y :destination image))
-	(let* ((label [form-label self])
+	(let* ((label (/form-label self))
 	       (shortfall (- width (formatted-line-width label)))
 	       (color
 		(or (when (and (listp label)
@@ -215,7 +215,7 @@ cells."
 (define-method describe cell (&optional description)
   "Narrate a description of the object. By default, uses
 the :description field of the cell."
-  [emote self (get-some-object-name self) :timeout 5.0])
+  (/emote self (get-some-object-name self) :timeout 5.0))
   ;; (setf description (or description <description>))
   ;; (when (stringp description)
   ;;   (dolist (line (split-string-on-lines description))
@@ -308,7 +308,7 @@ interpretation:
       cells participate in the Action Points system.
  -    :target --- This cell is susceptible to targeting.
  -    :proxy --- This cell is a proxy for another cell.
- -    :drawn --- This cell has a [draw] method used for custom drawing.
+ -    :drawn --- This cell has a (/draw) method used for custom drawing.
  -    :proxied  --- This cell is an occupant of a proxy.
  -    :dead --- This cell is no longer receiving run messages.
  -    :player --- Only one cell (your player avatar) has this category.
@@ -365,7 +365,7 @@ message every frame."
   "Give the cell its allotment of action points to begin a phase.
 If the last action of the previous turn brought the AP score into the
 negative, then you'll come up that much short."
-  (incf <action-points> [stat-value self :speed]))
+  (incf <action-points> (/stat-value self :speed)))
 
 (define-method do-phase cell ()
   "Invoked once at the beginning of each phase.")
@@ -387,7 +387,7 @@ points, its phase ends and another cell's phase begins.
 
 `Action points' (or `AP') control an actor cell's ability to take
 actions during a phase. The AP score for a cell's phase starts at
- [stat-value cell :speed]. The AP cost of an action is determined by
+ (/stat-value cell :speed). The AP cost of an action is determined by
 the corresponding method's use of `expend-action-points'; see below. 
 
 First your turn comes up, and XE2 waits for your input.  Once you
@@ -402,7 +402,7 @@ or :narrator instead of direct references to objects; the world
 processes the messages before delivery and sends them to the right
 place. (See also worlds.lisp)
 "
-  (when (and (not [in-category self :dead])
+  (when (and (not (/in-category self :dead))
 	     (< <phase-number> phase)
 	     (plusp <action-points>))
     (incf <phase-number>)))
@@ -414,26 +414,26 @@ place. (See also worlds.lisp)
     (setf <action-points> (max min <action-points>))))
 
 (define-method expend-default-action-points cell ()
-  [expend-action-points self [stat-value self :default-cost]])
+  (/expend-action-points self (/stat-value self :default-cost)))
 
 (define-method end-phase cell ()
   "End this cell's phase."
-  (setf <phase-number> [get-phase-number *world*]))
+  (setf <phase-number> (/get-phase-number *world*)))
 
 ;;; Player orientation
 
 (define-method distance-to-player cell ()
   "Calculate the distance from the current location to the player."
   ;; todo fix for sprites
-  (multiple-value-bind (row column) [grid-coordinates self]
-    [distance-to-player *world* row column]))
+  (multiple-value-bind (row column) (/grid-coordinates self)
+    (/distance-to-player *world* row column)))
 
 (define-method direction-to-player cell ()
   "Calculate the general compass direction of the player."
-  [direction-to-player *world* <row> <column>])
+  (/direction-to-player *world* <row> <column>))
 
 (define-method adjacent-to-player cell ()
-  [adjacent-to-player *world* <row> <column>])
+  (/adjacent-to-player *world* <row> <column>))
 
 ;;; Proxying and vehicles
 
@@ -444,21 +444,21 @@ place. (See also worlds.lisp)
       (error "Attempt to overwrite existing occupant cell in proxying."))
     (setf <occupant> occupant)
     ;; The cell should know when it is proxied, and who its proxy is.
-    [add-category occupant :proxied]
+    (/add-category occupant :proxied)
     (setf (field-value :proxy occupant) self)
     ;; Hide the proxy if it's in a world already.
     (when (numberp (field-value :row occupant))
-      [delete-cell world occupant <row> <column>])
+      (/delete-cell world occupant <row> <column>))
     ;; Don't let anyone step on occupied vehicle.
-    [add-category self :obstacle]
+    (/add-category self :obstacle)
     ;; Don't light up the map 
-    [add-category self :light-source]
+    (/add-category self :light-source)
     ;; If it's the player register self as player.
-    (when [is-player occupant]
+    (when (/is-player occupant)
       (message "OCCPU")
-      [add-category self :player]
-      [set-player world self]
-      (setf <phase-number> (1- [get-phase-number world])))))
+      (/add-category self :player)
+      (/set-player world self)
+      (setf <phase-number> (1- (/get-phase-number world))))))
 
 (define-method unproxy cell (&key dr dc dx dy)
   "Remove the occupant from this cell, dropping it on top."  
@@ -468,22 +468,22 @@ place. (See also worlds.lisp)
       (error "Attempt to unproxy empty cell."))
     (ecase (field-value :type occupant)
       (:cell
-	 (multiple-value-bind (r c) [grid-coordinates self]
-	   [drop-cell world occupant r c]))
+	 (multiple-value-bind (r c) (/grid-coordinates self)
+	   (/drop-cell world occupant r c)))
       (:sprite
-	 (multiple-value-bind (x y) [xy-coordinates self]
-	   [drop-sprite self occupant 
+	 (multiple-value-bind (x y) (/xy-coordinates self)
+	   (/drop-sprite self occupant 
 			(+ x (or dx 0))
-			(+ y (or dy 0))])))
-    [delete-category occupant :proxied]
+			(+ y (or dy 0))))))
+    (/delete-category occupant :proxied)
     (setf (field-value :proxy occupant) nil)
-    [do-post-unproxied occupant]
-    (when [is-player occupant]
-      [delete-category self :light-source]
-      [delete-category self :player]
-      [delete-category self :obstacle]
-      [set-player world occupant]
-      [run occupant])
+    (/do-post-unproxied occupant)
+    (when (/is-player occupant)
+      (/delete-category self :light-source)
+      (/delete-category self :player)
+      (/delete-category self :obstacle)
+      (/set-player world occupant)
+      (/run occupant))
     (setf <occupant> nil)))
 
 (define-method do-post-unproxied cell ()
@@ -493,10 +493,10 @@ unproxying. By default, it does nothing."
 
 (define-method forward cell (method &rest args)
   "Attempt to deliver the failed message to the occupant, if any."
-  (if (and [is-player self]
+  (if (and (/is-player self)
 	   (not (has-method method self))
 	   (null <occupant>))
-      [say self (format nil "The ~S command is not applicable." method) ]
+      (/say self (format nil "The ~S command is not applicable." method) )
       ;; otherwise maybe we're a vehicle
       (let ((occupant <occupant>))
 	(when (null occupant)
@@ -505,19 +505,19 @@ unproxying. By default, it does nothing."
   
 (define-method embark cell (&optional v)
   "Enter a vehicle V."
-  (let ((vehicle (or v [category-at-p *world* <row> <column> :vehicle])))
+  (let ((vehicle (or v (/category-at-p *world* <row> <column> :vehicle))))
     (if (null vehicle)
-	[>>say :narrator "No vehicle to embark."]
+	(/>>say :narrator "No vehicle to embark.")
 	(if (null (field-value :occupant vehicle))
-	    (progn [>>say :narrator "Entering vehicle."]
-		   [proxy vehicle self])
-	    [>>say :narrator "Already in vehicle."]))))
+	    (progn (/>>say :narrator "Entering vehicle.")
+		   (/proxy vehicle self))
+	    (/>>say :narrator "Already in vehicle.")))))
 
 (define-method disembark cell ()
   "Eject the occupant."
   (let ((occupant <occupant>))
-    (when (and occupant [in-category self :proxy])
-	  [unproxy self])))
+    (when (and occupant (/in-category self :proxy))
+	  (/unproxy self))))
 
 ;;; Cell movement
 
@@ -529,32 +529,32 @@ is in the way. Returns non-nil if a move occurred."
     (multiple-value-bind (r c) 
 	(step-in-direction <row> <column> direction)
       ;; 
-      (cond ((null [cells-at world r c]) ;; are we at the edge?
+      (cond ((null (/cells-at world r c)) ;; are we at the edge?
 	     ;; return nil because we didn't move
 	     (prog1 nil
 	     ;; edge conditions only affect player for now
-	       (when [is-player self]
+	       (when (/is-player self)
 		 (ecase (field-value :edge-condition world)
-		   (:block [say self "You cannot move in that direction."])
+		   (:block (/say self "You cannot move in that direction."))
 		   (:wrap nil) ;; TODO implement this for planet maps
-		   (:exit [exit *universe*])))))
+		   (:exit (/exit *universe*))))))
 	    (t
 	     (when (or ignore-obstacles 
-		       (not [obstacle-at-p *world* r c]))
+		       (not (/obstacle-at-p *world* r c)))
 	       ;; return t because we moved
 	       (prog1 t
-		 [expend-action-points self [stat-value self :movement-cost]]
-		 [move-cell world self r c])))))))
+		 (/expend-action-points self (/stat-value self :movement-cost))
+		 (/move-cell world self r c))))))))
 		 ;; (when <stepping>
-		 ;;   [step-on-current-square self]))))))))
+		 ;;   (/step-on-current-square self)))))))))
 
 (define-method set-location cell (r c)
   "Set the row R and column C of the cell."
   (setf <row> r <column> c))
 
 (define-method move-to cell (r c)
-  [delete-cell *world* self <row> <column>]
-  [drop-cell *world* self r c])
+  (/delete-cell *world* self <row> <column>)
+  (/drop-cell *world* self r c))
 
 (define-method exit cell ()
   "This method is invoked on a player cell when it leaves a world."
@@ -563,25 +563,25 @@ is in the way. Returns non-nil if a move occurred."
 (define-method step-on-current-square cell ()
   "Send :step events to all the cells on the current square."
   (when <stepping>
-    (do-cells (cell [cells-at *world* <row> <column>])
+    (do-cells (cell (/cells-at *world* <row> <column>))
       (unless (eq cell self) 
-	[step cell self]))))
+	(/step cell self)))))
 
 (define-method drop cell (cell &key loadout (exclusive nil))
   "Add CELL to the world at the current location. By default,
 EXCLUSIVE is nil; this allows one to drop objects on top of oneself.
 When LOADOUT is non-nil, call the :loadout method."
-  [drop-cell *world* cell <row> <column> :loadout loadout :exclusive exclusive])
+  (/drop-cell *world* cell <row> <column> :loadout loadout :exclusive exclusive))
 
 (define-method drop-sprite cell (sprite &optional x y)
   "Add SPRITE to the world at location X,Y."
   (multiple-value-bind (x0 y0)
-      [xy-coordinates self]
+      (/xy-coordinates self)
     (let ((x1 (or x x0))
 	  (y1 (or y y0)))
-      [add-sprite *world* sprite]
+      (/add-sprite *world* sprite)
       (assert (and x1 y1))
-      [update-position sprite x1 y1])))
+      (/update-position sprite x1 y1))))
 
 (define-method step cell (stepper)
   "Respond to being stepped on by the STEPPER."
@@ -589,7 +589,7 @@ When LOADOUT is non-nil, call the :loadout method."
 
 (define-method is-light-source cell ()
   "Returns non-nil if this cell is a light source."
-  [in-category self :light-source])
+  (/in-category self :light-source))
 
 ;;; Containers
 
@@ -601,7 +601,7 @@ When LOADOUT is non-nil, call the :loadout method."
 
 (define-method make-inventory cell ()
   "Create an empty <inventory> of length <max-items>."
-  (setf <inventory> (make-array [get-max-items self]
+  (setf <inventory> (make-array (/get-max-items self)
 				:initial-element nil
 				:adjustable nil)))
 
@@ -614,7 +614,7 @@ When LOADOUT is non-nil, call the :loadout method."
 (define-method get-max-items cell ()
   "Return the maximum number of items this container can hold."
   (assert <max-items>)
-  [stat-value self :max-items])
+  (/stat-value self :max-items))
 
 (define-method set-container cell (container)
   "Set the container pointer of this cell to CONTAINER.
@@ -623,11 +623,11 @@ All contained cells maintain a pointer to their containers."
 
 (define-method is-container cell ()
   "Returns non-nil if this cell is a container."
-  [in-category self :container])
+  (/in-category self :container))
 
 (define-method is-item cell ()
   "Returns non-nil if this cell is a potential inventory item."
-  [in-category self :item])
+  (/in-category self :item))
 
 (define-method first-open-slot cell ()
   "Return the integer position of the first open inventory slot, or
@@ -638,12 +638,12 @@ nil if none."
   "Add the ITEM to the cell's <inventory>.
 Return the new integer position if successful, nil otherwise."
   ;; TODO check whether we can combine items
-  (let ((pos [first-open-slot self]))
-    (when (and (numberp pos) [in-category item :item])
+  (let ((pos (/first-open-slot self)))
+    (when (and (numberp pos) (/in-category item :item))
       (prog1 pos
 	(setf (aref <inventory> pos) item)
-	[add-category item :contained]
-	[set-container item self]))))
+	(/add-category item :contained)
+	(/set-container item self)))))
       
 (define-method remove-item cell (item)
   "Remove ITEM from the <inventory>.
@@ -652,8 +652,8 @@ Return ITEM if successful, nil otherwise."
     (when pos
       (prog1 item
 	(setf (aref <inventory> pos) nil)
-	[delete-category item :contained]
-	[set-container item nil]))))
+	(/delete-category item :contained)
+	(/set-container item nil)))))
 
 (define-method item-at cell (pos)
   "Return the item at inventory position POS."
@@ -669,23 +669,23 @@ Return ITEM if successful, nil otherwise."
   (let ((total 0)
 	(inventory <inventory>)
 	(cell nil))
-    (if [is-container self]
+    (if (/is-container self)
 	;; recursively weigh the contents.
 	(progn
 	  (dotimes (n (length inventory))
 	    (setf cell (aref inventory n))
 	    (when cell
-	      (incf total [weight cell])))
+	      (incf total (/weight cell))))
 	  total)
 	;; base case; just return the weight
 	(or <weight> 0))))
 
 (define-method drop-item cell (pos)
   "Drop the item at inventory position POS."
-  (let ((item [item-at self pos]))
+  (let ((item (/item-at self pos)))
     (when item
-      [remove-item self item]
-      [drop self item])))
+      (/remove-item self item)
+      (/drop self item))))
 
 ;;; Finding and manipulating objects
 
@@ -693,12 +693,12 @@ Return ITEM if successful, nil otherwise."
   (let ((world *world*))
     (multiple-value-bind (nrow ncol)
 	(step-in-direction <row> <column> direction)
-      (if [in-bounds-p world nrow ncol]
+      (if (/in-bounds-p world nrow ncol)
 	  (let (cell)
-	    (let* ((cells [cells-at world nrow ncol])
+	    (let* ((cells (/cells-at world nrow ncol))
 		   (index2 (cond 
 			     ((not (null category))
-				(setf cell [category-at-p world nrow ncol category])
+				(setf cell (/category-at-p world nrow ncol category))
 				(position cell cells :test 'eq))
 			     ((and (eq :top index) (eq :here direction))
 			      ;; skip yourself and instead get the item you're standing on
@@ -716,25 +716,25 @@ Return ITEM if successful, nil otherwise."
   (setf <row> nil <column> nil))
 
 (define-method delete-from-world cell ()
-  [delete-cell *world* self <row> <column>])
-;;  [clear-location self])
+  (/delete-cell *world* self <row> <column>))
+;;  (/clear-location self))
 		       
 (define-method take cell (&key (direction :here) index category)
   "Take the item and return non-nil if successful."
   (multiple-value-bind (cell row column)
-      [find self :direction direction :index index :category category]
-    (when (and [in-category cell :item]
-	       [first-open-slot self])
+      (/find self :direction direction :index index :category category)
+    (when (and (/in-category cell :item)
+	       (/first-open-slot self))
       (prog1 t
-	[expend-default-action-points self]
-	[delete-from-world cell]
-	[add-item self cell]))))
+	(/expend-default-action-points self)
+	(/delete-from-world cell)
+	(/add-item self cell)))))
 
 (define-method use cell (user)
   "Return non-nil if cell is used up and should disappear."
   (declare (ignore user))
   (prog1 nil
-    [say self "Nothing happens."]))
+    (/say self "Nothing happens.")))
     
 (define-method resolve cell (reference &optional category)
   "Accept a REFERENCE to a cell, and try to get the real cell.
@@ -743,9 +743,9 @@ equipment slot keyword, or an integer denoting the nth inventory
 slot."
   (etypecase reference
     (keyword (if (member reference *compass-directions*)
-		 [find self :direction reference :category category]
-		 [equipment-slot self reference]))
-    (integer [item-at self reference])
+		 (/find self :direction reference :category category)
+		 (/equipment-slot self reference)))
+    (integer (/item-at self reference))
     (xe2:object reference)))
 
 ;;; Knowledge of objects
@@ -767,7 +767,7 @@ slot."
 
 (define-method is-equipment cell ()
   "Return non-nil if this cell is a piece of equipment."
-  [in-category self :equipment])
+  (/in-category self :equipment))
 
 (define-method equipment-slot cell (slot)
   "Return the equipment item (if any) in the slot named SLOT."
@@ -777,12 +777,12 @@ slot."
 (define-method equipment-match cell (item)
   "Return a list of possible slots on which this cell could equip
 ITEM. Returns nil if no such match is possible."
-  (when [is-equipment item]
+  (when (/is-equipment item)
     (intersection <equipment-slots> 
 		  (field-value :equip-for item))))
 
 (define-method add-equipment cell (item &optional slot)
-  (let ((match [equipment-match self item]))
+  (let ((match (/equipment-match self item)))
     (setf (getf <equipment> 
 		(or slot (first match)))
 	  item)))
@@ -797,47 +797,47 @@ ITEM. Returns nil if no such match is possible."
     (error "Cannot resolve null reference during equipping."))
   ;; (unless (keywordp slot)
   ;;   (error "Cannot equip null slot---you must supply a keyword."))
-  (let ((item [resolve self reference]))
+  (let ((item (/resolve self reference)))
     (when item
-      (let* ((match [equipment-match self item])
-	     (valid [is-equipment item])
+      (let* ((match (/equipment-match self item))
+	     (valid (/is-equipment item))
 	     (slot2 (or slot (when match 
 			       (first match))))
 	     (open (when slot2
-		     (null [equipment-slot self slot2]))))
+		     (null (/equipment-slot self slot2)))))
 	(if (and valid match open)
 	    (progn 
-	      [expend-default-action-points self]
-	      [add-equipment self item]
-	      [add-category item :equipped]
+	      (/expend-default-action-points self)
+	      (/add-equipment self item)
+	      (/add-category item :equipped)
 	      ;; remove from inventory
-	      [remove-item self item]
+	      (/remove-item self item)
 	      (setf (field-value :equipper item) self)
-	      (when (and *message-queue* [is-player self])
-		[>>newline :narrator ]))
+	      (when (and *message-queue* (/is-player self))
+		(/>>newline :narrator )))
 	    (progn
 	      ;; explain failure
-	      (when (and *message-queue* [is-player self])
-		[>>say :narrator "You cannot equip "]
-		[>>print-object-tag :narrator item]
-		[>>newline :narrator]
+	      (when (and *message-queue* (/is-player self))
+		(/>>say :narrator "You cannot equip ")
+		(/>>print-object-tag :narrator item)
+		(/>>newline :narrator)
 		(cond
 		  ((not valid) 
-		   [>>say :narrator "This item is not a piece of equipment."])
+		   (/>>say :narrator "This item is not a piece of equipment."))
 		  ((and match (not open))
-		   [>>say :narrator "You must un-equip the ~A first." slot2])
+		   (/>>say :narrator "You must un-equip the ~A first." slot2))
 		  ((not match)
-		   [>>say :narrator "This can only be equipped in one of: ~A"
-			  (field-value :equip-for item)])))))))))
+		   (/>>say :narrator "This can only be equipped in one of: ~A"
+			  (field-value :equip-for item)))))))))))
     
 (define-method dequip cell (slot)
   ;; TODO document
   ;; TODO narration
   (let ((item (getf <equipment> slot)))
     (when item
-      [>>expend-default-action-points]
-      [>>delete-equipment self slot]
-      [>>add-item self item])))
+      (/>>expend-default-action-points)
+      (/>>delete-equipment self slot)
+      (/>>add-item self item))))
 
 ;;; Loadout
 
@@ -862,60 +862,60 @@ world or have a location."
 
 (define-method attack cell (target)
   (if (null <attacking-with>)
-      [>>say :narrator "No attack method specified."]
-      (let* ((weapon [equipment-slot self <attacking-with>])
-	     (target-cell [resolve self target])
+      (/>>say :narrator "No attack method specified.")
+      (let* ((weapon (/equipment-slot self <attacking-with>))
+	     (target-cell (/resolve self target))
 	     (target-name (field-value :name target-cell)))
 	(if (null weapon)
-	    (when [is-player self]
-	      [>>say :narrator "Cannot attack without a weapon in ~A." 
-		     <attacking-with>])
-	    (let* ((attack-cost [stat-value weapon :attack-cost])
-		   (accuracy [stat-value weapon :accuracy])
-		   (dexterity [stat-value self :dexterity])
-		   (strength [stat-value self :strength])
+	    (when (/is-player self)
+	      (/>>say :narrator "Cannot attack without a weapon in ~A." 
+		     <attacking-with>))
+	    (let* ((attack-cost (/stat-value weapon :attack-cost))
+		   (accuracy (/stat-value weapon :accuracy))
+		   (dexterity (/stat-value self :dexterity))
+		   (strength (/stat-value self :strength))
 		   (to-hit (< (random 100)
 			      (+ accuracy (* (random 10) (/ dexterity 2))))))
 	      (if to-hit
 		  ;; calculate and send damage
 		  (let ((damage (+ (truncate (/ strength 3))
-				   [stat-value weapon :attack-power])))
-		    [>>expend-action-points self attack-cost]
-		    (when [is-player self]
-		      [>>say :narrator "You do ~D points of damage on the ~A."
+				   (/stat-value weapon :attack-power))))
+		    (/>>expend-action-points self attack-cost)
+		    (when (/is-player self)
+		      (/>>say :narrator "You do ~D points of damage on the ~A."
 			     damage
-			     (get-some-object-name target-cell)])
-		    [>>damage target-cell damage])
+			     (get-some-object-name target-cell)))
+		    (/>>damage target-cell damage))
 		  (progn 
-		    [>>expend-default-action-points self]
-		    (when [is-player self]
-		      [>>narrateln :narrator "You missed."]))))))))
+		    (/>>expend-default-action-points self)
+		    (when (/is-player self)
+		      (/>>narrateln :narrator "You missed.")))))))))
   
 (define-method fire cell (direction)
-  (let ((weapon [equipment-slot self <firing-with>]))
+  (let ((weapon (/equipment-slot self <firing-with>)))
     (if weapon
 	(progn 
-	  [expend-action-points self [stat-value weapon :attack-cost]]
-	  [fire weapon direction])
-	[>>narrateln :narrator "Nothing to fire with."])))
+	  (/expend-action-points self (/stat-value weapon :attack-cost))
+	  (/fire weapon direction))
+	(/>>narrateln :narrator "Nothing to fire with."))))
 
 (define-method damage cell (damage-points)
   (when (has-field :hit-points self)
     (progn 
-      [stat-effect self :hit-points (- damage-points)]
-      (when (zerop [stat-value self :hit-points])
-	[die self]))))
-      ;; (when [is-player self]
-      ;; 	[>>say :narrator "You take ~D hit points of damage." damage-points]))))
+      (/stat-effect self :hit-points (- damage-points))
+      (when (zerop (/stat-value self :hit-points))
+	(/die self)))))
+      ;; (when (/is-player self)
+      ;; 	(/>>say :narrator "You take ~D hit points of damage." damage-points)))))
 	
 (define-method die cell ()
   "Abandon this cell to the garbage collector."
-  (if [in-category self :dead]
+  (if (/in-category self :dead)
       (message "Warning: called die on dead cell!")
       (progn
 	(setf <action-points> 0)
-	[add-category self :dead]
-	[delete-from-world self])))
+	(/add-category self :dead)
+	(/delete-from-world self))))
 
 (define-method cancel cell ()
   "This cell was scheduled for drop and possible loadout in a world,
@@ -923,58 +923,58 @@ but this was canceled. A canceled cell should update any global state
 to reflect its disappearance; this is different from a dying cell." nil)
 
 (define-method expend-energy cell (amount)
-  (when (< amount [stat-value self :energy])
+  (when (< amount (/stat-value self :energy))
     (prog1 t
-      [stat-effect self :energy (- amount)])))
+      (/stat-effect self :energy (- amount)))))
 
 (defparameter *default-sample-hearing-range* 15)
 
 (define-method play-sample cell (sample-name)
   "Play the sample SAMPLE-NAME.
 May be affected by the player's :hearing-range stat, if any."
-  (when [get-player *world*]
-    (let* ((player [get-player *world*])
+  (when (/get-player *world*)
+    (let* ((player (/get-player *world*))
 	   (range (if (clon:has-field :hearing-range player)
 		      (clon:field-value :hearing-range player)
 		      *default-sample-hearing-range*))
 	   (dist (multiple-value-bind (row col) 
-		     [grid-coordinates self]
+		     (/grid-coordinates self)
 		   (distance col row
-			     [player-column *world*]
-			     [player-row *world*]))))
+			     (/player-column *world*)
+			     (/player-row *world*)))))
       (when (> range dist)
 	(play-sample sample-name)))))
 
 (define-method say cell (format-string &rest args)
   "Print a string to the message narration window. Arguments
 are as with `format'."
-  (unless [in-category self :dead]
+  (unless (/in-category self :dead)
     (let ((range (if (clon:has-field :hearing-range self)
 		     <hearing-range>
 		     *default-sample-hearing-range*))
 	  (dist (distance (or <column> 0) (or <row> 0)
-			  [player-column *world*]
-			  [player-row *world*])))
+			  (/player-column *world*)
+			  (/player-row *world*))))
       (when (> range dist)
 	(apply #'send-queue self :say :narrator format-string args)))))
 
 (define-method viewport-coordinates cell ()
   "Return as values X,Y the world coordinates of CELL."
   (assert (and <row> <column>))
-  [get-viewport-coordinates (field-value :viewport *world*)
-                            <row> <column>])
+  (/get-viewport-coordinates (field-value :viewport *world*)
+                            <row> <column>))
 
 (define-method image-coordinates cell ()
   "Return as values X,Y the viewport image coordinates of CELL."
   (assert (and <row> <column>))
-  [get-image-coordinates (field-value :viewport *world*)
-                         <row> <column>])
+  (/get-image-coordinates (field-value :viewport *world*)
+                         <row> <column>))
 
 (define-method screen-coordinates cell ()
   "Return as values X,Y the screen coordinates of CELL."
   (assert (and <row> <column>))
-  [get-screen-coordinates (field-value :viewport *world*)
-			  <row> <column>])
+  (/get-screen-coordinates (field-value :viewport *world*)
+			  <row> <column>))
 
 ;; TODO is this needed?
 (define-method deserialize cell ()
@@ -990,18 +990,18 @@ are as with `format'."
 (define-method hit cell (&optional other) nil)
 
 (define-method can-see-player cell ()
-  [line-of-sight *world* <row> <column> [player-row *world*] [player-column *world*]])
+  (/line-of-sight *world* <row> <column> (/player-row *world*) (/player-column *world*)))
 
 (define-method can-see cell (cell &optional category)
-  [line-of-sight *world* <row> <column> (field-value :row cell) (field-value :column cell) category])
+  (/line-of-sight *world* <row> <column> (field-value :row cell) (field-value :column cell) category))
 
 (define-method can-see-* cell (r c &optional category)
-  [line-of-sight *world* <row> <column> r c category])
+  (/line-of-sight *world* <row> <column> r c category))
 
 ;;; User Interaction with keyboard and mouse
 
 (define-method select cell ()
-  [describe self])
+  (/describe self))
 
 ;;; The asterisk cell is a wildcard
 
@@ -1034,7 +1034,7 @@ world, and collision detection is performed between sprites and cells.")
   (type :initform :sprite))
 
 (define-method image-coordinates sprite ()
-  [get-viewport-coordinates-* (field-value :viewport *world*) <x> <y>])
+  (/get-viewport-coordinates-* (field-value :viewport *world*) <x> <y>))
 
 ;; Convenience macro for defining cells:
 
@@ -1056,14 +1056,14 @@ world, and collision detection is performed between sprites and cells.")
     
 (define-method initialize sprite ()
   (when <image>
-    [update-image self <image>]))
+    (/update-image self <image>)))
 
 (define-method die sprite ()
-  [remove-sprite *world* self])
+  (/remove-sprite *world* self))
 
 (define-method update-image sprite (image)
   (setf <image> image)
-  [update-dimensions self])
+  (/update-dimensions self))
 
 (define-method update-position sprite (x y &optional ignore-obstacles)
   (declare (ignore ignore-obstacles))
@@ -1078,7 +1078,7 @@ world, and collision detection is performed between sprites and cells.")
 	(setf <x> x
 	      <y> y)))))
 ;;	  (setf <x> 0 <y> 0)))))
-;;	  [do-collision self nil]))))
+;;	  (/do-collision self nil)))))
 
 (define-method move sprite (direction &optional movement-distance)
   (let ((dist (or movement-distance <movement-distance>)))
@@ -1087,7 +1087,7 @@ world, and collision detection is performed between sprites and cells.")
       (when (and y x)
 	(multiple-value-bind (y0 x0) (xe2:step-in-direction y x direction dist)
 	  (assert (and y0 x0))
-	    [update-position self x0 y0])))))
+	    (/update-position self x0 y0))))))
 
 (define-method collide sprite (sprite)
   ;; (message "COLLIDING A=~S B=~S"
@@ -1097,7 +1097,7 @@ world, and collision detection is performed between sprites and cells.")
 	(y0 (field-value :y sprite))
 	(w (field-value :width sprite))
 	(h (field-value :height sprite)))
-    [collide-* self y0 x0 w h]))
+    (/collide-* self y0 x0 w h)))
     
 (define-method would-collide sprite (x0 y0)
   (clon:with-field-values (tile-size grid sprite-grid) *world*
@@ -1115,14 +1115,14 @@ world, and collision detection is performed between sprites and cells.")
 		    (let ((i0 (+ i top))
 			  (j0 (+ j left)))
 		      (when (array-in-bounds-p grid i0 j0)
-			(when [collide-* self
+			(when (/collide-* self
 					 (* i0 tile-size) 
 					 (* j0 tile-size)
-					 tile-size tile-size]
+					 tile-size tile-size)
 			  ;; save this intersection information
 			  (vector-push-extend self (aref sprite-grid i0 j0))
 			  ;; quit when obstacle found
-			  (let ((obstacle [obstacle-at-p *world* i0 j0]))
+			  (let ((obstacle (/obstacle-at-p *world* i0 j0)))
 			    (when obstacle
 			      (setf found obstacle))))))))
 		(return-from colliding found)))
@@ -1184,15 +1184,15 @@ world, and collision detection is performed between sprites and cells.")
 
 (define-method distance-to-player sprite ()
   "Calculate the distance from the current location to the player."
-  (multiple-value-bind (r c) [grid-coordinates self]
-    [distance-to-player *world* r c]))
+  (multiple-value-bind (r c) (/grid-coordinates self)
+    (/distance-to-player *world* r c)))
 
 (define-method undo-excursion sprite ()
-  [update-position self <saved-x> <saved-y>])
+  (/update-position self <saved-x> <saved-y>))
 
 (define-method viewport-coordinates sprite ()
-  [get-viewport-coordinates-* (field-value :viewport *world*)
-			      <x> <y>])
+  (/get-viewport-coordinates-* (field-value :viewport *world*)
+			      <x> <y>))
 
 (define-method grid-coordinates cell ()
   (values <row> <column>))
@@ -1210,8 +1210,8 @@ world, and collision detection is performed between sprites and cells.")
 
 (define-method drop sprite (cell &optional (delta-row 0) (delta-column 0))
   (multiple-value-bind (r c)
-      [grid-coordinates self]
-    [drop-cell *world* cell (+ r delta-row) (+ c delta-column)]))
+      (/grid-coordinates self)
+    (/drop-cell *world* cell (+ r delta-row) (+ c delta-column))))
   
 ;;; Popup text balloons
 
@@ -1266,14 +1266,14 @@ world, and collision detection is performed between sprites and cells.")
 	    (incf y2 (formatted-line-height line))))))))
 
 (define-method run balloon ()
-  [expend-default-action-points self]
+  (/expend-default-action-points self)
   (when <following>
-    (multiple-value-bind (r c) [grid-coordinates <following>]
+    (multiple-value-bind (r c) (/grid-coordinates <following>)
       ;; follow emoter
-      [move-to self r c]))
+      (/move-to self r c)))
   (when (integerp <timeout>)
     (when (minusp (decf <timeout>))
-      [die self])))
+      (/die self))))
 
 (define-method emote cell (text &key (timeout 8.0) (style :clear))
   (let* ((ftext (if (stringp text) (list (list (list text)))
@@ -1281,11 +1281,11 @@ world, and collision detection is performed between sprites and cells.")
 	 (balloon (clone =balloon= :text ftext :timeout timeout 
 			:following self :style style
 			:scale 2)))
-    [play-sample self "talk"]
+    (/play-sample self "talk")
     ;; get rid of any previous balloons first
-    [delete-category-at *world* <row> <column> :balloon]
+    (/delete-category-at *world* <row> <column> :balloon)
     ;; drop it
-    [drop self balloon]))
+    (/drop self balloon)))
 
 ;;; Sprite specials; editor placeholders for sprites.
 
@@ -1312,11 +1312,11 @@ world, and collision detection is performed between sprites and cells.")
 (define-method run sprite-special ()
   (with-fields (sprite-name) self
     (when sprite-name
-      [drop-sprite self (clone (symbol-value sprite-name))]
-      [die self])))
+      (/drop-sprite self (clone (symbol-value sprite-name)))
+      (/die self))))
 		     
 ;; (define-method run sprite-special ()
-;;   [die self])
+;;   (/die self))
 
 
 ;;; cells.lisp ends here

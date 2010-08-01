@@ -73,8 +73,8 @@ including an output formatter and a configurable command prompt.
 
 (define-method toggle-visible widget ()
   (if <visible>
-      [hide self]
-      [show self]))
+      (/hide self)
+      (/show self)))
 
 (define-method render widget ()
   "Render the widget to its image. The default implementation leaves
@@ -164,7 +164,7 @@ possibly return one of them."
       (dolist (widget <children>)
 	(assert (integerp x))
 	(assert (integerp y))
-        [move widget :x x :y y]
+        (/move widget :x x :y y)
         (incf y (field-value :height widget))))))
 
 (define-method set-children stack (children)
@@ -194,8 +194,8 @@ possibly return one of them."
 	  (image <image>)
 	  (focused-widget (nth <focus> <children>)))
       (dolist (widget <children>)
-        [move widget :x x :y y]
-	[render widget]
+        (/move widget :x x :y y)
+	(/render widget)
 	(draw-image (field-value :image widget) x y :destination image)
 	(when (eq widget focused-widget)
 	  (draw-rectangle x y (field-value :width widget)
@@ -216,7 +216,7 @@ possibly return one of them."
 	(when func
 	  (prog1 t
 	    (funcall func))))
-      [handle-key (nth <focus> <children>) event]))
+      (/handle-key (nth <focus> <children>) event)))
 
 (define-method forward split (method &rest args)
   (apply #'send self method (nth <focus> <children>) args))
@@ -324,22 +324,22 @@ PROPERTIES are chosen from:
 
 (define-method print formatter (string &rest keys &key image foreground background font)
   "Add a formatted STRING to the end of the current line.
-Example: [print my-formatter \"hello\" :foreground \"red\"]"
+Example: (/print my-formatter \"hello\" :foreground \"red\")"
   (vector-push-extend (cons string keys) <current-line>))
 
 (define-method print-formatted-string formatter (formatted-string)
   (vector-push-extend formatted-string <current-line>))	       
 
 (define-method print-image formatter (image)
-  [print self nil :image image])
+  (/print self nil :image image))
 
 (define-method println formatter (&rest args)
   "Print the ARGS as a formatted string, following up with a newline."
   (apply #'xe2:send self :print self args)
-  [newline self])
+  (/newline self))
 
 (define-method space formatter ()
-  [print self " "])
+  (/print self " "))
 
 (define-method clear-line formatter ()
   (setf <current-line> (make-array 10 :adjustable t :fill-pointer 0)))
@@ -361,11 +361,11 @@ line."
       (vector-pop <lines>))))
 
 (define-method delete-all-lines formatter ()
-  [delete-line self (fill-pointer <lines>)])
+  (/delete-line self (fill-pointer <lines>)))
 
 (define-method initialize formatter ()
-  (>reset-lines self)
-  [newline self])
+  (/reset-lines self)
+  (/newline self))
 
 (define-method update formatter ()
   "Invoked before each render. Replace this method for custom
@@ -379,18 +379,18 @@ auto-updated displays."
 	(string-capitalize (subseq str 1 (search "=" str :from-end t))))))
 
 (define-method print-object-tag formatter (ob)
-  [print-image self (or (field-value :tile ob) (field-value :image ob))]
-  [space self]
-  [print self (get-some-object-name ob)]
-  [space self])
+  (/print-image self (or (field-value :tile ob) (field-value :image ob)))
+  (/space self)
+  (/print self (get-some-object-name ob))
+  (/space self))
 
 (define-method print-separator formatter ()
-  [print self "  :  " :foreground ".gray20"])
+  (/print self "  :  " :foreground ".gray20"))
 
 (define-method render formatter ()
   (when <visible>
-    [clear self]
-    [update self]
+    (/clear self)
+    (/update self)
     (let ((y <height>) (n 0)
           line
           (lines <lines>)
@@ -446,10 +446,10 @@ All tokens must be Lisp-readable symbols, strings, or numbers.
 The command prompt will change its commands into message sends, and
 send them to a designated command receiver:
 
-:  yes             -->   [yes <receiver>]
-:  move :north     -->   [move <receiver> :north]
-:  attack :west :with :left-hand  --> [attack <receiver> :west 
-:                                             :with :left-hand]
+:  yes             -->   (/yes <receiver>)
+:  move :north     -->   (/move <receiver> :north)
+:  attack :west :with :left-hand  --> (/attack <receiver> :west 
+:                                             :with :left-hand)
 
 So the commands are just the receiver's methods. The command
 line's HELP system is just a method documentation browser
@@ -506,14 +506,14 @@ normally."
 			  (funcall func)))))
     (:forward (when (equal (normalize-event '("X" :control))
 			   keylist)
-		(prog1 t [goto self])))))
+		(prog1 t (/goto self))))))
 
 (define-method exit prompt ()
-  [clear-line self]  
+  (/clear-line self)  
   (setf <mode> :forward))
 
 (define-method goto prompt ()
-  [say self "Enter command below at the >> prompt. Press ENTER when finished, or CONTROL-X to cancel."]
+  (/say self "Enter command below at the >> prompt. Press ENTER when finished, or CONTROL-X to cancel.")
   (setf <mode> :direct))
 
 (define-method set-mode prompt (mode)
@@ -589,7 +589,7 @@ normally."
   (dolist (binding (ecase *user-keyboard-layout*
 		     (:qwerty *prompt-qwerty-keybindings*)
 		     (:sweden *prompt-sweden-keybindings*)))
-    [generic-keybind self binding])
+    (/generic-keybind self binding))
   ;; install keybindings for self-inserting characters
   (map nil #'(lambda (char)
 	       (bind-key-to-prompt-insertion self (string char) nil
@@ -606,8 +606,8 @@ normally."
   (apply #'message args))
 
 (define-method initialize prompt ()
-  [parent>>initialize self]
-  [install-default-keybindings self])
+  (send-parent self :initialize self)
+  (/install-default-keybindings self))
 
 (define-method forward-char prompt ()
   (setf <point> (min (1+ <point>)
@@ -626,7 +626,7 @@ normally."
   ;; line.
   (when (string= "." (subseq string (1- (length string))))
     (setf <line> (subseq string 0 (1- (length string))))
-    [execute self]))
+    (/execute self)))
 
 (define-method backward-delete-char prompt ()
   (when (< 0 <point>) 
@@ -637,23 +637,23 @@ normally."
 
 (define-method print-data prompt (data &optional comment)
   (dolist (line (split-string-on-lines (write-to-string data :circle t :pretty t :escape nil :lines 5)))
-    [say self (if comment ";; ~A"
-		  " ~A") line]))
+    (/say self (if comment ";; ~A"
+		  " ~A") line)))
 
 (defparameter *prompt-debug-on-error* t)
 
 (define-method execute prompt ()
   (labels ((print-it (c) 
-	     [print-data self c :comment]))
+	     (/print-data self c :comment)))
     (let* ((*read-eval* nil)
 	   (line <line>)
 	   (sexp (handler-case 
 		     (read-from-string (concatenate 'string "(" line ")"))
 		   (condition (c)
 		     (print-it c)))))
-      [clear-line self]
+      (/clear-line self)
       (when sexp 
-	[say self "~A" line]
+	(/say self "~A" line)
 	(if *prompt-debug-on-error*
 	    (apply #'send nil (make-keyword (car sexp)) <receiver> (mapcar #'eval (cdr sexp)))
 	    (handler-case
@@ -669,7 +669,7 @@ normally."
 	      (serious-condition (c)
 		(print-it c))))
 	(queue line <history>))))
-  [do-after-execute self])
+  (/do-after-execute self))
 
 (define-method do-after-execute prompt ()
   nil)
@@ -681,15 +681,15 @@ normally."
 
 (define-method forward-history prompt ()
   (when (> <history-position> 0)
-    (setf <line> [history-item self (progn (decf <history-position>)
-					   <history-position>)])
+    (setf <line> (/history-item self (progn (decf <history-position>)
+					   <history-position>)))
     (setf <point> (length <line>))))
  
 
 (define-method backward-history prompt ()
   (when (< <history-position> (queue-count <history>))
-    (setf <line> [history-item self (progn (incf <history-position>)
-					   <history-position>)])
+    (setf <line> (/history-item self (progn (incf <history-position>)
+					   <history-position>)))
     (setf <point> (length <line>))))
 
 (define-method set-receiver prompt (receiver)
@@ -814,7 +814,7 @@ normally."
   "Resize the textbox to WIDTH * HEIGHT and enable scrolling of contents.
 This method allocates a new SDL surface."
   (assert (and (numberp width) (numberp height)))
-  [resize self :height height :width width]
+  (/resize self :height height :width width)
   (setf <max-displayed-rows> (truncate (/ height (font-height <font>)))))
 
 (define-method resize-to-fit textbox ()
@@ -839,7 +839,7 @@ This method allocates a new SDL surface when necessary."
       (when (or (< <width> width0)
 		(< <height> height0))
 	(message "resizing textbox H:~S W:~S" height0 width0)
-	[resize self :height height0 :width width0]))))
+	(/resize self :height height0 :width width0)))))
 
 (define-method move-end-of-line textbox ()
   (setf <point-column> (length (nth <point-row> <buffer>))))
@@ -896,8 +896,8 @@ text INSERTION to be inserted at point."
   (bind-key-to-textbox-insertion self "QUOTE" '(:shift) "\""))
 
 (define-method initialize textbox ()
-  [parent>>initialize self]
-  [install-keybindings self])
+  (send-parent self :initialize self)
+  (/install-keybindings self))
 
 (define-method forward-char textbox ()
   (with-fields (buffer point-row point-column) self
@@ -997,9 +997,9 @@ text INSERTION to be inserted at point."
 
 (define-method render textbox ()
   (when <visible>
-    [clear self]
+    (/clear self)
     (when <auto-fit>
-      [resize-to-fit self])
+      (/resize-to-fit self))
     (with-fields (buffer x y width height) self
       (with-field-values (font image point-row) self
 	;; measure text
@@ -1058,18 +1058,18 @@ text INSERTION to be inserted at point."
   (properties :initform (make-hash-table :test 'eq)))
   
 (define-method initialize pager ()
-  [parent>>initialize self]
-  [auto-position self]
-  (labels ((s1 () [select self 1])
-	   (s2 () [select self 2])
-	   (s3 () [select self 3])
-	   (s4 () [select self 4])
-	   (s5 () [select self 5]))
-    [define-key self "F1" nil #'s1]
-    [define-key self "F2" nil #'s2]
-    [define-key self "F3" nil #'s3]
-    [define-key self "F4" nil #'s4]
-    [define-key self "F5" nil #'s5]))
+  (send-parent self :initialize self)
+  (/auto-position self)
+  (labels ((s1 () (/select self 1))
+	   (s2 () (/select self 2))
+	   (s3 () (/select self 3))
+	   (s4 () (/select self 4))
+	   (s5 () (/select self 5)))
+    (/define-key self "F1" nil #'s1)
+    (/define-key self "F2" nil #'s2)
+    (/define-key self "F3" nil #'s3)
+    (/define-key self "F4" nil #'s4)
+    (/define-key self "F5" nil #'s5)))
 
 (define-method page-property pager (page-name property-keyword)
   (getf (gethash page-name <properties>) property-keyword))
@@ -1093,15 +1093,15 @@ text INSERTION to be inserted at point."
 	(progn 
 	  (setf <current-page> newpage)
 	  ;; respect held keys property setting
-	  (if [page-property self newpage :held-keys]
+	  (if (/page-property self newpage :held-keys)
 	      (enable-held-keys)
 	      (disable-held-keys))
 	  ;; insert self always as first widget
 	  (apply #'xe2:install-widgets self (cdr (assoc newpage <pages>)))))))
 
 (define-method auto-position pager (&key (width xe2:*screen-width*))
-  [resize self :width width :height <pager-height>]
-  [move self :x 0 :y (- xe2:*screen-height* <pager-height>)])
+  (/resize self :width width :height <pager-height>)
+  (/move self :x 0 :y (- xe2:*screen-height* <pager-height>)))
 
 (define-method add-page pager (keyword widgets &rest properties)
   (assert (listp widgets))
@@ -1116,7 +1116,7 @@ text INSERTION to be inserted at point."
 (define-method render pager ()
   ;; calculate geometry. always draw
   (when <visible>
-    [clear self <background-color>]
+    (/clear self <background-color>)
     (let ((n 1)
           (line '()))
       (dolist (page <pages>)

@@ -68,10 +68,10 @@
   (gethash var <variables>))
 
 (defun mission-variable-value (var-name)
-  [get-variable *mission* var-name])
+  (/get-variable *mission* var-name))
 
 (defun set-mission-variable-value (var-name value)
-  [set-variable *mission* var-name value])
+  (/set-variable *mission* var-name value))
 
 (defsetf mission-variable-value set-mission-variable-value)
 
@@ -103,8 +103,8 @@
 			 *universe*)))
     ;; this probably works better if you have already set up a universe.
     (setf *mission* self)
-    [play universe :player player :address address]
-    [do-prologue self]))
+    (/play universe :player player :address address)
+    (/do-prologue self)))
       
 (define-method do-prologue mission ())
 

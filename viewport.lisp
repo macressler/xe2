@@ -104,12 +104,12 @@
 	  (new-height (* tile-size origin-height)))
       (unless (and (= new-width width)
 		   (= new-height height))
-	(when resize [resize self :height new-height :width new-width])))))
+	(when resize (/resize self :height new-height :width new-width))))))
 
 (define-method render viewport ()
   (declare (optimize (speed 3)))
   (when <visible>
-    [adjust self] ;; hehe
+    (/adjust self) ;; hehe
     (let* ((world (or <world> *world*))
            (origin-width <origin-width>)
            (origin-height <origin-height>)
@@ -125,7 +125,7 @@
                                height width sprites background
                                turn-number ambient-light) world
         ;; blank the display
-        [clear self]
+        (/clear self)
 	;; draw any background
 	(when (stringp background)
 	  (let ((surface (find-resource-object background))
@@ -174,16 +174,16 @@
             (when graphics (draw-resource-image graphics x1 y1 :destination image))))
         ;; draw the pending ops
         (map nil #'(lambda (cell)
-                     (multiple-value-bind (x y) [image-coordinates cell]
-                       [draw cell x y image]))
+                     (multiple-value-bind (x y) (/image-coordinates cell)
+                       (/draw cell x y image)))
              pending-draws)
-	[update-geometry self]
+	(/update-geometry self)
         ;; draw the overlays
-        [draw-overlays self]))))
+        (/draw-overlays self)))))
 
 (define-method hit viewport (x y)
   (with-fields (origin-x origin-y tile-size) self
-    (when [parent>>hit self x y]
+    (when (send-parent self :hit self x y)
       (let* ((x0 (- x <x>))
 	     (y0 (- y <y>))
 	     (r (truncate (/ y0 tile-size)))
@@ -196,7 +196,7 @@
 	     (cells (when (array-in-bounds-p grid r0 c0)
 		      (aref grid r0 c0))))
       (labels ((hit (sprite)
-		 (multiple-value-bind (sx sy) [xy-coordinates sprite]
+		 (multiple-value-bind (sx sy) (/xy-coordinates sprite)
 		   (let* ((im (field-value :image sprite))
 			  (h (image-height im))
 			  (w (image-width im)))
@@ -219,8 +219,8 @@
 	 (world-width (field-value :width world))
 	 (world-height (field-value :height world))
 	 (player (field-value :player world))
-	 (player-x [player-column world])
-	 (player-y [player-row world])
+	 (player-x (/player-column world))
+	 (player-y (/player-row world))
 	 (margin <margin>))
     (with-fields (origin-x origin-y origin-height origin-width) self
       ;; are we outside the "comfort zone"?
@@ -273,7 +273,7 @@
 		
 (define-method render minimap ()
   (when <visible>
-    [adjust self] ;; hehe
+    (/adjust self) ;; hehe
     (let* ((world (or <world> *world*))
            (origin-width <origin-width>)
            (origin-height <origin-height>)
@@ -290,7 +290,7 @@
                                height width 
                                turn-number ambient-light) world
         ;; blank the display
-        [clear self]
+        (/clear self)
         ;; ;; draw the border
         ;; (draw-rectangle 0 0 <width> <height>
         ;; 		      :color <border-color>
@@ -324,8 +324,8 @@
                                       :color color)
                         (return-from coloring)))))))))
         ;; draw player indicator
-        (draw-circle (* tile-size (- [player-column world] origin-x))
-                     (* tile-size (- [player-row world] origin-y))
+        (draw-circle (* tile-size (- (/player-column world) origin-x))
+                     (* tile-size (- (/player-row world) origin-y))
                      4 
                      :destination image :color ".white")))))
 
@@ -336,10 +336,10 @@ white.")
 
 (define-method select minimap ()
   (dolist (line (split-string-on-lines *minimap-help-string*))
-    [>>narrateln :narrator line]))
+    (/>>narrateln :narrator line)))
 
 (define-method hit minimap (x y)
-  (when [parent>>hit self x y]
+  (when (send-parent self :hit self x y)
     self))
   
 	

@@ -1,5 +1,5 @@
 
-;; [[file:~/xe2/void/void.org::*Header][xe2-lisp-file]]
+
 ;; Copyright (C) 2010  David O'Toole
 
 ;; Author: David O'Toole <dto@gnu.org>
@@ -1404,10 +1404,9 @@ Then it fires and gives chase.")
   [move self (random-direction)]
   (percent-of-time 10 [grow self])
   (percent-of-time 35 (let ((direction (car (one-of (list :east :west)))))
-                        (let ((wire (clone =wire=)))
-                          [orient wire direction 30]
-                          (multiple-value-bind (x y) [xy-coordinates self]
-                            [drop-sprite self wire (+ x 2) (+ y 2)]))))
+                        (let ((muon (clone =muon-particle=)))
+                          [drop self muon]
+                          [impel muon direction])))
   (if (< [distance-to-player self] 6)
       (progn [move self [direction-to-player self]]
              (if [adjacent-to-player self]
@@ -1976,4 +1975,3 @@ Then it fires and gives chase.")
                  :viewport *viewport*]
       [begin mission *player*])
     [loadout *player*])
-;; xe2-lisp-file ends here

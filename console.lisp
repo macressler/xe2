@@ -197,7 +197,7 @@ Do not set this variable directly from a module; instead, call
   (dolist (widget *active-widgets*)
     (with-field-values (image x y) widget
       (when image
-	[render widget])))
+	(send nil :render widget))))
   (dolist (widget *active-widgets*)
     (with-field-values (image x y visible) widget
       (when visible
@@ -316,7 +316,7 @@ matching keybinding, in which case the keybinding's corresponding
 function is triggered. If none of the widgets have a matching
 keybinding, nothing happens, and this function returns nil."
   (some #'(lambda (widget)
-	    [handle-key widget event])
+	    (send nil :handle-key widget event))
 	*active-widgets*))
 
 (defvar *event-handler-function* #'send-event-to-widgets
@@ -353,7 +353,7 @@ else.")
 (defun hit-widgets (x y &optional (widgets *active-widgets*))
   "Hit test the WIDGETS to find the clicked widget."
   (some #'(lambda (widget)
-	    [hit widget x y])
+	    (send nil :hit widget x y))
 	(reverse widgets)))
 
 ;;; Translating SDL key events into XE2 event lists
@@ -703,10 +703,10 @@ display."
 					       (with-message-queue (field-value :message-queue *world*)
 						 (case button
 						   (1 (when (has-method :select object) 
-							[select object]))
+							(send nil :select object)))
 						   (3 (when (has-method :activate object) 
-							[activate object]))))
-					       [process-messages *world*]))))))
+							(send nil :activate object)))))
+					       (send nil :process-messages *world*)))))))
 	(:mouse-button-up-event (:button button :state state :x x :y y)
 				nil)
 	(:joy-button-down-event (:which which :button button :state state)
