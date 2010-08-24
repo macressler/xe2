@@ -250,8 +250,15 @@
 
  (:name "nextpiano" :type :sample :file "nextpiano.wav" :properties (:volume 10))
  (:name "nextpiano2" :type :sample :file "nextpiano2.wav" :properties (:volume 5))
- (:name "rappy" :type :music :file "rappy.ogg" :properties (:volume 20))
+ (:name "rappy" :type :music :file "rappy.ogg" :properties (:volume 30))
+ (:name "rally" :type :music :file "rally.ogg" :properties (:volume 40))
+ (:name "conspiracy" :type :music :file "conspiracy.ogg" :properties (:volume 40))
+ (:name "crisis" :type :music :file "crisis.ogg" :properties (:volume 40))
+ (:name "rally" :type :music :file "rally.ogg" :properties (:volume 40)) 
+ (:name "raid" :type :music :file "raid.ogg" :properties (:volume 40))
+
  (:name "buzzo" :type :music :file "buzzo.ogg" :properties (:volume 40))
+ (:name "beatup" :type :music :file "beatup.ogg" :properties (:volume 40))
  (:name "radiolarians" :type :music :file "radiolarians-xxx.ogg" :properties (:volume 60))
  (:name "bip" :type :sample :file "bip.wav" :properties (:volume 3))
  (:name "serve" :type :sample :file "serve.wav" :properties (:volume 10))

@@ -7,16 +7,22 @@
 * Tasks
 
 ** TODO Keep macrovirii from shooting each other
+** TODO stop zombie bullets
 ** TODO Fix ball firing past you when you shoot at an adjacent wall
+** TODO 3 hit points max
+** TODO scarce health pickups
+** TODO no snowflake
+** TODO end zones add a defense component
+** TODO enemies can seek base or player 
 
 * Ideas
 
-** TODO NEVERENDING PUZZLE GAME with infinite level generator, like original XONG
-** TODO different PNG backgrounds
-** TODO 1280x720 window
-** TODO continuously falling blocks through some vertical band of varying width/pos
-** TODO no mans land
-** TODO falling blocks with a snake pong element
+** TODO [#A] NEVERENDING PUZZLE GAME with infinite level generator, like original XONG
+** TODO [#C] different PNG backgrounds
+** TODO [#C] 1280x720 window
+** TODO [#C] continuously falling blocks through some vertical band of varying width/pos
+** TODO [#C] no mans land
+** TODO [#C] falling blocks with a snake pong element
 ** TODO enemies chase and eat the ball
 ** TODO pulsating beat blocks
 ** TODO 8-way breakout firing

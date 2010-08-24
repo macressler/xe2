@@ -10,7 +10,6 @@
 (defcell macrovirus 
   (tile :initform "macro1")
   (team :initform :enemy)
-  (dead :initform nil)
   (generation :initform 0)
   (hit-points :initform (make-stat :base 4 :max 7 :min 0))
   (speed :initform (make-stat :base 1))
@@ -35,10 +34,9 @@
 
 (define-method die macrovirus ()
   (/play-sample self "biodeath")
-  (setf <dead> t)
   (dotimes (n 5)
     (/drop self (clone =psi=)))
-  (/delete-from-world self))
+  (send-parent self :die self))
 
 (define-method grow macrovirus ()
   (/expend-action-points self 100)
@@ -62,8 +60,11 @@
         (/grow self)))))
 
 (define-method run macrovirus ()
-  (unless <dead>
-    (if (< (/distance-to-player self) 13)
+  (when (not (/in-category self :dead))
+    (if (and (< (/distance-to-player self) 13)
+	     (/line-of-sight world <row> <column> 
+			     (/player-row world)
+			     (/player-column world)))
 	(let ((muon (clone =muon-particle=)))
 	  (/move self (/direction-to-player self))
 	  (/drop self muon)
@@ -214,7 +215,7 @@ Use chevrons to direct tracers into Black Holes."))
 (define-method loadout tracer ()
   (incf *enemies*))
 
-*(define-method cancel tracer ()
+(define-method cancel tracer ()
   (decf *enemies*))
 
 (define-method die tracer ()

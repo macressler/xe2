@@ -323,8 +323,10 @@
 	[drop-cell self (clone =mystery-box=) r c]))))
 
 (define-method begin-ambient-loop xong ()  
-  (play-music (car (one-of '("voronoia" "invierov" "dvo" "ancients"))) :loop t))
-;  (play-music (car (one-of '("flyby" "sparqq" "synthy" "neon" "phong" "xong-theme" "pensive" "toybox"))) :loop t))
+  (play-music (car (one-of '("rappy" "conspiracy" "crisis" "beatup" "rally" "dvo" 
+			     "ancients" "flyby" "sparqq" "synthy" "neon" "phong" 
+			     "xong-theme" "pensive" "toybox" :loop t)))
+	      :loop t))
 
 ;;; Other level gates
 

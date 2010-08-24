@@ -9,7 +9,7 @@
 
 (defcell tail 
   (categories :initform '(:actor))
-  (clock :initform 20))
+  (clock :initform 30))
   
 (define-method initialize tail (&key direction clock)
   (setf <clock> clock)
