@@ -988,7 +988,6 @@ along grid squares between R1,C1 and R2,C2."
 				(incf i)))
 			    (return-from tracing t))))
 	      (prog1 retval nil))))))))
-;;		(message "tracing ~S" retval)))))))))
 
 (define-method move-cell world (cell row column)
   "Move CELL to ROW, COLUMN."

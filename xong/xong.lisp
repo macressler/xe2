@@ -19,10 +19,6 @@
 
 (in-package :xong)
 
-(setf xe2:*dt* 60)
-
-(defparameter *remix-tile* 16)
-
 ;;; Controlling the game
 
 (define-prototype xong-prompt (:parent xe2:=prompt=))
@@ -97,10 +93,10 @@
   
 (define-method install-keybindings xong-prompt ()
   (dolist (k *qwerty-keybindings*)
-      (apply #'bind-key-to-prompt-insertion self k)))
-  ;; ;; we also want to respond to timer events. this is how. 
-  ;; [define-key self nil '(:timer) (lambda ()
-  ;; 				   [run-cpu-phase *world* :timer])])
+      (apply #'bind-key-to-prompt-insertion self k))
+  ;; we also want to respond to timer events. this is how. 
+  [define-key self nil '(:timer) (lambda ()
+				   [run-cpu-phase *world* :timer])])
 
 
 ;;; Splash screen
@@ -238,17 +234,14 @@
     (labels ((spacebar ()
 	       ;;
 	       ;; enable pseudo timing
-	       ;; (xe2:enable-timer)
-	       ;; (xe2:set-frame-rate 30)
-	       ;; (xe2:set-timer-interval 1)
-;;	       (xe2:enable-held-keys 1 3)
+	       (xe2:enable-timer)
+	       (xe2:set-frame-rate 30)
+	       (xe2:set-timer-interval 1)
+	       (xe2:enable-held-keys 1 3)
 	       ;;
-	       (setf xe2:*physics-function* #'(lambda (&rest ignore)
-						(when *viewport* [set-tile-size *viewport* *remix-tile*])
-						(when *world* [run-cpu-phase *world* :timer])))
 	       [set-player universe player]
 	       [play universe
-	       	     :address  (generate-level-address 1)
+	       	     :address '(=menu-world=)
 	       	     :prompt prompt
 	       	     :narrator terminal
 	       	     :viewport viewport]
@@ -256,13 +249,13 @@
 	       ;;
 	       [set-character *status* player]
 	       ;;
-	       [set-tile-size viewport *remix-tile*]
+	       [set-tile-size viewport 16]
 	       (setf (field-value :use-overlays viewport) t)
 	       [resize viewport :height 470 :width *xong-window-width*]
 	       [move viewport :x 0 :y 0]
 	       [set-origin viewport :x 0 :y 0 
-			   :height (truncate (/ (- *xong-window-height* 130) *remix-tile*))
-			   :width (truncate (/ *xong-window-width* *remix-tile*))]
+			   :height (truncate (/ (- *xong-window-height* 130) 16))
+			   :width (truncate (/ *xong-window-width* 16))]
 	       [adjust viewport]))
       (setf *space-bar-function* #'spacebar))
     ;;
@@ -309,8 +302,7 @@
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     (xe2:install-widgets splash-prompt splash)
-    (xe2:enable-classic-key-repeat 100 100)
-    [add-page *pager* :game (list prompt stack viewport terminal *status* quickhelp)]
-    [add-page *pager* :help (list help)]))
+    [add-page *pager* :game prompt stack viewport terminal *status* quickhelp]
+    [add-page *pager* :help help]))
 
 (xong)

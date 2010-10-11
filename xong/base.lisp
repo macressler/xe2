@@ -9,7 +9,7 @@
 (defparameter *gate-timeout* 70)
 
 (defcell gate
-  (categories :initform '(:actor :obstacle :gate ))
+  (categories :initform '(:actor :obstacle :gate :exclusive))
   (speed :initform (make-stat :base 10))
   (tile :initform "gate-closed")
   (clock :initform 0)
@@ -41,7 +41,7 @@
   (tile :initform "door")
   (name :initform "Level exit")
   (description :initform "Door to the next level of Xong.")
-  (categories :initform '(:gateway :actor  :obstacle))
+  (categories :initform '(:gateway :actor :exclusive :obstacle))
   (address :initform nil))
 
 (define-method level door (lev)
@@ -62,43 +62,91 @@
     [delete-category self :obstacle]
     (setf <tile> "door-open")))
 	
-;; ;;; Breakable paint walls re-color the ball
+;;; Breakable paint walls re-color the ball
 
-;; (defvar *wall-tiles* '(:purple "wall-purple"
-;; 			:black "wall-black"
-;; 			:red "wall-red"
-;; 			:blue "wall-blue"
-;; 			:orange "wall-orange"
-;; 			:green "wall-green"
-;; 			:white "wall-white"
-;; 			:yellow "wall-yellow"))
+(defvar *wall-tiles* '(:purple "wall-purple"
+			:black "wall-black"
+			:red "wall-red"
+			:blue "wall-blue"
+			:orange "wall-orange"
+			:green "wall-green"
+			:white "wall-white"
+			:yellow "wall-yellow"))
 
-;; (defcell wall 
-;;   (name :initform "Paint block")
-;;   (tile :initform "wall-purple")
-;;   (description :initform
-;; "These blocks of paint can be broken using the puck to 
-;; reach new areas and items. The puck also picks up the color.")
-;;   (categories :initform '(:exclusive :obstacle :wall))
-;;   (color :initform :purple))
+(defcell wall 
+  (name :initform "Paint block")
+  (tile :initform "wall-purple")
+  (description :initform
+"These blocks of paint can be broken using the puck to 
+reach new areas and items. The puck also picks up the color.")
+  (categories :initform '(:exclusive :obstacle :wall))
+  (color :initform :purple))
 
-;; (define-method paint wall (c)
-;;   (setf <color> c)
-;;   (let ((res (getf *wall-tiles* c)))
-;;     (assert (stringp res))
-;;     (setf <tile> res)))
+(define-method paint wall (c)
+  (setf <color> c)
+  (let ((res (getf *wall-tiles* c)))
+    (assert (stringp res))
+    (setf <tile> res)))
 
-;; (define-method die wall ()
-;;   (score 100)
-;;   [parent>>die self])
-
-
+(define-method die wall ()
+  (score 100)
+  [parent>>die self])
 
 ;;; The floor
 
 (defcell floor
   (tile :initform "floor")
   (color :initform ".black"))
+
+;;; Radioactive gas
+
+(defvar *plasma-tiles* '(:purple "plasma-purple"
+			:black "plasma-black"
+			:red "plasma-red"
+			:blue "plasma-blue"
+			:orange "plasma-orange"
+			:green "plasma-green"
+			:white "plasma-white"
+			:yellow "plasma-yellow"))
+
+(defcell plasma
+  (tile :initform "plasma-white")
+  (color :initform :white)
+  (name :initform "Toxic paint plasma")
+  (speed :initform (make-stat :base 10))
+  (movement-cost :initform (make-stat :base 10))
+  (clock :initform 100)
+  (categories :initform '(:actor :paint-source :plasma))
+  (description :initform "Spreading toxic paint gas. Avoid at all costs!"))
+
+(define-method step plasma (stepper)
+  (when [is-player stepper]
+    [damage stepper 1]))
+
+(define-method set-color plasma (color)
+  (setf <color> color)
+  (setf <tile> (getf *plasma-tiles* color)))
+
+(define-method set-clock plasma (clock)
+  (setf <clock> clock))
+
+(define-method run plasma ()
+  [play-sample self "plasma"]
+  (decf <clock>)
+  (if (> 0 <clock>)
+      [die self]
+      (progn 
+	(do-cells (cell [cells-at *world* <row> <column>])
+	  (when (has-field :hit-points cell)
+	    [damage cell 1]))
+	(let ((dir (random-direction)))
+	  (multiple-value-bind (r c) (step-in-direction <row> <column> dir)
+	    (let ((brick [category-at-p *world* r c :wall]))
+	      (if brick
+		  (progn 
+		    [paint brick <color>]
+		    [die self])
+		  [move self dir])))))))
 
 ;;; Bulkheads are indestructible walls
 
@@ -115,8 +163,7 @@
   (list '=xong= 
 	:level n
 	:extenders (truncate (/ (* 3 (1- n)) 2))
-	:tracers 0; (+ 4 (truncate (/ (* (1- n) 2) 3)))
-	:macrovirii 15
+	:tracers (+ 4 (truncate (/ (* (1- n) 2) 3)))
 	:monitors (if (= n 1)
 		      0
 		      (* 2 (truncate (/ n 2))))
@@ -124,7 +171,7 @@
 	:mystery-boxes (+ 1 (truncate (/ n 2)))
 	:oscillators (* (max 0 (- n 2)) (truncate (/ n 4)))
 	:puzzle-length (+ 4 (truncate (/ n 3)))
-	:extra-holes 0; (+ 1 (truncate (/ n 3)))
+	:extra-holes (+ 1 (truncate (/ n 3)))
 	:puckups (+ 4 (truncate (* (1- n) 2.5)))
 	:diamonds (+ 9 (* (1- n) 3))
 	:swatches (+ 10 (truncate (* 1.6 n)))))
@@ -140,7 +187,6 @@
 		  (", or click any object." :foreground ".white" :background ".blue"))))
   (edge-condition :initform :block)
   (level :initform 1)
-  (tile-size :initform 16)
   (width :initform *xong-level-width*)
   (height :initform *xong-level-height*)
   (scale :initform '(1 nm))
@@ -218,7 +264,6 @@
 (define-method generate xong (&key (level 1)
 				   (extenders 0)
 				   (tracers 4)
-				   (macrovirii 5)
 				   (rooms 1)
 				   (mystery-boxes 2)
 				   (oscillators 3)
@@ -241,19 +286,19 @@
       (let ((color (if (< n (length *colors*))
 		       (nth n *colors*)
 		       (car (one-of *colors*)))))
-	(labels ((drop-brick (r c)
+	(labels ((drop-wall (r c)
 		   (prog1 nil
-		     (let ((brick (clone =brick=)))
-		       [drop-cell self brick r c]
-		       [paint brick color]))))
+		     (let ((wall (clone =wall=)))
+		       [drop-cell self wall r c :exclusive t]
+		       [paint wall color]))))
 	  (multiple-value-bind (r c) [random-place self]
 	    (unless (= 0 r c)
 	      (let ((hr (+ r 2 (random 3)))
 		    (hc (+ c 2 (random 3))))
 		[replace-cells-at self hr hc
 				  (clone =floor=)]
-;;		[drop-cell self (clone =hole=) hr hc]
-		(trace-rectangle #'drop-brick r c
+		[drop-cell self (clone =hole=) hr hc]
+		(trace-rectangle #'drop-wall r c
 				 (+ 4 (random 8)) (+ 4 (random 8)) :fill)))))))
     (dotimes (n extra-holes)
       (multiple-value-bind (r c) [random-place self]
@@ -268,11 +313,6 @@
 	(multiple-value-bind (r c)
 	    [random-place self :avoiding player :distance 10]
 	  [drop-cell self monitor r c :loadout t])))
-    (dotimes (n macrovirii)
-      (let ((virus (clone =macrovirus=)))
-	(multiple-value-bind (r c)
-	    [random-place self :avoiding player :distance 10]
-	  [drop-cell self virus r c :loadout t])))
     ;; EXPERIMENTAL
     ;; (dotimes (n )
     ;;   (let ((balloon (clone =balloon= :text '((("This is some") (" formatted " :foreground ".red") ("text."))
@@ -323,8 +363,7 @@
 	[drop-cell self (clone =mystery-box=) r c]))))
 
 (define-method begin-ambient-loop xong ()  
-  (play-music (car (one-of '("voronoia" "invierov"))) :loop t))
-;  (play-music (car (one-of '("flyby" "sparqq" "synthy" "neon" "phong" "xong-theme" "pensive" "toybox"))) :loop t))
+  (play-music (car (one-of '("flyby" "sparqq" "synthy" "neon" "phong" "xong-theme" "pensive" "toybox"))) :loop t))
 
 ;;; Other level gates
 
@@ -417,9 +456,9 @@
 
 (defcell karma
   (tile :initform "rezblur1")
-  (speed :initform (make-stat :base 2))
-  (movement-cost :initform (make-stat :base 20))
-  (clock :initform 40)
+  (speed :initform (make-stat :base 10))
+  (movement-cost :initform (make-stat :base 10))
+  (clock :initform 20)
   (samples :initform *karma-samples*)
   (categories :initform '(:actor :paint-source :karma)))
 
@@ -438,9 +477,6 @@
 	(percent-of-time 1
 	  [play-sample self (car (one-of <samples>))]
 	  [drop self (clone =dancefloor=)])
-	;; (do-cells (cell [cells-at *world* <row> <column>])
-	;;   (when (has-field :hit-points cell)
-	;;     [damage cell 1]))
 	[move self dir])))
 
 ;;; Menu level
@@ -458,8 +494,8 @@
     (dotimes (i height)
       (dotimes (j width)
 	[drop-cell self (clone =floor=) i j]))
-    ;; (dotimes (i 10)
-    ;;   [drop-cell self (clone =karma= :clock nil) (random height) (random width)])
+    (dotimes (i 10)
+      [drop-cell self (clone =karma= :clock nil) (random height) (random width)])
     (let ((beckoner (clone =beckoner=))
 	  (urhere (clone =balloon= 
 			 :style :flat

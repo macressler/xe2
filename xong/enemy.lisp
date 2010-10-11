@@ -4,85 +4,6 @@
 
 (defvar *enemies* 0)
 
-(defparameter *macrovirus-tiles*
-  '("macro1" "macro2" "macro3" "macro4"))
-
-(defcell macrovirus 
-  (tile :initform "macro1")
-  (team :initform :enemy)
-  (generation :initform 0)
-  (hit-points :initform (make-stat :base 4 :max 7 :min 0))
-  (speed :initform (make-stat :base 1))
-  (strength :initform (make-stat :base 10))
-  (defense :initform (make-stat :base 10))
-  (stepping :initform t)
-  (movement-cost :initform (make-stat :base 20))
-  (direction :initform (random-direction))
-  (categories :initform '(:actor :obstacle :enemy :target)))
-
-(define-method divide macrovirus ()
-  [play-sample self "munch1"]
-  [stat-effect self :hit-points 3]
-  (dotimes (i (if (zerop (random 17))
-                  2 1))
-    [drop self (clone =macrovirus=)]))
-
-(define-method hit macrovirus (&optional other)
-  (when (and other [in-category other :particle])
-    [die other])
-  [damage self 1])
-
-(define-method die macrovirus ()
-  [play-sample self "biodeath"]
-  (dotimes (n 5)
-    [drop self (clone =psi=)])
-  [parent>>die self])
-
-(define-method grow macrovirus ()
-  [expend-action-points self 100]
-  [play-sample self (if (zerop (random 2)) "bleep" "bloup")]
-  (incf <generation>)
-  (when (= 2 <generation>)
-    [divide self])
-  (when (> <generation> 3)
-    [die self])
-  (setf <tile> (nth <generation> *macrovirus-tiles*)))
-
-(define-method find-food macrovirus (direction)
-  (let ((food [category-in-direction-p *world* <row> <column> direction :macrovirus-food]))
-    (when food
-      (prog1 food
-        [play-sample self (if (= 0 (random 1))
-                              "slurp1" "slurp2")]
-        [say self "The macrovirus eats pollen."]
-        [delete-from-world food]
-        [move self direction]
-        [grow self]))))
-
-(define-method run macrovirus ()
-  [move self (random-direction)]
-  (percent-of-time 10 [grow self])
-  (percent-of-time 35 (let ((direction (car (one-of (list :east :west)))))
-                        (let ((muon (clone =muon-particle=)))
-                          [drop self muon]
-                          [impel muon direction])))
-  (if (< [distance-to-player self] 6)
-      (progn [move self [direction-to-player self]]
-             (if [adjacent-to-player self]
-                 [attack self [direction-to-player self]]))
-
-    ;; otherwise look for food
-      (block searching
-        (dolist (dir xe2:*compass-directions*)
-          (when (or [in-category self :dead]
-                    [find-food self dir])
-            (return-from searching))))))
-  
-(define-method attack macrovirus (direction)
-  (let ((player [get-player *world*]))
-    [play-sample self "munch2"]
-    [damage player 3]))
-
 ;;; Yasichi
 
 (defparameter *yasichi-bounce-time* 8)
@@ -138,8 +59,7 @@
   (categories :initform '(:actor :damaging))
   (stepping :initform t)
   (speed :initform (make-stat :base 1))
-  (movement-cost :initform (make-stat :base 10))
-  (clock :initform 4000)
+  (clock :initform 20)
   (description :initform "Deadly wires are an instant kill for player and puck."))
   
 (define-method initialize wire (&key direction clock)
@@ -175,9 +95,9 @@
   (categories :initform '(:actor :target :obstacle 
 			  :opaque :exclusive :enemy :equipper :puck :tailed :tracer))
   (dead :initform nil)
-  (speed :initform (make-stat :base 5 :min 1))
+  (speed :initform (make-stat :base 7 :min 5))
   (max-items :initform (make-stat :base 3))
-  (movement-cost :initform (make-stat :base 3))
+  (movement-cost :initform (make-stat :base 1))
   (stepping :initform t)
   (tail-length :initform (make-stat :base 20))
   (attacking-with :initform :robotic-arm)
@@ -206,8 +126,8 @@ Use chevrons to direct tracers into Black Holes."))
       [move self <direction>])))
 
 (define-method drop-wire tracer ()
-  [drop-cell *world* (clone =wire= :direction <direction> :clock 12)
-	     <row> <column> :exclusive nil])
+  [drop-cell *world* (clone =wire= :direction <direction> :clock 5)
+	     <row> <column>])
 
 (define-method move tracer (direction)
   [drop-wire self]
@@ -236,7 +156,7 @@ Use chevrons to direct tracers into Black Holes."))
 			  :exclusive :enemy :target :puck :monitor))
   (direction :initform nil)
   (speed :initform (make-stat :base 2))
-  (movement-cost :initform (make-stat :base 8))
+  (movement-cost :initform (make-stat :base 6))
   (hit-points :initform (make-stat :base 20 :min 0))
   (equipment-slots :initform '(:robotic-arm))
   (max-items :initform (make-stat :base 3))
@@ -324,7 +244,7 @@ squeezing by in between pulses!"))
 (defcell puckup 
   (tile :initform "puckup")
   (name :initform "Replacement puck")
-  (categories :initform '())
+  (categories :initform '(:exclusive))
   (description :initform "A new puck, in case you lose the one you have."))
 
 (define-method step puckup (stepper)
@@ -344,7 +264,7 @@ squeezing by in between pulses!"))
   (tile :initform "hole")
   (nospew :initform nil)
   (open :initform t)
-  (categories :initform '( :hole))
+  (categories :initform '(:exclusive :hole))
   (name :initform "Black hole")
   (description :initform 
 "These holes eat the puck and enemies. The object of the game is to
@@ -352,30 +272,21 @@ defeat enemies by guiding them into the black holes. Be careful; black
 holes can only eat one object before closing. Not only that, they
 explode with deadly plasma radiation!"))
 
-(define-method spew-karma hole ()
+(define-method spew-plasma hole ()
   (clon:with-field-values (row column) self
     (let ((color (car (one-of *colors*))))
       (assert (and row column))
       (dotimes (n (+ 9 (random 10)))
-	(let ((karma (clone =karma=)))
-	  (labels ((do-circle (image)
-		     (prog1 t
-		       (multiple-value-bind (x y) 
-			   [viewport-coordinates self]
-			 (let ((x0 (+ x 8))
-			       (y0 (+ y 8)))
-			   (draw-circle x0 y0 40 :destination image)
-			   (draw-circle x0 y0 35 :destination image))))))
-	    [>>add-overlay :viewport #'do-circle])
-	  [play-sample self "explode"]
-	  [set-clock karma (+ 10 (random 10))]
+	(let ((plasma (clone =plasma=)))
+	  [set-color plasma color]
+	  [set-clock plasma (+ 10 (random 10))]
 	  (let ((limit 10))
 	    (block placing
 	      (loop do (let ((r (+ row (- (random 3) (random 5))))
 			     (c (+ column (- (random 3) (random 5)))))
 			 (if [line-of-sight *world* row column r c]
 			     (progn 
-			       [drop-cell *world* karma r c]
+			       [drop-cell *world* plasma r c]
 			       (return-from placing))
 			     ;; try again
 			     (decf limit)))
@@ -385,7 +296,7 @@ explode with deadly plasma radiation!"))
   (when <open>
     (assert (and <row> <column>))
     (unless <nospew>
-      [spew-karma self])
+      [spew-plasma self])
     (progn [play-sample self "hole-suck"]
 	   (if [in-category stepper :puck]
 	       [die stepper]
@@ -420,7 +331,7 @@ explode with deadly plasma radiation!"))
 (defcell snake 
   (tile :initform "snake-white")
   (smashed :initform nil)
-  (speed :initform (make-stat :base 2))
+  (speed :initform (make-stat :base 20))
   (movement-cost :initform (make-stat :base 60))
   (escape-clock :initform 0)
   (ahead :initform nil)
@@ -542,8 +453,8 @@ explode with deadly plasma radiation!"))
 
 (defcell muon-trail
   (categories :initform '(:actor))
-  (clock :initform 20)
-  (speed :initform (make-stat :base 5))
+  (clock :initform 2)
+  (speed :initform (make-stat :base 10))
   (default-cost :initform (make-stat :base 10))
   (tile :initform ".gear")
   (direction :initform :north))
@@ -564,7 +475,7 @@ explode with deadly plasma radiation!"))
 
 (defcell muon-particle 
   (categories :initform '(:actor :muon :target))
-  (speed :initform (make-stat :base 10))
+  (speed :initform (make-stat :base 20))
   (default-cost :initform (make-stat :base 3))
   (movement-cost :initform (make-stat :base 20))
   (attack-power :initform 5)
@@ -630,7 +541,7 @@ explode with deadly plasma radiation!"))
 (defcell oscillator 
   (tile :initform "oscillator")
   (categories :initform '(:actor :obstacle :target :enemy :opaque :oscillator :puck))
-  (speed :initform (make-stat :base 3))
+  (speed :initform (make-stat :base 10))
   (movement-cost :initform (make-stat :base 20))
   (default-cost :initform (make-stat :base 20))
   (direction :initform (car (one-of '(:south :west))))

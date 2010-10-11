@@ -9,7 +9,7 @@
 
 (defcell tail 
   (categories :initform '(:actor))
-  (clock :initform 20))
+  (clock :initform 4))
   
 (define-method initialize tail (&key direction clock)
   (setf <clock> clock)
@@ -71,7 +71,7 @@
 (defcell diamond 
   (tile :initform "chevron-pickup")
   (name :initform "Chevron pack")
-  (categories :initform '())
+  (categories :initform '(:exclusive))
   (description :initform "Adds five chevrons to your inventory."))
 
 (define-method step diamond (stepper)
@@ -163,7 +163,7 @@
 
 (define-method pause player ()
   [pause *world*])
- 
+
 (define-method step player (stepper)
   (when [in-category stepper :item]
     [grab self stepper])
@@ -181,7 +181,7 @@
     [set-player *universe* player]
     [set-character *status* player]
     [play *universe*
-	  :address '(make-level-address 1)]
+	  :address '(=menu-world=)]
     [loadout player]
     [play-sample self "go"]))
 
@@ -249,8 +249,8 @@
   (tile :initform "puck")
   (description :initform "A frictionless paint-absorbent hockey puck.")
   (categories :initform '(:puck :obstacle :target :actor :paintable :item))
-  (speed :initform (make-stat :base 6))
-  (movement-cost :initform (make-stat :base 6))
+  (speed :initform (make-stat :base 10))
+  (movement-cost :initform (make-stat :base 10))
   (direction :initform :here)
   (stepping :initform t)
   (color :initform :white))
@@ -283,12 +283,8 @@
 	      (progn 
 		(when [in-category obstacle :paintable]
 		  [paint obstacle <color>])
-		(when (clon:has-field :hit-points obstacle)
-		  [damage obstacle 10])
 		(when [in-category obstacle :breakable]
 		  [die obstacle])
-		(when [in-category obstacle :brick]
-		  [hit obstacle])
 		(when [in-category obstacle :wall]
 		  [paint self (field-value :color obstacle)]
 		  [die obstacle]
@@ -318,7 +314,7 @@
 (defcell mystery-box
   (name :initform "Mystery box")
   (tile :initform "mystery-box")
-  (categories :initform '(:target :obstacle :breakable))
+  (categories :initform '(:target :obstacle :breakable :exclusive))
   (description :initform  "Break it open to find a surprise inside!"))
 
 (define-method die mystery-box ()

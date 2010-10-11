@@ -1,0 +1,948 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.47pre4 r22446"
+   sodipodi:docname="objects.svg"
+   inkscape:export-filename="/home/dto/xe2/xong/objects.png"
+   inkscape:export-xdpi="30.200001"
+   inkscape:export-ydpi="30.200001">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <filter
+       id="filter2818"
+       inkscape:label="Fuzzy Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Overlays a semi-transparent shifted copy to a blurred one"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur2820"
+         stdDeviation="10"
+         result="result8" />
+      <feComposite
+         id="feComposite2822"
+         in2="result8"
+         result="result6"
+         in="SourceGraphic"
+         operator="in" />
+      <feComposite
+         id="feComposite2824"
+         in2="result6"
+         operator="in"
+         result="result11" />
+      <feFlood
+         id="feFlood2826"
+         result="result10"
+         in="result11"
+         flood-opacity="1"
+         flood-color="rgb(255,222,85)" />
+      <feBlend
+         id="feBlend2828"
+         in2="result10"
+         mode="normal"
+         in="result11"
+         result="result12" />
+      <feComposite
+         id="feComposite2830"
+         in2="SourceGraphic"
+         result="fbSourceGraphic"
+         operator="in"
+         in="result12" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix3722" />
+      <feOffset
+         id="feOffset3724"
+         dx="4"
+         dy="4"
+         result="result11"
+         in="fbSourceGraphic" />
+      <feGaussianBlur
+         id="feGaussianBlur3726"
+         stdDeviation="4"
+         result="result8" />
+      <feComposite
+         id="feComposite3728"
+         in2="result8"
+         result="result9"
+         in="fbSourceGraphic"
+         operator="in" />
+      <feBlend
+         id="feBlend3730"
+         in2="result8"
+         in="result9"
+         mode="darken" />
+    </filter>
+    <filter
+       id="filter2835"
+       inkscape:label="Inner Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur2837"
+         stdDeviation="10"
+         result="result8" />
+      <feComposite
+         id="feComposite2839"
+         in2="result8"
+         result="result6"
+         in="SourceGraphic"
+         operator="in" />
+      <feComposite
+         id="feComposite2841"
+         in2="result6"
+         operator="in"
+         result="result11" />
+      <feFlood
+         id="feFlood2843"
+         result="result10"
+         in="result11"
+         flood-opacity="1"
+         flood-color="rgb(255,222,85)" />
+      <feBlend
+         id="feBlend2845"
+         in2="result10"
+         mode="normal"
+         in="result11"
+         result="result12" />
+      <feComposite
+         id="feComposite2847"
+         in2="SourceGraphic"
+         result="result2"
+         operator="in"
+         in="result12" />
+    </filter>
+    <inkscape:perspective
+       id="perspective3133"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <filter
+       id="filter3155"
+       inkscape:label="Inner Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3157"
+         stdDeviation="10"
+         result="result8" />
+      <feComposite
+         id="feComposite3159"
+         in2="result8"
+         result="result6"
+         in="SourceGraphic"
+         operator="in" />
+      <feComposite
+         id="feComposite3161"
+         in2="result6"
+         operator="in"
+         result="result11" />
+      <feFlood
+         id="feFlood3163"
+         result="result10"
+         in="result11"
+         flood-opacity="1"
+         flood-color="rgb(255,222,85)" />
+      <feBlend
+         id="feBlend3165"
+         in2="result10"
+         mode="normal"
+         in="result11"
+         result="result12" />
+      <feComposite
+         id="feComposite3167"
+         in2="SourceGraphic"
+         result="result2"
+         operator="in"
+         in="result12" />
+    </filter>
+    <filter
+       id="filter3173"
+       inkscape:label="Inner Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3175"
+         stdDeviation="10"
+         result="result8" />
+      <feComposite
+         in2="result8"
+         id="feComposite3177"
+         result="result6"
+         in="SourceGraphic"
+         operator="in" />
+      <feComposite
+         in2="result6"
+         id="feComposite3179"
+         operator="in"
+         result="result11" />
+      <feFlood
+         id="feFlood3181"
+         result="result10"
+         in="result11"
+         flood-opacity="1"
+         flood-color="rgb(255,222,85)" />
+      <feBlend
+         in2="result10"
+         id="feBlend3183"
+         mode="normal"
+         in="result11"
+         result="result12" />
+      <feComposite
+         in2="SourceGraphic"
+         id="feComposite3185"
+         result="result2"
+         operator="in"
+         in="result12" />
+    </filter>
+    <filter
+       id="filter3261"
+       inkscape:label="Inner Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3263"
+         stdDeviation="10"
+         result="result8" />
+      <feComposite
+         id="feComposite3265"
+         in2="result8"
+         result="result6"
+         in="SourceGraphic"
+         operator="in" />
+      <feComposite
+         id="feComposite3267"
+         in2="result6"
+         operator="in"
+         result="result11" />
+      <feFlood
+         id="feFlood3269"
+         result="result10"
+         in="result11"
+         flood-opacity="1"
+         flood-color="rgb(255,222,85)" />
+      <feBlend
+         id="feBlend3271"
+         in2="result10"
+         mode="normal"
+         in="result11"
+         result="result12" />
+      <feComposite
+         id="feComposite3273"
+         in2="SourceGraphic"
+         result="result2"
+         operator="in"
+         in="result12" />
+    </filter>
+    <filter
+       id="filter3275"
+       inkscape:label="Inner Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3277"
+         stdDeviation="10"
+         result="result8" />
+      <feComposite
+         id="feComposite3279"
+         in2="result8"
+         result="result6"
+         in="SourceGraphic"
+         operator="in" />
+      <feComposite
+         id="feComposite3281"
+         in2="result6"
+         operator="in"
+         result="result11" />
+      <feFlood
+         id="feFlood3283"
+         result="result10"
+         in="result11"
+         flood-opacity="1"
+         flood-color="rgb(255,222,85)" />
+      <feBlend
+         id="feBlend3285"
+         in2="result10"
+         mode="normal"
+         in="result11"
+         result="result12" />
+      <feComposite
+         id="feComposite3287"
+         in2="SourceGraphic"
+         result="result2"
+         operator="in"
+         in="result12" />
+    </filter>
+    <filter
+       id="filter3289"
+       inkscape:label="Inner Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3291"
+         stdDeviation="10"
+         result="result8" />
+      <feComposite
+         id="feComposite3293"
+         in2="result8"
+         result="result6"
+         in="SourceGraphic"
+         operator="in" />
+      <feComposite
+         id="feComposite3295"
+         in2="result6"
+         operator="in"
+         result="result11" />
+      <feFlood
+         id="feFlood3297"
+         result="result10"
+         in="result11"
+         flood-opacity="1"
+         flood-color="rgb(255,222,85)" />
+      <feBlend
+         id="feBlend3299"
+         in2="result10"
+         mode="normal"
+         in="result11"
+         result="result12" />
+      <feComposite
+         id="feComposite3301"
+         in2="SourceGraphic"
+         result="result2"
+         operator="in"
+         in="result12" />
+    </filter>
+    <inkscape:perspective
+       id="perspective3401"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3524"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <filter
+       id="filter3661"
+       inkscape:label="Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Glow of object's own color at the edges"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3663"
+         stdDeviation="5"
+         result="result91" />
+      <feComposite
+         id="feComposite3665"
+         in2="result91"
+         in="SourceGraphic"
+         operator="over" />
+    </filter>
+    <filter
+       id="filter3672"
+       inkscape:label="Inner Glow"
+       inkscape:menu="Shadows and Glows"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3674"
+         stdDeviation="10"
+         result="result8" />
+      <feComposite
+         id="feComposite3676"
+         in2="result8"
+         result="result6"
+         in="SourceGraphic"
+         operator="in" />
+      <feComposite
+         id="feComposite3678"
+         in2="result6"
+         operator="in"
+         result="result11" />
+      <feFlood
+         id="feFlood3680"
+         result="result10"
+         in="result11"
+         flood-opacity="1"
+         flood-color="rgb(255,222,85)" />
+      <feBlend
+         id="feBlend3682"
+         in2="result10"
+         mode="normal"
+         in="result11"
+         result="result12" />
+      <feComposite
+         id="feComposite3684"
+         in2="SourceGraphic"
+         result="result2"
+         operator="in"
+         in="result12" />
+    </filter>
+    <filter
+       id="filter3766"
+       inkscape:label="Inkblot"
+       inkscape:menu="Textures"
+       inkscape:menu-tooltip="Inkblot on tissue or rough paper"
+       height="1.3"
+       y="-0.15"
+       width="1.3"
+       x="-0.15"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3768"
+         result="result1"
+         in="SourceGraphic"
+         stdDeviation="4" />
+      <feTurbulence
+         id="feTurbulence3770"
+         result="result0"
+         numOctaves="4"
+         baseFrequency="0.05"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap3772"
+         in2="result0"
+         result="result2"
+         scale="20"
+         yChannelSelector="G"
+         xChannelSelector="R"
+         in="result1" />
+      <feGaussianBlur
+         id="feGaussianBlur3774"
+         result="result4"
+         in="SourceGraphic"
+         stdDeviation="3" />
+      <feComposite
+         id="feComposite3776"
+         in2="result2"
+         in="result4"
+         operator="arithmetic"
+         k2="-0.25"
+         k3="0.5"
+         k1="1.5"
+         result="result5" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8"
+     inkscape:cx="458.26684"
+     inkscape:cy="422.00402"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="719"
+     inkscape:window-x="1360"
+     inkscape:window-y="26"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#440055;fill-opacity:1;stroke:#d40000;stroke-width:0.6895951;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect2829"
+       width="779.81042"
+       height="896.95325"
+       x="-96.512352"
+       y="126.02842"
+       ry="16.692038" />
+    <rect
+       style="fill:#00ff00;fill-opacity:1;stroke:#d40000;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       id="rect2816"
+       width="57.556171"
+       height="57.556171"
+       x="327.14285"
+       y="416.64789"
+       ry="8.7731476"
+       inkscape:export-filename="/home/dto/xe2/xong/wall-green.png"
+       inkscape:export-xdpi="25.84"
+       inkscape:export-ydpi="25.84" />
+    <rect
+       ry="8.7731476"
+       y="416.39536"
+       x="404.41953"
+       height="57.556171"
+       width="57.556171"
+       id="rect2832"
+       style="fill:#ffff00;fill-opacity:1;stroke:#d40000;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       inkscape:export-filename="/home/dto/xe2/xong/wall-yellow.png"
+       inkscape:export-xdpi="25.84"
+       inkscape:export-ydpi="25.84" />
+    <rect
+       ry="8.7731476"
+       y="292.64676"
+       x="103.23967"
+       height="57.556171"
+       width="57.556171"
+       id="rect2834"
+       style="fill:#ff0000;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#d40000;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       id="rect2836"
+       width="57.556171"
+       height="57.556171"
+       x="397.26178"
+       y="343.15186"
+       ry="8.7731476"
+       inkscape:export-filename="/home/dto/xe2/xong/wall-purple.png"
+       inkscape:export-xdpi="25.84"
+       inkscape:export-ydpi="25.84" />
+    <rect
+       ry="8.7731476"
+       y="496.009"
+       x="324.40466"
+       height="57.556171"
+       width="57.556171"
+       id="rect2838"
+       style="fill:#00ffff;fill-opacity:1;stroke:#d40000;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       inkscape:export-filename="/home/dto/xe2/xong/wall-blue.png"
+       inkscape:export-xdpi="25.84"
+       inkscape:export-ydpi="25.84" />
+    <rect
+       ry="8.7731476"
+       y="486.009"
+       x="398.69034"
+       height="57.556171"
+       width="57.556171"
+       id="rect2840"
+       style="fill:#ffffff;fill-opacity:1;stroke:#d40000;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       inkscape:export-filename="/home/dto/xe2/xong/wall-white.png"
+       inkscape:export-xdpi="25.84"
+       inkscape:export-ydpi="25.84" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       id="rect2825"
+       width="57.556171"
+       height="57.556171"
+       x="162.52539"
+       y="292.64676"
+       ry="8.7731476" />
+    <rect
+       ry="8.7731476"
+       y="339.07535"
+       x="322.52539"
+       height="57.556171"
+       width="57.556171"
+       id="rect2827"
+       style="fill:#ff0000;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       inkscape:export-filename="/home/dto/xe2/xong/wall-red.png"
+       inkscape:export-xdpi="25.84"
+       inkscape:export-ydpi="25.84" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       id="rect2831"
+       width="57.556171"
+       height="57.556171"
+       x="87.261765"
+       y="449.58044"
+       ry="8.7731476"
+       transform="matrix(2.3328635,0,0,2.3328635,-108.23671,-591.15805)"
+       inkscape:export-filename="/home/dto/xe2/xong/player-purple-svg.png"
+       inkscape:export-xdpi="9.062149"
+       inkscape:export-ydpi="9.062149" />
+    <g
+       id="g3303"
+       inkscape:export-filename="/home/dto/xe2/xong/monitor.png"
+       inkscape:export-xdpi="9.062149"
+       inkscape:export-ydpi="9.062149">
+      <path
+         transform="matrix(2.5684112,0,0,3.8919758,-221.58432,-1135.3316)"
+         d="m 233.01055,510.57648 a 13.290994,8.2142859 0 1 1 -26.58198,0 13.290994,8.2142859 0 1 1 26.58198,0 z"
+         sodipodi:ry="8.2142859"
+         sodipodi:rx="13.290994"
+         sodipodi:cy="510.57648"
+         sodipodi:cx="219.71956"
+         id="path3153"
+         style="fill:#00ffff;fill-opacity:1;stroke:#00ffff;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         sodipodi:type="arc" />
+      <path
+         id="path3171"
+         d="m 261.62435,893.84792 c 96.31542,107.02938 159.60842,0 159.60842,0 l 0,-66.71959 -14.67664,0 1.83459,66.71959 -146.76637,0 z"
+         style="fill:#ff0000;stroke:#ffff00;stroke-width:3.16167592999999991px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3275)" />
+      <path
+         style="fill:#ff0000;stroke:#ffff00;stroke-width:3.16167592999999991px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3261)"
+         d="m 421.94707,813.26828 c -96.31542,-107.02934 -159.60842,0 -159.60842,0 l 0,66.71959 14.67664,0 -1.83459,-66.71959 146.76637,0 z"
+         id="path3187" />
+    </g>
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#d40000;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       id="rect3228"
+       width="57.556171"
+       height="57.556171"
+       x="133.69034"
+       y="496.00903"
+       ry="8.7731476"
+       inkscape:export-filename="/home/dto/xe2/xong/player-purple-svg.png"
+       inkscape:export-xdpi="9.062149"
+       inkscape:export-ydpi="9.062149" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#ffff00;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect3245"
+       width="70"
+       height="34.285713"
+       x="-225.71428"
+       y="506.64789"
+       ry="17.142857" />
+    <rect
+       inkscape:export-ydpi="25.84"
+       inkscape:export-xdpi="25.84"
+       inkscape:export-filename="/home/dto/xe2/xong/wall-orange.png"
+       style="fill:#ff6600;fill-opacity:1;stroke:#d40000;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       id="rect3253"
+       width="57.556171"
+       height="57.556171"
+       x="327.26181"
+       y="567.43756"
+       ry="8.7731476" />
+    <g
+       id="g3310"
+       transform="matrix(0,1,-1,0,892.36217,705.21929)"
+       inkscape:export-filename="/home/dto/xe2/xong/tracer-right.png"
+       inkscape:export-xdpi="8.3878145"
+       inkscape:export-ydpi="8.3878145">
+      <rect
+         transform="matrix(1.8497445,1.8497445,-1.8497445,1.8497445,229.97367,-199.57487)"
+         ry="8.7731476"
+         y="285.3078"
+         x="211.56668"
+         height="42.857143"
+         width="42.857143"
+         id="rect2833"
+         style="fill:#7fff2a;fill-opacity:1;stroke:#445500;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2835)" />
+      <rect
+         transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,677.17521,147.66627)"
+         style="fill:#ff00ff;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+         id="rect3308"
+         width="57.556171"
+         height="57.556171"
+         x="48.690353"
+         y="874.58044"
+         ry="8.7731476"
+         inkscape:export-filename="/home/dto/xe2/xong/wall-purple.png"
+         inkscape:export-xdpi="25.84"
+         inkscape:export-ydpi="25.84" />
+    </g>
+    <rect
+       ry="1.8767295"
+       y="179.43175"
+       x="680.97455"
+       height="100.84681"
+       width="99.474571"
+       id="rect3314"
+       style="fill:#440055;fill-opacity:1;stroke:#d40000;stroke-width:0.08258512;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       transform="matrix(0,1,-1,0,0,0)"
+       inkscape:export-filename="/home/dto/xe2/xong/wire-right.png"
+       inkscape:export-xdpi="18.26"
+       inkscape:export-ydpi="18.26" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+       id="rect3226"
+       width="57.556171"
+       height="57.556171"
+       x="133.23967"
+       y="509.78961"
+       ry="8.7731476"
+       transform="matrix(0,0.29461071,-1.2968389,0,643.84186,703.18274)"
+       inkscape:export-filename="/home/dto/xe2/xong/wire-right.png"
+       inkscape:export-xdpi="18.26"
+       inkscape:export-ydpi="18.26" />
+    <rect
+       style="fill:#440055;fill-opacity:1;stroke:none;stroke-width:0.50000000000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect3316"
+       width="59.093922"
+       height="59.093922"
+       x="-271.22595"
+       y="604.35956"
+       ry="1.8767295"
+       inkscape:export-filename="/home/dto/xe2/xong/chevron-pickup.png"
+       inkscape:export-xdpi="30.200001"
+       inkscape:export-ydpi="30.200001" />
+    <image
+       y="611.50421"
+       x="390.59958"
+       id="image3403"
+       height="16"
+       width="16"
+       xlink:href="file:///home/dto/xe2/xong/chevron-pickup.png" />
+    <rect
+       style="fill:#440055;fill-opacity:1;stroke:#ffff00;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect3407"
+       width="38.571426"
+       height="31.428572"
+       x="417.14285"
+       y="660.93359"
+       ry="1.8767295" />
+    <g
+       id="g3432" />
+    <text
+       xml:space="preserve"
+       style="font-size:27.72770882px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Strasua;-inkscape-font-specification:Strasua"
+       x="-249.44164"
+       y="646.17297"
+       id="text3416"
+       inkscape:export-filename="/home/dto/xe2/xong/chevron-pickup.png"
+       inkscape:export-xdpi="30.200001"
+       inkscape:export-ydpi="30.200001"><tspan
+         sodipodi:role="line"
+         id="tspan3418"
+         x="-249.44164"
+         y="646.17297">C </tspan></text>
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 544.11607,698.80357 c -13.11676,0 -23.75,10.63324 -23.75,23.75 0,13.11676 10.63324,23.75 23.75,23.75 13.11676,0 23.75,-10.63324 23.75,-23.75 0,-13.11676 -10.63324,-23.75 -23.75,-23.75 z m 0,7.40625 c 8.82258,0 15.96875,7.14617 15.96875,15.96875 0,8.82258 -7.14617,15.96875 -15.96875,15.96875 -8.82258,0 -15.96875,-7.14617 -15.96875,-15.96875 0,-8.82258 7.14617,-15.96875 15.96875,-15.96875 z"
+       id="path3414" />
+    <text
+       inkscape:export-ydpi="30.200001"
+       inkscape:export-xdpi="30.200001"
+       inkscape:export-filename="/home/dto/xe2/xong/newpuck.png"
+       transform="scale(0.99287967,1.0071714)"
+       xml:space="preserve"
+       style="font-size:26.51796532px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Strasua;-inkscape-font-specification:Strasua"
+       x="-230.78857"
+       y="714.43054"
+       id="text3420"><tspan
+         sodipodi:role="line"
+         id="tspan3422"
+         x="-230.78857"
+         y="714.43054">P</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3424"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Strasua;font-style:normal;font-weight:normal;font-size:40px;-inkscape-font-specification:Strasua;font-stretch:normal;font-variant:normal"><flowRegion
+         id="flowRegion3426"><rect
+           id="rect3428"
+           width="5.7142859"
+           height="49.642857"
+           x="375.35715"
+           y="544.86218"
+           style="-inkscape-font-specification:Strasua;font-family:Strasua;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal" /></flowRegion><flowPara
+         id="flowPara3430"></flowPara></flowRoot>    <image
+       y="593.29736"
+       x="515.55176"
+       id="image3526"
+       height="16"
+       width="16"
+       xlink:href="file:///home/dto/xe2/xong/newpuck.png" />
+    <g
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Strasua;-inkscape-font-specification:Strasua"
+       id="text3530"
+       transform="matrix(1,0,0,2.018791,0,-669.2548)" />
+    <g
+       transform="matrix(1,0,0,1.8770887,24.642857,-576.88073)"
+       id="g3537"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Strasua;-inkscape-font-specification:Strasua"
+       inkscape:export-filename="/home/dto/xe2/xong/chevron-right.png"
+       inkscape:export-xdpi="27.11768"
+       inkscape:export-ydpi="27.11768">
+      <path
+         id="path3539"
+         d="m 283.14856,682.15077 0,-5.68 20.4,-6.92 -20.4,-6.92 0,-5.72 29.72,10.04 c 1.46663,0.50668 2.19996,1.37335 2.2,2.6 -4e-5,1.22668 -0.73337,2.08001 -2.2,2.56 l -29.72,10.04 m -24.64286,0 0,-5.68 20.4,-6.92 -20.4,-6.92 0,-5.72 29.72,10.04 c 1.46663,0.50668 2.19996,1.37335 2.2,2.6 -4e-5,1.22668 -0.73337,2.08001 -2.2,2.56 l -29.72,10.04"
+         style="filter:url(#filter3661)" />
+    </g>
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;filter:url(#filter3672)"
+       id="path3670"
+       sodipodi:cx="551.07141"
+       sodipodi:cy="387.00504"
+       sodipodi:rx="26.785713"
+       sodipodi:ry="26.785713"
+       d="m 577.85712,387.00504 a 26.785713,26.785713 0 1 1 -53.57142,0 26.785713,26.785713 0 1 1 53.57142,0 z"
+       inkscape:export-filename="/home/dto/xe2/xong/puck.png"
+       inkscape:export-xdpi="28"
+       inkscape:export-ydpi="28" />
+    <rect
+       inkscape:export-ydpi="9.062149"
+       inkscape:export-xdpi="9.062149"
+       inkscape:export-filename="/home/dto/xe2/xong/player-other-svg.png"
+       transform="matrix(2.3328635,0,0,2.3328635,318.90615,-199.72948)"
+       ry="8.7731476"
+       y="449.58044"
+       x="87.261765"
+       height="57.556171"
+       width="57.556171"
+       id="rect3688"
+       style="fill:#ffffff;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)" />
+    <text
+       xml:space="preserve"
+       style="font-size:119.36508179px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff6600;fill-opacity:1;stroke:none;font-family:Strasua;-inkscape-font-specification:Strasua"
+       x="559.36505"
+       y="966.40985"
+       id="text3690"
+       inkscape:export-filename="/home/dto/xe2/xong/player-other-svg.png"
+       inkscape:export-xdpi="9.062149"
+       inkscape:export-ydpi="9.062149"><tspan
+         sodipodi:role="line"
+         id="tspan3692"
+         x="559.36505"
+         y="966.40985">?</tspan></text>
+    <g
+       id="g3750"
+       transform="translate(-522.85714,348.57143)">
+      <rect
+         style="fill:#00ffff;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+         id="rect3694"
+         width="57.556171"
+         height="57.556171"
+         x="362.52539"
+         y="182.64676"
+         ry="8.7731476" />
+      <rect
+         ry="8.7731476"
+         y="199.43248"
+         x="385.02539"
+         height="57.556171"
+         width="57.556171"
+         id="rect3708"
+         style="fill:#ffffff;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)" />
+      <rect
+         style="fill:#ff00ff;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+         id="rect3732"
+         width="57.556171"
+         height="57.556171"
+         x="343.69037"
+         y="226.009"
+         ry="8.7731476"
+         inkscape:export-filename="/home/dto/xe2/xong/wall-purple.png"
+         inkscape:export-xdpi="25.84"
+         inkscape:export-ydpi="25.84" />
+      <rect
+         inkscape:export-ydpi="25.84"
+         inkscape:export-xdpi="25.84"
+         inkscape:export-filename="/home/dto/xe2/xong/wall-orange.png"
+         style="fill:#ff6600;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+         id="rect3738"
+         width="57.556171"
+         height="57.556171"
+         x="391.54755"
+         y="227.43756"
+         ry="8.7731476" />
+    </g>
+    <g
+       id="g3744"
+       transform="translate(-819.99999,497.14285)">
+      <rect
+         ry="8.7731476"
+         y="249.07535"
+         x="488.23969"
+         height="57.556171"
+         width="57.556171"
+         id="rect3734"
+         style="fill:#ff0000;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+         inkscape:export-filename="/home/dto/xe2/xong/wall-red.png"
+         inkscape:export-xdpi="25.84"
+         inkscape:export-ydpi="25.84" />
+      <rect
+         ry="8.7731476"
+         y="216.39536"
+         x="524.41949"
+         height="57.556171"
+         width="57.556171"
+         id="rect3736"
+         style="fill:#ffff00;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+         inkscape:export-filename="/home/dto/xe2/xong/wall-yellow.png"
+         inkscape:export-xdpi="25.84"
+         inkscape:export-ydpi="25.84" />
+      <rect
+         style="fill:#00ff00;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+         id="rect3740"
+         width="57.556171"
+         height="57.556171"
+         x="527.14282"
+         y="263.79074"
+         ry="8.7731476"
+         inkscape:export-filename="/home/dto/xe2/xong/wall-green.png"
+         inkscape:export-xdpi="25.84"
+         inkscape:export-ydpi="25.84" />
+      <rect
+         ry="8.7731476"
+         y="277.43756"
+         x="498.69037"
+         height="57.556171"
+         width="57.556171"
+         id="rect3742"
+         style="fill:#00ffff;fill-opacity:1;stroke:#d40000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter2818)"
+         inkscape:export-filename="/home/dto/xe2/xong/wall-blue.png"
+         inkscape:export-xdpi="25.84"
+         inkscape:export-ydpi="25.84" />
+    </g>
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff00ff;fill-opacity:1;stroke:none;filter:url(#filter3766)"
+       id="path3756"
+       sodipodi:cx="543.83929"
+       sodipodi:cy="722.98718"
+       sodipodi:rx="13.482142"
+       sodipodi:ry="13.482142"
+       d="m 557.32144,722.98718 a 13.482142,13.482142 0 1 1 -26.96429,0 13.482142,13.482142 0 1 1 26.96429,0 z"
+       transform="matrix(1.2715232,0,0,1.2715232,-201.50426,-203.89707)"
+       inkscape:export-filename="/home/dto/xe2/xong/hole.png"
+       inkscape:export-xdpi="38"
+       inkscape:export-ydpi="38" />
+    <path
+       transform="matrix(1.2715232,0,0,1.2715232,-199.18283,-156.93278)"
+       d="m 557.32144,722.98718 a 13.482142,13.482142 0 1 1 -26.96429,0 13.482142,13.482142 0 1 1 26.96429,0 z"
+       sodipodi:ry="13.482142"
+       sodipodi:rx="13.482142"
+       sodipodi:cy="722.98718"
+       sodipodi:cx="543.83929"
+       id="path3788"
+       style="fill:#008080;fill-opacity:1;stroke:none;filter:url(#filter3766)"
+       sodipodi:type="arc"
+       inkscape:export-filename="/home/dto/xe2/xong/hole-closed.png"
+       inkscape:export-xdpi="38"
+       inkscape:export-ydpi="38" />
+  </g>
+</svg>

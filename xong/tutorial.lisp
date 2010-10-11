@@ -1,6 +1,6 @@
 (in-package :xong)
 
-;;; Text labels
+;;; Text overlay balloons
 
 (defcell balloon 
   (categories :initform '(:drawn :actor))
@@ -14,7 +14,7 @@
   (setf <style> style)
   (setf <timeout> (if (floatp timeout)
 		      ;; specify in (roughly) seconds if floating
-		      (truncate (* 35 timeout))
+		      (truncate (* 15 timeout))
 		      ;; leave as frames if integer
 		      timeout)))
   
@@ -94,21 +94,21 @@
 		(setf timeout nil)
 		(act)))))))
 
-;; ;;; Tutorial level 1: puckman
+;;; Tutorial level 1: puckman
 
-;; (defvar *bricks* 0)
+(defvar *bricks* 0)
 
-;; (defcell brick
-;;   (tile :initform "wall-red")
-;;   (categories :initform '(:obstacle :paint-source :wall :brick))
-;;   (color :initform :red))
+(defcell brick
+  (tile :initform "wall-red")
+  (categories :initform '(:obstacle :paint-source :wall :brick))
+  (color :initform :red))
 
-;; (define-method initialize brick ()
-;;   (incf *bricks*))
+(define-method initialize brick ()
+  (incf *bricks*))
 
-;; (define-method die brick ()
-;;   (decf *bricks*)
-;;   [parent>>die self])
+(define-method die brick ()
+  (decf *bricks*)
+  [parent>>die self])
     
 (defparameter *puck-welcome-text* '((("Hello and welcome to the tutorial!"))))
 
