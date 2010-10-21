@@ -19,6 +19,8 @@
 
 (in-package :xong)
 
+(setf xe2:*dt* 30)
+
 ;;; Controlling the game
 
 (define-prototype xong-prompt (:parent xe2:=prompt=))
@@ -93,11 +95,7 @@
   
 (define-method install-keybindings xong-prompt ()
   (dolist (k *qwerty-keybindings*)
-      (apply #'bind-key-to-prompt-insertion self k))
-  ;; we also want to respond to timer events. this is how. 
-  [define-key self nil '(:timer) (lambda ()
-				   [run-cpu-phase *world* :timer])])
-
+      (apply #'bind-key-to-prompt-insertion self k)))
 
 ;;; Splash screen
   
@@ -188,15 +186,14 @@
 
 ;;; Main program. 
 
-(defparameter *xong-window-width* 800)
-(defparameter *xong-window-height* 600)
+(defparameter *xong-window-width* 1280)
+(defparameter *xong-window-height* 720)
 
 (defvar *viewport*)
 
 (defun xong ()
   (xe2:message "Initializing Xong...")
   (setf xe2:*window-title* "Xong")
-  (setf clon:*send-parent-depth* 2) 
   (xe2:set-screen-height *xong-window-height*)
   (xe2:set-screen-width *xong-window-width*)
   ;; go!
@@ -233,11 +230,8 @@
     ;;
     (labels ((spacebar ()
 	       ;;
-	       ;; enable pseudo timing
-	       (xe2:enable-timer)
-	       (xe2:set-frame-rate 30)
-	       (xe2:set-timer-interval 1)
-	       (xe2:enable-held-keys 1 3)
+	       (setf xe2:*physics-function* #'(lambda (&rest ignore)
+						(when *world* [run-cpu-phase *world* :timer])))
 	       ;;
 	       [set-player universe player]
 	       [play universe
@@ -251,7 +245,7 @@
 	       ;;
 	       [set-tile-size viewport 16]
 	       (setf (field-value :use-overlays viewport) t)
-	       [resize viewport :height 470 :width *xong-window-width*]
+	       [resize viewport :height (- *xong-window-height* 40) :width *xong-window-width*]
 	       [move viewport :x 0 :y 0]
 	       [set-origin viewport :x 0 :y 0 
 			   :height (truncate (/ (- *xong-window-height* 130) 16))
@@ -302,7 +296,7 @@
     (setf *pager* (clone =pager=))
     [auto-position *pager*]
     (xe2:install-widgets splash-prompt splash)
-    [add-page *pager* :game prompt stack viewport terminal *status* quickhelp]
-    [add-page *pager* :help help]))
+    [add-page *pager* :game (list prompt stack viewport terminal *status* quickhelp)]
+    [add-page *pager* :help (list help)]))
 
 (xong)

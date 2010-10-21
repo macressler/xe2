@@ -1,0 +1,37 @@
+* What is XIODANCE?
+
+Pronounced "ZY-oh-dance", 
+
+* Features
+
+** 10-button USB dance pad recommended (game console pad with compatible USB adapter)
+** Numeric keypad can be used to try out the game and even freestyle with the fingers
+** Backing tracks can be XM or 
+** Dance gesture input system
+*** Instead of navigating menus, you use short sequences of dance steps to trigger actions.
+**** Could mean a learning curve, but dance game fans might be interested in that.
+*** un-prefixed dance steps (:up :down :left :right) in sequence trigger song-specific actions
+*** the phrases have a simple onscreen representation as an icon with a title
+*** you don't have to memorize the phrases, but it helps 
+*** corner buttons are command prefixes, each corner (:A :B :X :Y)
+*** gestures look like (:A :right) meaning perhaps "trigger chord D minor"
+*** another example: (:Y :Y) meaning quit?
+*** (:X :down) --> XM pattern change to 2 (like numeric keypad)
+*** (:X :A) --> XM pattern change to 9 (like numeric keypad)
+** usb microphone for making noise
+*** slight audio latency will not be a big problem
+** usb camera for making freestyle videos
+
+* Audience
+
+** Stepmania fans who already own PC compatible pads
+*** They can just download the game and plug in their dance pad.
+** Dance game fans who already own PS2 compatible pads
+*** Not all these have enough arrows (the cheap konami ones that come with home versions of DDR don't have :X and :Y in the lower two corners.
+*** Intermediate and advanced players usually own nicer pads that are compatible with USB as well as multiple game consoles.
+*** I can refer others to amazon or ddrgame.com for confirmed compatible pads and/or dance pad adaptors; roughly USD$20 plus shipping
+*** back-of-the-game-box-style icons with text to show device and OS compatibility
+*** "USB Keyboard" "USB Mouse" "USB Camera" "10-button USB Dance pad" "USB Midi Keyboard"
+
+  
+   
