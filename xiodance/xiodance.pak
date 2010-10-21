@@ -1,0 +1,13 @@
+(
+ (:name ".default-font" :type :font :properties (:height 14 :width 7) :data "7x14b")
+
+ (:name "electron" :type :music :file "electron.xm" :properties (:volume 100))
+ (:name "bip" :type :sample :file "bip.wav" :properties (:volume 3))
+ (:name "ka" :type :sample :file "ka.wav" :properties (:volume 100))
+ (:name "pad1" :type :sample :file "pad1.wav" :properties (:volume 100))
+ (:name "pad2" :type :sample :file "pad2.wav" :properties (:volume 100))
+ (:name "bd" :type :sample :file "bd.wav" :properties (:volume 100))
+ (:name "snare" :type :sample :file "snare.wav" :properties (:volume 100))
+ 
+ (:name ".startup" :type :lisp :file "xiodance.lisp")
+)

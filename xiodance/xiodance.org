@@ -2,6 +2,12 @@
 
 Pronounced "ZY-oh-dance", 
 
+* Paste area
+
+(09:51:04 PM) nyef: Only allowed 9 XM patterns?
+(09:54:24 PM) David O'Toole: i'm thinking about that.
+(09:54:59 PM) David O'Toole: perhaps you can enter 2 digits and , i can reserve another button for ENTER to trigger the sound so you can do it when you want
+
 * Features
 
 ** 10-button USB dance pad recommended (game console pad with compatible USB adapter)

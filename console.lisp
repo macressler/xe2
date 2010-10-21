@@ -423,10 +423,8 @@ as hash keys."
 
 ;;; Joystick support (gamepad probably required)
 
-(defparameter *joystick-button-symbols*
-  '(:button-0 :button-1 :button-2 :button-3 :button-4 :button-5 :button-6 :button-7 :button-8 :button-9
-    :button-10 :button-11 :button-12 :button-13 :button-14 :button-15 :button-16 :button-17 :button-18 :button-19
-    :left :right :up :down :select :start))
+(defvar *joystick-button-symbols*
+  '(:a :b :x :y :left :right :up :down :select :start))
 
 (defparameter *generic-joystick-mapping*
   '((0 . :button-0)
