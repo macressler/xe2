@@ -101,7 +101,7 @@
 (defun xiodance ()
   (xe2:message "Initializing Xiodance...")
   (setf xe2:*window-title* "Xiodance")
-  (setf xe2:*output-chunksize* 256)
+  (setf xe2:*output-chunksize* 128)
   (xe2:set-screen-height *xiodance-window-height*)
   (xe2:set-screen-width *xiodance-window-width*)
   (let* ((prompt (clone =xiodance=)))
