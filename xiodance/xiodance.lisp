@@ -62,10 +62,10 @@
   (play-music "electron" :loop t))
 
 (define-method button-y xiodance ()
-  (play-sample "pad1" :loop t))
+  (play-sample "pad1"))
 
 (define-method button-x xiodance ()
-  (play-sample "pad2" :loop t))
+  (play-sample "pad2"))
 
 (define-method button-b xiodance ()
   (play-sample "bd"))
