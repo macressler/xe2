@@ -1,4 +1,4 @@
-;;; superxong.lisp --- hockey paintball snake pong
+;;; xiodance --- freestyle video dance engine
 
 ;; Copyright (C) 2009  David O'Toole
 
@@ -17,12 +17,12 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(defpackage :xiodance
+  (:documentation "XIODANCE is a freestyle video dance engine written in Common Lisp.")
+  (:use :xe2 :common-lisp)
+  (:export xiodance))
+
 (in-package :xiodance)
-
-(setf xe2:*dt* 60)
-
-(setf xe2:*joystick-button-symbols*
-      '(:a :b :x :y :left :right :up :down :select :start))
 
 (defparameter *basic-keybindings* 
   '(("KP8" nil "up .")
@@ -34,17 +34,17 @@
     ("KP7" nil "button-b .")
     ("KP9" nil "button-a .")
     ("KP-ENTER" nil "start .")
-    ("KP-INSERT" nil "select .")
-    ("JOYSTICK" (:up) "up .")
-    ("JOYSTICK" (:left) "left .")
-    ("JOYSTICK" (:right) "right .")
-    ("JOYSTICK" (:down) "down .")
-    ("JOYSTICK" (:y) "button-y .")
-    ("JOYSTICK" (:x) "button-x .")
-    ("JOYSTICK" (:b) "button-b .")
-    ("JOYSTICK" (:a) "button-a .")
-    ("JOYSTICK" (:start) "start .")
-    ("JOYSTICK" (:select) "select .")))
+    ("KP0" nil "select .")
+    ("JOYSTICK" (:up :button-down) "up .")
+    ("JOYSTICK" (:left :button-down) "left .")
+    ("JOYSTICK" (:right :button-down) "right .")
+    ("JOYSTICK" (:down :button-down) "down .")
+    ("JOYSTICK" (:y :button-down) "button-y .")
+    ("JOYSTICK" (:x :button-down) "button-x .")
+    ("JOYSTICK" (:b :button-down) "button-b .")
+    ("JOYSTICK" (:a :button-down) "button-a .")
+    ("JOYSTICK" (:start :button-down) "start .")
+    ("JOYSTICK" (:select :button-down) "select .")))
 
 (defparameter *qwerty-keybindings*
   (append *basic-keybindings* nil))
@@ -52,38 +52,46 @@
 (define-prototype xiodance (:parent xe2:=prompt=))
   
 (define-method install-keybindings xiodance ()
-  (dolist (k *qwerty-keybindings*)
+  (dolist (k *basic-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
 
 (define-method select xiodance ()
-  (halt-music 0))
+  (play-music "electron2" :loop t))
 
 (define-method start xiodance ()
   (play-music "electron" :loop t))
 
 (define-method button-y xiodance ()
-  (play-sample "pad1"))
+  (play-sample "pad1" :loop t))
 
 (define-method button-x xiodance ()
-  (play-sample "pad2")
+  (play-sample "pad2" :loop t))
 
 (define-method button-b xiodance ()
   (play-sample "bd"))
+
 (define-method button-a xiodance ()
-(define-method up xiodance ()
-(define-method down xiodance ()
+  (play-sample "ka"))
+
+(define-method up xiodance ())
+
+(define-method down xiodance ())
+
 (define-method left xiodance ()
+  (play-sample "snare"))
+
 (define-method right xiodance ()
+  (play-sample "snare"))
 
 (defparameter *energy-dance-pad-mapping*
-  '((0 . :up)
-    (1 . :left)
-    (2 . :right)
-    (3 . :down)
-    (4 . :y)
-    (5 . :x)
-    (6 . :b)
-    (7 . :a)
+  '((12 . :up)
+    (15 . :left)
+    (13 . :right)
+    (14 . :down)
+    (0 . :y)
+    (3 . :x)
+    (2 . :b)
+    (1 . :a)
     (8 . :select)
     (9 . :start)))
 
@@ -93,16 +101,22 @@
 (defun xiodance ()
   (xe2:message "Initializing Xiodance...")
   (setf xe2:*window-title* "Xiodance")
+  (setf xe2:*output-chunksize* 256)
   (xe2:set-screen-height *xiodance-window-height*)
   (xe2:set-screen-width *xiodance-window-width*)
   (let* ((prompt (clone =xiodance=)))
     [resize prompt :height 20 :width 100]
     [move prompt :x 0 :y 0]
-    [hide prompt]
+    [show prompt]
+    [set-receiver prompt prompt]
     [install-keybindings prompt]
     (xe2:reset-joystick)
     (set-music-volume 255)
+    (setf xe2:*dt* 60)
+    (setf xe2:*joystick-button-symbols*
+	  '(:a :b :x :y :left :right :up :down :select :start))
     (setf *joystick-mapping* *energy-dance-pad-mapping*)
-    (xe2:install-widgets (list prompt))
+    (xe2:install-widgets prompt)
     (xe2:enable-classic-key-repeat 100 100)))
 
+(xiodance)

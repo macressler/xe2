@@ -111,6 +111,7 @@ with-fields with-field-values write-pak *grammar* one-of
 left-hand-side right-hand-side expansions generate
 send-event-to-widgets play-music halt-music seek-music
 *joystick-mapping* *generic-joystick-mapping* *ps3-joystick-mapping*
+*joystick-button-symbols*
 draw-resource-image *event-handler-function* *use-sound*
 trace-rectangle trace-row trace-column trace-octagon trace-line
 midpoint =asterisk= =gray-asterisk= self *module-widgets* defsprite
@@ -134,6 +135,7 @@ enable-held-keys disable-held-keys do-cells draw-box *resizable* achieve
 *resize-hook* draw-rectangle *quitting* *after-load-module-hook* *mission*
 mission-variable-value set-mission-variable-value with-mission-locals =mission=
 local-variable-value set-local-variable-value with-locals with-mission-locals
+
 *module* quit reset))
 
 (in-package :xe2)
