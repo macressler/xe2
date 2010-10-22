@@ -24,6 +24,8 @@
 
 (in-package :xiobeat)
 
+(setf xe2:*dt* 10)
+
 (defparameter *basic-keybindings* 
   '(("KP8" nil "up .")
     ("KP4" nil "left .")
@@ -56,32 +58,33 @@
       (apply #'bind-key-to-prompt-insertion self k)))
 
 (define-method select xiobeat ()
-  (play-music "electron2" :loop t))
+  (play-music "xiophant" :loop t))
 
 (define-method start xiobeat ()
-  (play-music "electron" :loop t))
+  (play-music "electron2" :loop t))
 
 (define-method button-y xiobeat ()
-  (play-sample "pad1"))
+  (play-sample "hit2"))
 
 (define-method button-x xiobeat ()
-  (play-sample "pad2"))
+  (play-sample "scratch"))
 
 (define-method button-b xiobeat ()
-  (play-sample "bd"))
+  (play-sample "snare2"))
 
 (define-method button-a xiobeat ()
-  (play-sample "ka"))
+  (play-sample "ting"))
 
-(define-method up xiobeat ())
+(define-method up xiobeat ()
+  (play-sample "bip"))
 
 (define-method down xiobeat ())
 
 (define-method left xiobeat ()
-  (play-sample "snare"))
+  (play-sample "snare2"))
 
 (define-method right xiobeat ()
-  (play-sample "snare"))
+  (play-sample "snare3"))
 
 (defparameter *energy-dance-pad-mapping*
   '((12 . :up)
@@ -112,7 +115,6 @@
     [install-keybindings prompt]
     (xe2:reset-joystick)
     (set-music-volume 255)
-    (setf xe2:*dt* 60)
     (setf xe2:*joystick-button-symbols*
 	  '(:a :b :x :y :left :right :up :down :select :start))
     (setf *joystick-mapping* *energy-dance-pad-mapping*)
