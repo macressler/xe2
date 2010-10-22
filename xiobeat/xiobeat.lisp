@@ -1,4 +1,4 @@
-;;; xiodance --- freestyle video dance engine
+;;; xiobeat --- freestyle video dance engine
 
 ;; Copyright (C) 2009  David O'Toole
 
@@ -17,12 +17,12 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(defpackage :xiodance
-  (:documentation "XIODANCE is a freestyle video dance engine written in Common Lisp.")
+(defpackage :xiobeat
+  (:documentation "XIOBEAT is a freestyle video dance engine written in Common Lisp.")
   (:use :xe2 :common-lisp)
-  (:export xiodance))
+  (:export xiobeat))
 
-(in-package :xiodance)
+(in-package :xiobeat)
 
 (defparameter *basic-keybindings* 
   '(("KP8" nil "up .")
@@ -49,38 +49,38 @@
 (defparameter *qwerty-keybindings*
   (append *basic-keybindings* nil))
 
-(define-prototype xiodance (:parent xe2:=prompt=))
+(define-prototype xiobeat (:parent xe2:=prompt=))
   
-(define-method install-keybindings xiodance ()
+(define-method install-keybindings xiobeat ()
   (dolist (k *basic-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
 
-(define-method select xiodance ()
+(define-method select xiobeat ()
   (play-music "electron2" :loop t))
 
-(define-method start xiodance ()
+(define-method start xiobeat ()
   (play-music "electron" :loop t))
 
-(define-method button-y xiodance ()
+(define-method button-y xiobeat ()
   (play-sample "pad1"))
 
-(define-method button-x xiodance ()
+(define-method button-x xiobeat ()
   (play-sample "pad2"))
 
-(define-method button-b xiodance ()
+(define-method button-b xiobeat ()
   (play-sample "bd"))
 
-(define-method button-a xiodance ()
+(define-method button-a xiobeat ()
   (play-sample "ka"))
 
-(define-method up xiodance ())
+(define-method up xiobeat ())
 
-(define-method down xiodance ())
+(define-method down xiobeat ())
 
-(define-method left xiodance ()
+(define-method left xiobeat ()
   (play-sample "snare"))
 
-(define-method right xiodance ()
+(define-method right xiobeat ()
   (play-sample "snare"))
 
 (defparameter *energy-dance-pad-mapping*
@@ -95,16 +95,16 @@
     (8 . :select)
     (9 . :start)))
 
-(defparameter *xiodance-window-width* 800)
-(defparameter *xiodance-window-height* 600)
+(defparameter *xiobeat-window-width* 800)
+(defparameter *xiobeat-window-height* 600)
 
-(defun xiodance ()
-  (xe2:message "Initializing Xiodance...")
-  (setf xe2:*window-title* "Xiodance")
+(defun xiobeat ()
+  (xe2:message "Initializing Xiobeat...")
+  (setf xe2:*window-title* "Xiobeat")
   (setf xe2:*output-chunksize* 128)
-  (xe2:set-screen-height *xiodance-window-height*)
-  (xe2:set-screen-width *xiodance-window-width*)
-  (let* ((prompt (clone =xiodance=)))
+  (xe2:set-screen-height *xiobeat-window-height*)
+  (xe2:set-screen-width *xiobeat-window-width*)
+  (let* ((prompt (clone =xiobeat=)))
     [resize prompt :height 20 :width 100]
     [move prompt :x 0 :y 0]
     [show prompt]
@@ -119,4 +119,4 @@
     (xe2:install-widgets prompt)
     (xe2:enable-classic-key-repeat 100 100)))
 
-(xiodance)
+(xiobeat)

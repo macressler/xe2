@@ -8,5 +8,5 @@
  (:name "pad2" :type :sample :file "pad2.wav" :properties (:volume 80))
  (:name "bd" :type :sample :file "bd.wav" :properties (:volume 100))
  (:name "snare" :type :sample :file "snare.wav" :properties (:volume 120))
- (:name ".startup" :type :lisp :file "xiodance.lisp" :properties (:autoload t))
+ (:name ".startup" :type :lisp :file "xiobeat.lisp" :properties (:autoload t))
 )
