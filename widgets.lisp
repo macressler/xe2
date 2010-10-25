@@ -320,6 +320,7 @@ PROPERTIES are chosen from:
   - :FONT ---  Font name. Defaults to *default-font*.
 ")
   (lines :documentation "Vector of lines.")
+  (display-current-line :initform nil)
   (current-line :documentation "Formatted line currently being composed."))
 
 (define-method print formatter (string &rest keys &key image foreground background font)
@@ -391,22 +392,31 @@ auto-updated displays."
   (when <visible>
     (/clear self)
     (/update self)
-    (let ((y <height>) (n 0)
-          line
-          (lines <lines>)
-          (image <image>))
-      (setf n (fill-pointer lines))
-      (when (plusp n)
-        (loop do
-              (progn 
-                (setf line (aref lines (- n 1)))
-                (decf y (formatted-line-height line))
-                (render-formatted-line line 0 y :destination image)
-                (decf n))
-              ;; reached top of output image?
-              while (and (plusp y) 
-                         ;; ran out of lines to display?
-                         (not (zerop n))))))))
+    (let* ((current-line (coerce <current-line> 'list))
+	   (y-offset (if current-line
+			 (formatted-line-height current-line)
+			 0)))
+      (let ((y (- <height> (if <display-current-line>
+			       y-offset 0)))
+	    (n 0)
+	    line
+	    (lines <lines>)
+	    (image <image>))
+	(when (and current-line <display-current-line>)
+	  (render-formatted-line current-line 0 (- <height> y-offset)
+				 :destination image))
+	(setf n (fill-pointer lines))
+	(when (plusp n)
+	  (loop do
+	    (progn 
+	      (setf line (aref lines (- n 1)))
+	      (decf y (formatted-line-height line))
+	      (render-formatted-line line 0 y :destination image)
+	      (decf n))
+	    ;; reached top of output image?
+		while (and (plusp y) 
+			   ;; ran out of lines to display?
+			   (not (zerop n)))))))))
 
 (defun split-string-on-lines (string)
   (with-input-from-string (stream string)

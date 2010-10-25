@@ -137,7 +137,8 @@
 ;; keypad.
 
 (defparameter *basic-keybindings* 
-  '(("KP8" nil "up .")
+  '(("Q" (:control) "quit .")
+    ("KP8" nil "up .")
     ("KP4" nil "left .")
     ("KP6" nil "right .")
     ("KP2" nil "down .")
@@ -191,10 +192,13 @@
 
 (defparameter *icon-images* 
   '(:up "up" :left "left" :right "right" :down "down"
-    :a "a" :x "x" :y "y" :b "b" :period "period"))
+    :a "a" :x "x" :y "y" :b "b" :period "period" :prompt "prompt"))
 
 (defun arrow-icon-image (arrow)
   (getf *icon-images* arrow))
+
+(defun arrow-icon-formatted-string (arrow)
+  (list nil :image (arrow-icon-image arrow)))
 
 ;;; Modes
 
@@ -218,7 +222,8 @@
 
 (define-method render status ()
   (with-fields (image width height) self
-    (draw-box 0 0 width height :stroke-color ".gray50" :color ".gray50")
+    (draw-box 0 0 width height :stroke-color ".gray10" :color ".gray10" 
+	      :destination image)
     (let ((x 0) 
 	  (y 0))
       (dolist (row '((:b :up :a) 
@@ -238,6 +243,16 @@
 	  (incf x *icon-width*))
 	(incf y *icon-height*)))))
 
+;;; Arrow phrase command display/processor
+
+(defvar *commander* nil)
+
+(define-prototype commander (:parent xe2:=formatter=)
+  (display-current-line :initform t))
+
+(define-method insert commander (arrow)
+  (/print-formatted-string self (arrow-icon-formatted-string arrow)))
+
 ;;; Stomp mode is the basic functionality the other modes build on.
 
 (define-prototype stomper (:parent xe2:=prompt=))
@@ -246,34 +261,49 @@
   (dolist (k *basic-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
 
+(define-method quit stomper ()
+  (xe2:quit))
+
 (define-method select stomper ()
-  (play-music "xiophant" :loop t))
+  (play-music "electron" :loop t))
 
 (define-method start stomper ()
-  (play-music "electron2" :loop t))
+  (/insert *commander* :period)
+  (/newline *commander*)
+  (/insert *commander* :prompt))
 
 (define-method button-y stomper ()
-  (play-sample "hit2"))
+  (/insert *commander* :y))
 
 (define-method button-x stomper ()
-  (play-sample "scratch"))
+;;  (/insert *commander* :x)
+;  (play-sample "scratch")
+  (/start self))
 
 (define-method button-b stomper ()
-  (play-sample "snare2"))
+;;  (/insert *commander* :b)
+  (/start self))
 
 (define-method button-a stomper ()
-  (play-sample "ting"))
+  (/insert *commander* :a)
+  (play-sample "bass"))
 
 (define-method up stomper ()
-  (play-sample "bip"))
+  (/insert *commander* :up)
+  (play-sample "ting"))
+;  (play-sample "snare"))
 
-(define-method down stomper ())
+(define-method down stomper ()
+  (play-sample "scratch")
+  (/insert *commander* :down))
 
 (define-method left stomper ()
-  (play-sample "snare2"))
+  (/insert *commander* :left)
+  (play-sample "snare3"))
 
 (define-method right stomper ()
-  (play-sample "snare3"))
+  (/insert *commander* :right)
+  (play-sample "cymb"))
 
 (setf xe2:*dt* 20)
 
@@ -284,17 +314,23 @@
   (xe2:set-screen-height *xiobeat-window-height*)
   (xe2:set-screen-width *xiobeat-window-width*)
   (let* ((prompt (clone =stomper=))
-	 (status (clone =status=)))
+	 (status (clone =status=))
+	 (commander (clone =commander=)))
     [resize status :height 600 :width 200]
     [move status :x 0 :y 0]
     [resize prompt :height 20 :width 100]
     [move prompt :x 200 :y 0]
     [show prompt]
+    [resize commander :height 550 :width 580]
+    [move commander :x 200 :y 25]
+    [show commander]
+    (setf *commander* commander)
     [set-receiver prompt prompt]
     [install-keybindings prompt]
     (xe2:reset-joystick)
     (set-music-volume 255)
-    (xe2:install-widgets status prompt)
+    [insert *commander* :prompt]
+    (xe2:install-widgets status prompt commander)
     (xe2:enable-classic-key-repeat 100 100)))
 
 (xiobeat)
