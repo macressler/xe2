@@ -1,3 +1,10 @@
+* Tasks
+
+** Insert arrow graphics
+** 
+** Dance pad status widget, query the buttons
+
+
 * What is XIOBEAT?
 
 Pronounced "ZY-oh-beet", 
@@ -7,6 +14,10 @@ Pronounced "ZY-oh-beet",
 (09:51:04 PM) nyef: Only allowed 9 XM patterns?
 (09:54:24 PM) David O'Toole: i'm thinking about that.
 (09:54:59 PM) David O'Toole: perhaps you can enter 2 digits and , i can reserve another button for ENTER to trigger the sound so you can do it when you want
+
+
+* Dance gesture language
+*** 
 
 * Features
 

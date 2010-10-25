@@ -1,5 +1,5 @@
 (
- (:name ".default-font" :type :font :properties (:height 14 :width 7) :data "7x14b")
+ (:name ".default-font" :type :font :properties (:height 18 :width 9) :data "9x18b")
  (:name "electron" :type :music :file "electron.ogg" :properties (:volume 255))
  (:name "electron2" :type :music :file "electron2.ogg" :properties (:volume 240))
  (:name "xiophant" :type :music :file "xiophant.ogg" :properties (:volume 200))
@@ -17,5 +17,16 @@
  (:name "snare" :type :sample :file "snare.wav" :properties (:volume 120))
  (:name "snare2" :type :sample :file "snare2.wav" :properties (:volume 120))
  (:name "snare3" :type :sample :file "snare3.wav" :properties (:volume 120))
+ 
+ (:name "up" :type :image :file "up.png")
+ (:name "down" :type :image :file "down.png")
+ (:name "left" :type :image :file "left.png")
+ (:name "right" :type :image :file "right.png")
+ (:name "a" :type :image :file "a.png")
+ (:name "b" :type :image :file "b.png")
+ (:name "x" :type :image :file "x.png")
+ (:name "y" :type :image :file "y.png")
+ (:name "period" :type :image :file "period.png")
+
  (:name ".startup" :type :lisp :file "xiobeat.lisp" :properties (:autoload t))
 )
