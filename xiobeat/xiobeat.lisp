@@ -77,8 +77,7 @@
 (in-package :xiobeat)
 
 (setf xe2:*resizable* t)
-
-;;; Main program. 
+(setf xe2:*dt* 20)
 
 (defparameter *window-width* 1280)
 (defparameter *window-height* 720)
@@ -96,12 +95,12 @@
 (defvar *pager*)
 (defvar *forms*)
 
-(defun handle-xiomacs-command (command)
+(defun handle-xiobeat-command (command)
   (assert (stringp command))
   (/insert *prompt* command)
   (/execute *prompt*))
 
-(setf xe2:*form-command-handler-function* #'handle-xiomacs-command)
+(setf xe2:*form-command-handler-function* #'handle-xiobeat-command)
 
 (define-prototype help-prompt (:parent =prompt=)
   (default-keybindings :initform '(("N" nil "page-down .")
@@ -117,28 +116,28 @@
 
 (add-hook '*after-load-module-hook* (lambda ()
 				      (/message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*)))
-				      (when (string= *module* "xiomacs")
+				      (when (string= *module* "xiobeat")
 					(/visit *form* "FrontPage"))))
 
-(define-prototype xiomacs-prompt (:parent xe2:=prompt=))
+(define-prototype xiobeat-prompt (:parent xe2:=prompt=))
 
-(define-method say xiomacs-prompt (&rest args)
+(define-method say xiobeat-prompt (&rest args)
   (apply #'send nil :say *terminal* args))
 
-(define-method goto xiomacs-prompt ()
+(define-method goto xiobeat-prompt ()
   (/unfocus (/left-form *forms*))
   (/unfocus (/right-form *forms*))
   (setf <mode> :direct))
 
-(define-method do-after-execute xiomacs-prompt ()
+(define-method do-after-execute xiobeat-prompt ()
   (/clear-line self)  
   (setf <mode> :forward))
 
-(define-method exit xiomacs-prompt ()
+(define-method exit xiobeat-prompt ()
   (/parent>>exit self)
   (/refocus *forms*))
 
-(define-prototype xiomacs-split (:parent xe2:=split=))
+(define-prototype xiobeat-split (:parent xe2:=split=))
 
 (defparameter *qwerty-keybindings*
   '(;; arrow key cursor movement
@@ -196,71 +195,71 @@
     ("X" (:meta) :goto-prompt)
     ("T" (:control) :next-tool)))
 
-(define-method install-keybindings xiomacs-split ()
+(define-method install-keybindings xiobeat-split ()
   (dolist (binding (case *user-keyboard-layout*
 		     (:qwerty *qwerty-keybindings*)
 		     (otherwise *qwerty-keybindings*)))
     (/generic-keybind self binding)))
 
-(define-method left-form xiomacs-split ()
+(define-method left-form xiobeat-split ()
   (nth 0 <children>))
 
-(define-method right-form xiomacs-split ()
+(define-method right-form xiobeat-split ()
   (nth 1 <children>))
 
-(define-method other-form xiomacs-split ()
+(define-method other-form xiobeat-split ()
   (ecase <focus>
     (0 (/right-form self))
     (1 (/left-form self))))
 
-(define-method left-world xiomacs-split ()
+(define-method left-world xiobeat-split ()
   (field-value :world (/left-form self)))
 
-(define-method right-world xiomacs-split ()
+(define-method right-world xiobeat-split ()
   (field-value :world (/right-form self)))
 
-(define-method selected-form xiomacs-split ()
+(define-method selected-form xiobeat-split ()
   (nth <focus> <children>))
 
-(define-method left-selected-data xiomacs-split ()
+(define-method left-selected-data xiobeat-split ()
   (/get-selected-cell-data (/left-form self)))
 
-(define-method right-selected-data xiomacs-split ()
+(define-method right-selected-data xiobeat-split ()
   (/get-selected-cell-data (/right-form self)))
 
-(define-method focus-left xiomacs-split ()
+(define-method focus-left xiobeat-split ()
   (/focus (/left-form self))
   (/unfocus (/right-form self)))
 
-(define-method focus-right xiomacs-split ()
+(define-method focus-right xiobeat-split ()
   (/focus (/right-form self))
   (/unfocus (/left-form self)))
 
-(define-method refocus xiomacs-split ()
+(define-method refocus xiobeat-split ()
   (ecase <focus>
     (0 (/focus-left self))
     (1 (/focus-right self))))
 
-(define-method left-pane xiomacs-split ()
+(define-method left-pane xiobeat-split ()
   "Select the left spreadsheet pane."
   (/say self "Selecting left pane.")
   (/focus-left self)
   (setf <focus> 0))
 
-(define-method right-pane xiomacs-split ()
+(define-method right-pane xiobeat-split ()
   "Select the right spreadsheet pane."
   (/say self "Selecting right pane.")
   (/focus-right self)
   (setf <focus> 1))
 
-(define-method switch-panes xiomacs-split ()
+(define-method switch-panes xiobeat-split ()
   (let ((newpos (mod (1+ <focus>) (length <children>))))
     (setf <focus> newpos)
     (ecase newpos
       (0 (/left-pane self))
       (1 (/right-pane self)))))
 
-(define-method apply-left xiomacs-split ()
+(define-method apply-left xiobeat-split ()
   "Move data LEFTWARD from right pane to left pane, applying current
 left side tool to the right side data."
   (let* ((form (/left-form self))
@@ -269,7 +268,7 @@ left side tool to the right side data."
     (/say self (format nil "Applying LEFT tool ~S to data ~S in LEFT form." tool data))
     (/apply-tool form data)))
 
-(define-method apply-right xiomacs-split ()
+(define-method apply-right xiobeat-split ()
   "Move data RIGHTWARD from left pane to right pane, applying current
 right side tool to the left side data."
   (let* ((form (/right-form self))
@@ -278,7 +277,7 @@ right side tool to the left side data."
     (/say self (format nil "Applying RIGHT tool ~S to data ~S in RIGHT form." tool data))
     (/apply-tool form data)))
 
-(define-method paste xiomacs-split (&optional page)
+(define-method paste xiobeat-split (&optional page)
   (let ((source (if page 
 		    (find-page page)
 		    (field-value :world (/other-form self))))
@@ -302,7 +301,7 @@ right side tool to the left side data."
 		   (sc (or left0 0)))
 	      (/paste-region destination source r0 c0 sr sc height width))))))))
   
-(define-method commands xiomacs-split ()
+(define-method commands xiobeat-split ()
   "Syntax: command-name arg1 arg2 ...
 Available commands: HELP EVAL SWITCH-PANES LEFT-PANE RIGHT-PANE
 NEXT-TOOL SET-TOOL APPLY-LEFT APPLY-RIGHT VISIT SELECT SAVE-ALL
@@ -540,8 +539,6 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
   (/insert *commander* :right)
   (play-sample "cymb"))
 
-(setf xe2:*dt* 20)
-
 (defun xiobeat ()
   (xe2:message "Initializing Xiobeat...")
   (setf xe2:*window-title* "Xiobeat")
@@ -568,22 +565,22 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     (xe2:install-widgets status prompt commander)
     (xe2:enable-classic-key-repeat 100 100)))
 
-(defun xiomacs ()
+(defun xiobeat ()
   (setf xe2:*screen-width* *window-width*)
   (setf xe2:*screen-height* *window-height*)
-  (xe2:message "Initializing XIOMACS...")
-  (setf xe2:*window-title* "XIOMACS")
+  (xe2:message "Initializing XIOBEAT...")
+  (setf xe2:*window-title* "XIOBEAT")
   (clon:initialize)
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
-  (let* ((prompt (clone =xiomacs-prompt=))
+  (let* ((prompt (clone =xiobeat-prompt=))
 	 (help (clone =help-textbox=))
 	 (help-prompt (clone =help-prompt=))
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
 	 (form2 (clone =form= "*scratch*"))
 	 (terminal (clone =narrator=))
-	 (split (clone =xiomacs-split=))
+	 (split (clone =xiobeat-split=))
 	 (stack (clone =stack=)))
     ;;
     (setf *form* form)
@@ -611,7 +608,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     (/show prompt)
     (/install-keybindings prompt)
     (/install-keybindings split)
-    (/say prompt "Welcome to XIOMACS. Press ALT-X to enter command mode, or F1 for help.")
+    (/say prompt "Welcome to XIOBEAT. Press ALT-X to enter command mode, or F1 for help.")
     (/set-mode prompt :forward) ;; don't start with prompt on
     (/set-receiver prompt split)
     ;; 
@@ -625,7 +622,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     (/resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*)
     (/move help :x 0 :y 0)
     (setf (field-value :read-only help) t)
-    (let ((text	(find-resource-object "xiomacs-help-message")))
+    (let ((text	(find-resource-object "xiobeat-help-message")))
       (/set-buffer help text))
     ;;
     (/resize help-prompt :width 10 :height 10)
@@ -646,12 +643,12 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     ;; (/move help :x 0 :y 0)
     (/resize-to-scroll help :height 540 :width 800) 
     (/move help :x 0 :y 0)
-    (let ((text	(find-resource-object "xiomacs-help-message")))
+    (let ((text	(find-resource-object "xiobeat-help-message")))
       (/set-buffer help text))
     ;;
     (/resize quickhelp :height *quickhelp-height* :width *quickhelp-width*)
     (/move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*))
-    (let ((text	(find-resource-object "xiomacs-quickhelp-message")))
+    (let ((text	(find-resource-object "xiobeat-quickhelp-message")))
       (dolist (line text)
     	(dolist (string line)
     	  (funcall #'send nil :print-formatted-string quickhelp string))
