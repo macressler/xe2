@@ -235,6 +235,7 @@
 	    (let ((icon (arrow-icon-image button))
 		  (index (get-button-index button)))
 	      ;; draw a rectangle if the button is pressed
+	      ;; TODO nice shaded glowing panels
 	      (when (plusp (poll-joystick-button index))
 		(draw-box x y *icon-height* *icon-height*
 			  :stroke-color ".dark orange" :color ".dark orange" :destination image))
