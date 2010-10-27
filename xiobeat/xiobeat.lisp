@@ -97,6 +97,7 @@
 (defvar *pager*)
 (defvar *frame*)
 (defvar *track*)
+(defvar *engine*)
 
 (defun handle-xiobeat-command (command)
   (assert (stringp command))
@@ -437,7 +438,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 
 (define-method render status ()
   (with-fields (image width height) self
-    (draw-box 0 0 width height :stroke-color ".forest green" :color ".forest green" 
+    (draw-box 0 0 width height :stroke-color ".black" :color ".black" 
 	      :destination image)
     (let ((x 0) 
 	  (y 0))
@@ -582,6 +583,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 	 (stack (clone =stack=)))
     ;;
     (setf *form* form)
+    (setf *engine* engine)
     (setf *prompt* prompt)
     (setf *terminal* terminal)
     (setf *frame* frame)
@@ -599,20 +601,20 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 					 *pager-height*) 
 			:width (- *sidebar-width* 2))
 	       (/resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*)
-	       (/resize frame :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*))
+	       (/resize frame :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *status-height* *terminal-height*))
 	       (/resize terminal :height *terminal-height* :width *screen-width*)
 	       (/resize quickhelp :height *quickhelp-height* :width *quickhelp-width*)
 	       ;;
-	       [resize status :height *status-height* :width *window-width*]
-	       [move status :x 0 :y 0]
-	       [show status]
+	       (/resize status :height *status-height* :width *window-width*)
+	       (/move status :x 0 :y 0)
+	       (/show status)
 	       (setf *status* status)
-	       [resize engine :height 20 :width 100]
-	       [move engine :x 200 :y 0]
-	       [show engine]
-	       [resize commander :height 550 :width 580]
-	       [move commander :x 200 :y 25]
-	       [show commander]
+	       (/resize engine :height 20 :width 100)
+	       (/move engine :x 200 :y 0)
+	       (/hide engine)
+	       (/resize commander :height 550 :width 580)
+	       (/move commander :x 200 :y 25)
+	       (/hide commander)
 	       (setf *commander* commander)
 	       ;;	           [set-receiver prompt engine]
 	       (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
@@ -672,7 +674,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     	  (funcall #'send nil :print-formatted-string quickhelp string))
     	(/newline quickhelp)))
     ;;
-    (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
+    (/resize stack :width *screen-width* :height (- *screen-height* *pager-height*))
     (/move stack :x 0 :y 0)
     (/set-children stack (list frame status terminal prompt))
     ;;

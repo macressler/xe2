@@ -824,7 +824,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
     (dotimes (row <rows>)
       (setf cell (/cell-at self row column))
       (when cell
-	(setf width (max width (/form-width cell)))))
+	(setf width (max width (/width cell)))))
     (ecase <view-style> 
       (:label (max width (formatted-string-width *blank-cell-string*)))
       (:tile <tile-size>))))
@@ -977,7 +977,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		      ;; see also cells.lisp
 		      (progn 
 			(ecase view-style
-			  (:label (/form-render cell image x y column-width))
+			  (:label (/render cell image x y column-width))
 			  (:tile (if (/in-category cell :drawn)
 				     (push (list cell x y) pending-draws)
 				     (when (field-value :tile cell)
