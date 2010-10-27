@@ -79,6 +79,20 @@
 (setf xe2:*resizable* t)
 (setf xe2:*dt* 20)
 
+(defconstant +ticks-per-minute+ 60000 "Each tick is one millisecond.")
+
+(defvar *beats-per-minute* 120)
+
+(defun ticks-per-beat (bpm)
+  (float (/ +ticks-per-minute+ bpm)))
+
+(defvar *position* 0.0 "Song position in ticks. Fractional ticks are allowed.")
+
+(defun position-seconds ()
+  (float (/ *position* 1000)))
+
+(defvar *wall-ticks* 0)
+
 (defparameter *window-width* 1280)
 (defparameter *window-height* 720)
 (defparameter *prompt-height* 20)
@@ -316,7 +330,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (define-method exit xiobeat-prompt ()
   [parent>>exit self]
   (/refocus *frame*))
-
+      
 ;;; Dance pad layout
 
 ;;    The diagram below gives the standard dance pad layout for
@@ -554,6 +568,11 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 ;;; Stomp mode is the basic functionality the other modes build on.
 
 (define-prototype stomper (:parent xe2:=prompt=))
+
+(define-method handle-key stomper (event)
+  (let ((func (gethash event <keymap>)))
+    (when (functionp func)
+      (prog1 t (funcall func)))))
   
 (define-method install-keybindings stomper ()
   (dolist (k *dance-keybindings*)
@@ -693,6 +712,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	       (/resize engine :height 20 :width 100)
 	       (/move engine :x 200 :y 0)
 	       (/hide engine)
+	       (/set-receiver engine engine)
 	       (/resize commander :height 550 :width 580)
 	       (/move commander :x 200 :y 25)
 	       (/hide commander)
@@ -730,7 +750,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (/move help-prompt :x 0 :y 0)
     (/hide help-prompt)
     (/set-receiver help-prompt help)
-
     ;;
     (/resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width *sidebar-width*)
     (/move form2 :x 0 :y 0)
@@ -771,7 +790,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (setf *pager* (clone =pager=))
     (/auto-position *pager*)
     ;;
-    (/add-page *pager* :edit (list prompt stack frame terminal status quickhelp))
+    (/add-page *pager* :edit (list engine prompt stack frame terminal status quickhelp))
     (/add-page *pager* :help (list help-prompt help))
     (/select *pager* :edit)
     (xe2:reset-joystick)
