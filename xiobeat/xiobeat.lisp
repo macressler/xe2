@@ -156,7 +156,7 @@
     ("ESCAPE" nil :cancel)
     ("G" (:control) :cancel)
     ;; view mode
-    ("F9" nil :tile-view)
+    ("F9" nil :image-view)
     ("F10" nil :label-view)
     ;; other
     ("X" (:control) :goto-prompt)
@@ -274,7 +274,7 @@ right side tool to the left side data."
   "Syntax: command-name arg1 arg2 ...
 Available commands: HELP EVAL SWITCH-PAGES LEFT-PAGE RIGHT-PAGE
 NEXT-TOOL SET-TOOL APPLY-LEFT APPLY-RIGHT VISIT SELECT SAVE-ALL
-SAVE-MODULE LOAD-MODULE TILE-VIEW LABEL-VIEW QUIT VISIT APPLY-TOOL
+SAVE-MODULE LOAD-MODULE IMAGE-VIEW LABEL-VIEW QUIT VISIT APPLY-TOOL
 CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
  nil)
 
@@ -484,6 +484,14 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
   (with-fields (arrow image) self
     (setf arrow new-arrow)
     (setf image (arrow-icon-image new-arrow))))
+
+(define-method print step ()
+  (format nil "~S" <arrow>))
+
+(define-method read step (string)
+  (let ((input (read-from-string string)))
+    (assert (member input *dance-phrase-symbols*))
+    (setf <arrow> input)))
 
 (define-method initialize step (&optional (arrow :blank))
   (/set self arrow))

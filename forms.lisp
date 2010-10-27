@@ -187,7 +187,7 @@ The cells' :cancel method is invoked."
     
 (define-method deserialize page ()
     (/create-default-grid self)
-    (clon:with-field-values (width height grid sprites serialized-grid) self
+    (clon:with-field-values (width height grid serialized-grid) self
       (dotimes (i height)
 	(dotimes (j width)
 	  (map nil #'(lambda (cell)
@@ -509,7 +509,6 @@ initialize the arrays for a page of the size specified there."
   (mark-column :initform nil)
   (scroll-margin :initform 0)
   (view-style :initform :label)
-  (tile-size :initform 16)
   (cursor-color :initform ".yellow")
   (focused :initform nil)
   (cursor-blink-color :initform ".magenta")
@@ -640,7 +639,6 @@ See also CREATE-PAGE."
     (/clear-mark self)
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <cursor-row> (min <rows> <cursor-row>))
-;;    (setf <tile-size> (field-value :tile-size page))
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <column-widths> (make-array (+ 1 <columns>) :initial-element 0)
 	  <row-heights> (make-array (+ 1 <rows>) :initial-element 0)
@@ -662,12 +660,12 @@ See also CREATE-PAGE."
 
 (define-method set-view-style form (style)
   "Set the rendering style of the current form to STYLE.
-Must be one of (:tile :label)."
+Must be one of (:image :label)."
   (setf <view-style> style))
 
-(define-method tile-view form ()
-  "Switch to tile view in the current form."
-  (/set-view-style self :tile))
+(define-method image-view form ()
+  "Switch to image view in the current form."
+  (/set-view-style self :image))
 
 (define-method label-view form ()
   "Switch to label view in the current form."
@@ -795,8 +793,8 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	(setf height (max height (/height cell)))))
     (ecase <view-style>
       (:label (max (formatted-string-height *blank-cell-string*) height))
-      (:tile <tile-size>))))
-
+      (:image height))))
+	
 (define-method column-width form (column)
   (let ((width 0) cell)
     (dotimes (row <rows>)
@@ -805,7 +803,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 	(setf width (max width (/width cell)))))
     (ecase <view-style> 
       (:label (max width (formatted-string-width *blank-cell-string*)))
-      (:tile <tile-size>))))
+      (:image width))))
 
 (define-method compute-geometry form ()
   ;; TODO this could obviously be sped up
@@ -956,11 +954,11 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		      (progn 
 			(ecase view-style
 			  (:label (/render cell image x y column-width))
-			  (:tile (if (/in-category cell :drawn)
+			  (:image (if (/in-category cell :drawn)
 				     (push (list cell x y) pending-draws)
-				     (when (field-value :tile cell)
+				     (when (field-value :image cell)
 				       (draw-image (find-resource-object 
-						    (field-value :tile cell)) x y :destination image)))))
+						    (field-value :image cell)) x y :destination image)))))
 			(when entered
 			  (draw-rectangle x y 
 					  column-width 
@@ -989,7 +987,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		  ;; move to next column right
 		  (incf x (aref column-widths column))))
 	      ;; move to next row down ;; TODO fix row-spacing
-	      (incf y (+ (if (eq :tile view-style)
+	      (incf y (+ (if (eq :image view-style)
 			     0 0) (aref row-heights row))))
 	    ;; draw any pending drawn cells
 	    (dolist (args pending-draws)

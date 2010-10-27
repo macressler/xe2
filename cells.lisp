@@ -35,7 +35,16 @@
   (widget :initform nil)
   (image :initform nil :documentation "Image to display. either a resource name string, or an XE2 image object."))
   
+(define-method in-category cell (category)
+  (member category <categories>))
+
 (defparameter *default-cell-width* 32)
+
+(define-method get cell ())
+
+(define-method set cell (data))
+
+(define-method print cell () "")
 
 (define-method width cell () 
   (with-field-values (widget image label) self
