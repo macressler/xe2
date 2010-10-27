@@ -37,8 +37,8 @@
  (:name "prompt" :type :image :file "prompt.png")
  (:name "period" :type :image :file "period.png")
 
- (:name "xiomacs-help-message" :type :text :file "README")
- (:name "xiomacs-quickhelp-message" :type :formatted-text :file	 "quickhelp.text")
+ (:name "xiobeat-help-message" :type :text :file "README")
+ (:name "xiobeat-quickhelp-message" :type :formatted-text :file	 "quickhelp.text")
 
  (:name ".startup" :type :lisp :file "xiobeat.lisp" :properties (:autoload t))
 )

@@ -1,6 +1,4 @@
-;; (replace-string "[" "(/")
-;; (replace-string "]" ")")
-;;; forms.lisp --- port of cell-mode to common lisp
+;;; forms.lisp --- generic object oriented spreadsheet
 
 ;; Copyright (C) 2006, 2007, 2010  David O'Toole
 
@@ -22,15 +20,15 @@
 
 (in-package :xe2)
 
-(defun generate-page-name (world)
-  (concatenate 'string (get-some-object-name world) "-" (format nil "~S" (genseq))))
+(defun generate-page-name (page)
+  (concatenate 'string (get-some-object-name page) "-" (format nil "~S" (genseq))))
 
 (defun create-blank-page (&key height width name)
-  (let ((world (clone =world= :height height :width width)))
-    (prog1 world
-      (setf (field-value :name world)
-	    (or name (generate-page-name world)))
-      (/generate world))))
+  (let ((page (clone =page= :height height :width width)))
+    (prog1 page
+      (setf (field-value :name page)
+	    (or name (generate-page-name page)))
+      (/generate page))))
 
 (defun find-page (page)
   (etypecase page
@@ -48,9 +46,9 @@
     (list 
        ;; it's an address
        (destructuring-bind (prototype-name &rest parameters) page
-	 (let ((world (clone (symbol-value prototype-name))))
-	   (/generate-with world parameters)
-	   (find-page world))))
+	 (let ((page (clone (symbol-value prototype-name))))
+	   (/generate-with page parameters)
+	   (find-page page))))
     (string (or (find-resource-object page :noerror)
 		(progn (make-object-resource page (create-blank-page :name page))
 		       (let ((object (find-resource-object page)))
@@ -94,10 +92,10 @@
   (setf <variable> variable))
 
 (define-method set var-cell (value)
-  (/set-variable *world* <variable> value))
+  (/set-variable *page* <variable> value))
 
 (define-method get var-cell ()
-  (/get-variable *world* <variable>))
+  (/get-variable *page* <variable>))
 
 (define-method compute var-cell ()
   (setf <label> (list (cons (format nil ">> ~A  " <variable>) *var-cell-style*))))
@@ -275,7 +273,7 @@
     (:parent =widget= :documentation  "An interactive graphical spreadsheet.")
   prompt narrator computing
   (page-name :initform nil)
-  (world :documentation "The xe2:=world= of objects to be displayed.")
+  (page :documentation "The xe2:=page= of objects to be displayed.")
   rows columns
   (entered :initform nil :documentation "When non-nil, forward key events to the entry and/or any attached widget.")
   (cursor-row :initform 0) 
@@ -311,13 +309,13 @@
 
 (define-method initialize form (&optional (page *default-page-name*))
   (with-fields (entry) self
-    (let ((world (find-page page)))
+    (let ((page (find-page page)))
       (send-parent self :initialize self)
       (/visit self page))))
 
 (define-method generate form (&rest parameters)
   "Invoke the current page's default :generate method, passing PARAMETERS."
-  (/generate-with <world> parameters))
+  (/generate-with <page> parameters))
 
 (define-method set-tool form (tool)
   "Set the current sheet's selected tool to TOOL."
@@ -345,8 +343,8 @@
       (/say self (format nil "Changing tool operation to ~S" tool)))))
 
 (define-method set-modified form (&optional (value t))
-  (with-fields (world) self
-    (with-fields (name) world
+  (with-fields (page) self
+    (with-fields (name) page
       (set-resource-modified-p name value))))
   
 (define-method apply-tool form (data)
@@ -361,7 +359,7 @@ at the current cursor location. See also APPLY-LEFT and APPLY-RIGHT."
   (if (and (symbolp data)
 	   (boundp data)
 	   (clon:object-p (symbol-value data)))
-      (/drop-cell <world> (clone (symbol-value data)) <cursor-row> <cursor-column>)
+      (/drop-cell <page> (clone (symbol-value data)) <cursor-row> <cursor-column>)
       (/say self "Cannot clone.")))
 
 (define-method inspect form ()
@@ -370,7 +368,7 @@ at the current cursor location. See also APPLY-LEFT and APPLY-RIGHT."
 (define-method erase form (&optional data)
   "Erase the top cell at the current location."
   (/say self "Erasing top cell.")
-  (let ((grid (field-value :grid <world>)))
+  (let ((grid (field-value :grid <page>)))
     (ignore-errors (vector-pop (aref grid <cursor-row> <cursor-column>)))))
 
 (define-method set-mark form ()
@@ -392,22 +390,22 @@ at the current cursor location. See also APPLY-LEFT and APPLY-RIGHT."
 	(values nil nil nil nil))))
 
 (define-method visit form (&optional (page *default-page-name*))
-  "Visit the page PAGE with the current form. If PAGE is a =world=
+  "Visit the page PAGE with the current form. If PAGE is a =page=
 object, visit it and add the page to the page collection. If PAGE is a
 string, visit the named page. If the named page does not exist, a
 default page is created. If PAGE is a list, it is interpreted as a
-world address, and a new world is generated according to that address.
-See also CREATE-WORLD."
-  (let ((world (find-page page)))
-    (assert (object-p world))
-    (setf <page-name> (field-value :name world))
+page address, and a new page is generated according to that address.
+See also CREATE-PAGE."
+  (let ((page (find-page page)))
+    (assert (object-p page))
+    (setf <page-name> (field-value :name page))
     (/say self (format nil "Visiting page ~S" <page-name>))
     (set-resource-modified-p <page-name> t)
-    (setf <world> world)
-    (setf *world* world) ;; TODO suspicious
+    (setf <page> page)
+    (setf *page* page) ;; TODO suspicious
     (/install-keybindings self)
-    (setf <rows> (field-value :height world))
-    (setf <columns> (field-value :width world))
+    (setf <rows> (field-value :height page))
+    (setf <columns> (field-value :width page))
     (assert (integerp <rows>))
     (assert (integerp <columns>))
     (setf <cursor-row> 0)
@@ -415,7 +413,7 @@ See also CREATE-WORLD."
     (/clear-mark self)
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <cursor-row> (min <rows> <cursor-row>))
-    (setf <tile-size> (field-value :tile-size world))
+    (setf <tile-size> (field-value :tile-size page))
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <column-widths> (make-array (+ 1 <columns>) :initial-element 0)
 	  <row-heights> (make-array (+ 1 <rows>) :initial-element 0)
@@ -424,7 +422,7 @@ See also CREATE-WORLD."
 
 (define-method cell-at form (row column)
   (assert (and (integerp row) (integerp column)))
-  (/top-cell-at <world> row column))
+  (/top-cell-at <page> row column))
 
 (define-method set-prompt form (prompt)
   (setf <prompt> prompt))
@@ -494,12 +492,12 @@ Type HELP :COMMANDS for a list of available commands."
   (xe2:save-modified-objects)
   (/say self "Saving objects... Done."))
   
-(define-method create-world form (&key height width name object)
-  "Create and visit a blank world of height HEIGHT, width WIDTH, and name NAME.
+(define-method create-page form (&key height width name object)
+  "Create and visit a blank page of height HEIGHT, width WIDTH, and name NAME.
 If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
-  (let ((world (or object (create-blank-page :height height :width width :name name))))
-    (when name (setf (field-value :name world) name))
-    (/visit self world)))
+  (let ((page (or object (create-blank-page :height height :width width :name name))))
+    (when name (setf (field-value :name page) name))
+    (/visit self page)))
 
 (define-method enter form ()
   "Begin entering LISP data into the current cell."
@@ -511,7 +509,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
       (/move entry :x 0 :y 0)
       (when (null cell)
 	(setf cell (clone =data-cell=))
-	(/drop-cell <world> cell <cursor-row> <cursor-column>))
+	(/drop-cell <page> cell <cursor-row> <cursor-column>))
       (let ((data (/get cell)))
 	(when data 
 	  (let* ((output (/print cell))
@@ -623,7 +621,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		    do (incf y (aref row-heights row))
 		    when (> y y0) return row)))
 	(when (and (integerp selected-column) (integerp selected-row))
-	  (when (array-in-bounds-p (field-value :grid <world>)
+	  (when (array-in-bounds-p (field-value :grid <page>)
 				 selected-row selected-column)
 	    (prog1 t
 	      (setf <cursor-row> selected-row
@@ -647,8 +645,8 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 
 (define-method render form ()
   (/clear self)
-  (when <world>
-    (with-field-values (cursor-row cursor-column row-heights world page-name 
+  (when <page>
+    (with-field-values (cursor-row cursor-column row-heights page page-name 
 				   origin-row origin-column header-line status-line
 				   mark-row mark-column width height
 				   view-style header-style tool tool-methods entered focused
@@ -803,7 +801,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
   
 (define-method scroll form ()
   (with-fields (cursor-row cursor-column origin-row origin-column scroll-margin
-			   origin-height origin-width world rows columns) self
+			   origin-height origin-width page rows columns) self
     (when (or 
 	   ;; too far left
 	   (> (+ origin-column scroll-margin) 
@@ -908,7 +906,7 @@ DIRECTION is one of :up :down :right :left."
 ;;; Creating commonly used cells
 
 (define-method drop-at-cursor form (type)
-  (/drop-cell <world> (clone type) <cursor-row> <cursor-column>)) 
+  (/drop-cell <page> (clone type) <cursor-row> <cursor-column>)) 
 
 (define-method drop-data-cell form ()
   (/drop-at-cursor self =data-cell=))

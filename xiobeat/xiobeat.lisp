@@ -36,7 +36,7 @@
 
 ;;; Modes of play 
 
-;; Stomp your feet to create sound in Freestyle mode using any Ogg
+;; Stomp your feet to create sound in Stomp mode using any Ogg
 ;; Vorbis or XM (Extended Module) format song as a backing track, and
 ;; load any WAV sample into each of the 8 dance pad buttons to be
 ;; triggered by foot stomps. Using XM songs as a backing track allows

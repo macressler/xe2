@@ -1,4 +1,4 @@
-;;; cells.lisp --- defining roguelike game objects
+;;; cells.lisp --- defining objects
 
 ;; Copyright (C) 2008  David O'Toole
 
@@ -36,12 +36,72 @@
 
 ;;; Base cell prototype
 
-;; The base cell prototype's data members and methods build in many basic
-;; features of the roguelike engine:
+;; This is a base object for forms-browseable objects. See forms.lisp
 
-(define-prototype cell
-    (:documentation 
-"`Cells' are interacting CLON objects. Each cell represents some
+(define-prototype cell ()
+  (name :initform nil :documentation "The name of this cell.")
+  (description :initform nil :documentation "A description of the cell.") 
+  (categories :initform nil :documentation "List of category keyword symbols")
+  (label :initform nil :documentation "Optional string or formatted line to display.")
+  (image :initform nil :documentation "Image to display. either a resource name string, or an XE2 image object."))
+  
+(defparameter *default-cell-width* 64)
+
+(define-method width cell () 
+  (with-field-values (widget image) self
+    (cond (widget (image-height (field-value :image widget)))
+	  (image (image-height image))
+	  (label (formatted-line-width (/label self)))
+	  (t *default-cell-width*))))
+
+(define-method height cell () 
+  (with-field-values (widget image label) self
+    (cond (widget (image-height (field-value :image widget)))
+	  (image (image-height image))
+	  (label (formatted-line-height (/label self)))
+	  (t *default-cell-width*))))
+
+(define-method render cell (dest x y width)
+  (with-field-values (widget image label)
+      (cond (widget 
+	     (/render widget)
+	     (draw-image (field-value :image widget)
+			 x y :destination dest))
+	    ;; it's an image
+	    (image 
+	     (if (stringp image)
+		 (draw-resource-image image x y :destination dest)
+		 (draw-image image x y :destination dest)))
+	    (<label>
+	     ;; we have a formatted line
+	     (let ((label (/form-label self)))
+	       (when (listp label)
+		 (let*
+		     ((shortfall (- width (formatted-line-width label)))
+		      (color (or (when (and (listp label)
+					    (listp (last label)))
+				   (getf (cdr (car (last label))) :background))
+				 ".cyan"))
+		      (spacer (when (plusp shortfall) 
+				(list nil :width shortfall :background color)))
+		      (line (if spacer (append label (list spacer))
+				      label)))
+		   (render-formatted-line line x y :destination dest))))))))
+
+(defvar *default-cell-label* '((" DEF ")))
+
+(define-method label cell ()
+  (when label 
+    (etypecase label
+      (string (list (list label)))
+      (list label))))
+
+;;; "gCells" implement a 2D game engine.
+
+(define-prototype gcell
+    (:parent =cell=
+     :documentation 
+"`GCells' are interacting CLON game objects. Each cell represents some
 in-game entity; player characters, enemies, weapons, items, walls and
 floors are all different types of cells. Game play occurs in a
 three-dimensional grid of cells called a World (see below).
@@ -101,7 +161,6 @@ When nil, the method DRAW is invoked instead of using a tile.")
   (stepping :initform nil :documentation "Whether to generate step events where you walk.")
   (movement-cost :initform '(:base 10 :min nil :max nil :delta nil)
 		 :documentation "Base cost of moving one square.")
-  (tooltip :initform nil :documentation "A formatted line giving dev help or information about the cell.")
   ;; <: knowledge :>
   (name :documentation "The name of this cell.")
   (description :documentation "A description of the cell.") 
@@ -132,69 +191,25 @@ When nil, the method DRAW is invoked instead of using a tile.")
   ;; serialization
   (excluded-fields :initform '(:render-cell :equipper :parent-container :occupant :proxy)))
 
-(define-method compute cell () nil)
-
-;;; Forms compatibility
-
-(defvar *default-cell-label* '((" DEF ")))
-
-(define-method form-label cell ()
-  (with-field-values (label) self
-    (or (if (null label)
-	    ;; use a substitute label
-	    (cond ((stringp <tile>)
-		   (list (list nil :image <tile>) (list " ") (list (some-name-of self)))))
-	    (etypecase label
-	      (string (list (list label)))
-	      (list label)))
-	*default-cell-label*)))
-  
-(define-method form-width cell () 
-  (if <widget>
-      (image-width (field-value :image <widget>))
-      (formatted-line-width (/form-label self))))
-
-(define-method form-height cell ()
-  (if <widget>
-      (image-height (field-value :image <widget>))
-      (formatted-line-height (/form-label self))))
+(define-method compute gcell () nil)
     
-(define-method set cell (data)
+(define-method set gcell (data)
   nil)
 
-(define-method get cell ()
+(define-method get gcell ()
   (object-name (object-parent self)))
 
-(define-method print cell ()
+(define-method print gcell ()
   "")
 
-(define-method read cell (text)
+(define-method read gcell (text)
   (read-from-string text))
 
-(define-method form-render cell (image x y width)
-  (let ((widget <widget>))
-    (if widget 
-	(progn (/render widget)
-	       (draw-image (field-value :image widget)
-			   x y :destination image))
-	(let* ((label (/form-label self))
-	       (shortfall (- width (formatted-line-width label)))
-	       (color
-		(or (when (and (listp label)
-			       (listp (last label)))
-		      (getf (cdr (car (last label))) :background))
-		    ".cyan"))
-	       (spacer (when (plusp shortfall) 
-			 (list nil :width shortfall :background color))))
-	  (let ((line (if spacer (append label (list spacer))
-			  label)))
-	    (render-formatted-line line x y :destination image))))))
-
-(define-method is-located cell ()
+(define-method is-located gcell ()
   "Returns non-nil if this cell is located somewhere on the grid."
   (or (and (integerp <row>) (integerp <column>))))
 
-(define-method dislocate cell ()
+(define-method dislocate gcell ()
   "Remove any location data from the cell."
   (when (integerp <row>)
     (setf <row> nil <column> nil))
@@ -210,9 +225,16 @@ cells."
   `(define-prototype ,name (:parent =cell=)
      ,@args))
 
+(defmacro defgcell (name &body args)
+  "Define a gcell named NAME, with the fields ARGS as in a normal
+prototype declaration. This is a convenience macro for defining new
+gcells."
+  `(define-prototype ,name (:parent =gcell=)
+     ,@args))
+
 ;;; Names, knowledge, and descriptions
 
-(define-method describe cell (&optional description)
+(define-method describe gcell (&optional description)
   "Narrate a description of the object. By default, uses
 the :description field of the cell."
   (/emote self (get-some-object-name self) :timeout 5.0))
@@ -223,7 +245,7 @@ the :description field of the cell."
 
 ;;; Statistics 
 
-(define-method stat-value cell (stat-name &optional component (clamping t))
+(define-method stat-value gcell (stat-name &optional component (clamping t))
   "Compute the current value of the statistic in field STAT-NAME.
 If a COMPONENT keyword is provided, return that component of the stat
 instead of computing the value.
@@ -250,7 +272,7 @@ Stats are just property lists with four different components: :base
 		(setf val max)))
 	    (values val unit))))))
 
-(define-method stat-effect cell (stat-name val
+(define-method stat-effect gcell (stat-name val
 					   &optional (component :base) (clamping t))
   "Add VAL, which may be negative, to the COMPONENT part of the stat
 field named by STAT-NAME. The default is to change the :base value."
@@ -277,12 +299,12 @@ You must provide at least a :base value."
 
 ;;; Pushing stuff; let the cell decide whether to move
 
-(define-method push cell (direction)
+(define-method push gcell (direction)
   nil)
 
 ;;; Custom rendering
 
-(define-method draw cell (x y image)
+(define-method draw gcell (x y image)
   "Use XE2 drawing commands to render a presentation of this cell at
 X, Y to the offscreen image IMAGE.  This method is invoked to draw a
 cell when its TILE field is nil, or when it is in the
@@ -291,7 +313,7 @@ category :drawn. See also viewport.lisp."
 
 ;;; Cell categories
 
-(define-method in-category cell (category) 
+(define-method in-category gcell (category) 
   "Return non-nil if this cell is in the specified CATEGORY.
 
 Cells may be placed into categories that influence their processing by
@@ -311,7 +333,7 @@ interpretation:
  -    :drawn --- This cell has a (/draw) method used for custom drawing.
  -    :proxied  --- This cell is an occupant of a proxy.
  -    :dead --- This cell is no longer receiving run messages.
- -    :player --- Only one cell (your player avatar) has this category.
+ -    :player --- Only one gcell (your player avatar) has this category.
  -    :enemy --- This cell is playing against you.
  -    :exclusive --- Prevent some objects from stacking. See also the method `drop-cell' in worlds.lisp
  -    :obstacle --- Blocks movement and causes collisions
@@ -321,7 +343,7 @@ interpretation:
  -    :light-source --- This object casts light. 
  -    :opaque --- Blocks line-of-sight, casts shadows. 
  -    :container --- This cell contains other cells, and has an <inventory> field
- -    :contained ---  This cell is contained in another cell (i.e. not in open space on the map)
+ -    :contained ---  This cell is contained in another gcell (i.e. not in open space on the map)
  -    :item --- A potential inventory item. 
  -    :equipper --- Uses equipment. 
  -    :equipped --- This item is currently equipped.
@@ -329,30 +351,30 @@ interpretation:
 "
   (member category <categories>))
 
-(define-method add-category cell (category)
+(define-method add-category gcell (category)
   "Add this cell to the specified CATEGORY."
   (pushnew category <categories>))
 
-(define-method delete-category cell (category)
+(define-method delete-category gcell (category)
   "Remove this cell from the specified CATEGORY."
   (setf <categories> (remove category <categories>)))
 
 ;;; Run method
 
-(define-method run cell ()
+(define-method run gcell ()
   nil)
 
 ;;; Action Points
 
-(define-method get-actions cell ()
+(define-method get-actions gcell ()
   <actions>)
 
-(define-method is-actor cell ()
+(define-method is-actor gcell ()
   "Return non-nil if this cell is an actor. Actor cells receive a :run
 message every frame."
   (member :actor <categories>))
 
-(define-method is-player cell ()
+(define-method is-player gcell ()
   "Return non-nil if this is the player."
   (member :player <categories>))
 
@@ -361,19 +383,19 @@ message every frame."
 
 ;; The following functions calculate action points.
 
-(define-method begin-phase cell ()
+(define-method begin-phase gcell ()
   "Give the cell its allotment of action points to begin a phase.
 If the last action of the previous turn brought the AP score into the
 negative, then you'll come up that much short."
   (incf <action-points> (/stat-value self :speed)))
 
-(define-method do-phase cell ()
+(define-method do-phase gcell ()
   "Invoked once at the beginning of each phase.")
 
-(define-method poll-keys cell ()
+(define-method poll-keys gcell ()
   nil)
 
-(define-method can-act cell (phase)
+(define-method can-act gcell (phase)
   "Determine whether the cell has enough action points to take some
 action during PHASE.
 
@@ -407,37 +429,37 @@ place. (See also worlds.lisp)
 	     (plusp <action-points>))
     (incf <phase-number>)))
   
-(define-method expend-action-points cell (points &optional min)
+(define-method expend-action-points gcell (points &optional min)
   "Expend POINTS action points, possibly going into the negative."
   (decf <action-points> points)
   (when (numberp min)
     (setf <action-points> (max min <action-points>))))
 
-(define-method expend-default-action-points cell ()
+(define-method expend-default-action-points gcell ()
   (/expend-action-points self (/stat-value self :default-cost)))
 
-(define-method end-phase cell ()
+(define-method end-phase gcell ()
   "End this cell's phase."
   (setf <phase-number> (/get-phase-number *world*)))
 
 ;;; Player orientation
 
-(define-method distance-to-player cell ()
+(define-method distance-to-player gcell ()
   "Calculate the distance from the current location to the player."
   ;; todo fix for sprites
   (multiple-value-bind (row column) (/grid-coordinates self)
     (/distance-to-player *world* row column)))
 
-(define-method direction-to-player cell ()
+(define-method direction-to-player gcell ()
   "Calculate the general compass direction of the player."
   (/direction-to-player *world* <row> <column>))
 
-(define-method adjacent-to-player cell ()
+(define-method adjacent-to-player gcell ()
   (/adjacent-to-player *world* <row> <column>))
 
 ;;; Proxying and vehicles
 
-(define-method proxy cell (occupant)
+(define-method proxy gcell (occupant)
   "Make this cell a proxy for OCCUPANT."
   (let ((world *world*))
     (when <occupant> 
@@ -460,7 +482,7 @@ place. (See also worlds.lisp)
       (/set-player world self)
       (setf <phase-number> (1- (/get-phase-number world))))))
 
-(define-method unproxy cell (&key dr dc dx dy)
+(define-method unproxy gcell (&key dr dc dx dy)
   "Remove the occupant from this cell, dropping it on top."  
   (let ((world *world*)
 	(occupant <occupant>))
@@ -486,12 +508,12 @@ place. (See also worlds.lisp)
       (/run occupant))
     (setf <occupant> nil)))
 
-(define-method do-post-unproxied cell ()
+(define-method do-post-unproxied gcell ()
   "This method is invoked on the unproxied former occupant cell after
 unproxying. By default, it does nothing."
   nil)
 
-(define-method forward cell (method &rest args)
+(define-method forward gcell (method &rest args)
   "Attempt to deliver the failed message to the occupant, if any."
   (if (and (/is-player self)
 	   (not (has-method method self))
@@ -503,7 +525,7 @@ unproxying. By default, it does nothing."
 	  (error "Cannot forward message ~S. No implementation found." method))
 	(apply #'send self method occupant args))))
   
-(define-method embark cell (&optional v)
+(define-method embark gcell (&optional v)
   "Enter a vehicle V."
   (let ((vehicle (or v (/category-at-p *world* <row> <column> :vehicle))))
     (if (null vehicle)
@@ -513,7 +535,7 @@ unproxying. By default, it does nothing."
 		   (/proxy vehicle self))
 	    (/>>say :narrator "Already in vehicle.")))))
 
-(define-method disembark cell ()
+(define-method disembark gcell ()
   "Eject the occupant."
   (let ((occupant <occupant>))
     (when (and occupant (/in-category self :proxy))
@@ -521,7 +543,7 @@ unproxying. By default, it does nothing."
 
 ;;; Cell movement
 
-(define-method move cell (direction &optional ignore-obstacles)
+(define-method move gcell (direction &optional ignore-obstacles)
   "Move this cell one step in DIRECTION on the grid. If
 IGNORE-OBSTACLES is non-nil, the move will occur even if an obstacle
 is in the way. Returns non-nil if a move occurred."
@@ -548,32 +570,32 @@ is in the way. Returns non-nil if a move occurred."
 		 ;; (when <stepping>
 		 ;;   (/step-on-current-square self)))))))))
 
-(define-method set-location cell (r c)
+(define-method set-location gcell (r c)
   "Set the row R and column C of the cell."
   (setf <row> r <column> c))
 
-(define-method move-to cell (r c)
+(define-method move-to gcell (r c)
   (/delete-cell *world* self <row> <column>)
   (/drop-cell *world* self r c))
 
-(define-method exit cell ()
+(define-method exit gcell ()
   "This method is invoked on a player cell when it leaves a world."
   nil)
 
-(define-method step-on-current-square cell ()
+(define-method step-on-current-square gcell ()
   "Send :step events to all the cells on the current square."
   (when <stepping>
-    (do-cells (cell (/cells-at *world* <row> <column>))
+    (do-cells (gcell (/cells-at *world* <row> <column>))
       (unless (eq cell self) 
 	(/step cell self)))))
 
-(define-method drop cell (cell &key loadout (exclusive nil))
+(define-method drop gcell (cell &key loadout (exclusive nil))
   "Add CELL to the world at the current location. By default,
 EXCLUSIVE is nil; this allows one to drop objects on top of oneself.
 When LOADOUT is non-nil, call the :loadout method."
   (/drop-cell *world* cell <row> <column> :loadout loadout :exclusive exclusive))
 
-(define-method drop-sprite cell (sprite &optional x y)
+(define-method drop-sprite gcell (sprite &optional x y)
   "Add SPRITE to the world at location X,Y."
   (multiple-value-bind (x0 y0)
       (/xy-coordinates self)
@@ -583,11 +605,11 @@ When LOADOUT is non-nil, call the :loadout method."
       (assert (and x1 y1))
       (/update-position sprite x1 y1))))
 
-(define-method step cell (stepper)
+(define-method step gcell (stepper)
   "Respond to being stepped on by the STEPPER."
   (declare (ignore stepper)))
 
-(define-method is-light-source cell ()
+(define-method is-light-source gcell ()
   "Returns non-nil if this cell is a light source."
   (/in-category self :light-source))
 
@@ -599,42 +621,42 @@ When LOADOUT is non-nil, call the :loadout method."
 ;; an inventory, the first open slot is used. 
 ;; TODO allow arbitrary placement
 
-(define-method make-inventory cell ()
+(define-method make-inventory gcell ()
   "Create an empty <inventory> of length <max-items>."
   (setf <inventory> (make-array (/get-max-items self)
 				:initial-element nil
 				:adjustable nil)))
 
-(define-method make-equipment cell ()
+(define-method make-equipment gcell ()
   "Create an empty equipment property list."
   (setf <equipment> (mapcon #'(lambda (slot)
 				(list slot nil))
 			    <equipment-slots>)))
 
-(define-method get-max-items cell ()
+(define-method get-max-items gcell ()
   "Return the maximum number of items this container can hold."
   (assert <max-items>)
   (/stat-value self :max-items))
 
-(define-method set-container cell (container)
+(define-method set-container gcell (container)
   "Set the container pointer of this cell to CONTAINER.
 All contained cells maintain a pointer to their containers."
   (setf <container> container))
 
-(define-method is-container cell ()
+(define-method is-container gcell ()
   "Returns non-nil if this cell is a container."
   (/in-category self :container))
 
-(define-method is-item cell ()
+(define-method is-item gcell ()
   "Returns non-nil if this cell is a potential inventory item."
   (/in-category self :item))
 
-(define-method first-open-slot cell ()
+(define-method first-open-slot gcell ()
   "Return the integer position of the first open inventory slot, or
 nil if none."
   (position nil <inventory>))
 
-(define-method add-item cell (item)
+(define-method add-item gcell (item)
   "Add the ITEM to the cell's <inventory>.
 Return the new integer position if successful, nil otherwise."
   ;; TODO check whether we can combine items
@@ -645,7 +667,7 @@ Return the new integer position if successful, nil otherwise."
 	(/add-category item :contained)
 	(/set-container item self)))))
       
-(define-method remove-item cell (item)
+(define-method remove-item gcell (item)
   "Remove ITEM from the <inventory>.
 Return ITEM if successful, nil otherwise."
   (let* ((pos (position item <inventory>)))
@@ -655,16 +677,16 @@ Return ITEM if successful, nil otherwise."
 	(/delete-category item :contained)
 	(/set-container item nil)))))
 
-(define-method item-at cell (pos)
+(define-method item-at gcell (pos)
   "Return the item at inventory position POS."
   (assert <inventory>)
   (aref <inventory> pos))
 
-(define-method replace-item-at cell (item pos)
+(define-method replace-item-at gcell (item pos)
   "Replace the inventory item at position POS with ITEM."
   (setf (aref <inventory> pos) item))
 
-(define-method weight cell ()
+(define-method weight gcell ()
   "Recursively calculate the weight of this cell."
   (let ((total 0)
 	(inventory <inventory>)
@@ -673,14 +695,14 @@ Return ITEM if successful, nil otherwise."
 	;; recursively weigh the contents.
 	(progn
 	  (dotimes (n (length inventory))
-	    (setf cell (aref inventory n))
+	    (setf gcell (aref inventory n))
 	    (when cell
 	      (incf total (/weight cell))))
 	  total)
 	;; base case; just return the weight
 	(or <weight> 0))))
 
-(define-method drop-item cell (pos)
+(define-method drop-item gcell (pos)
   "Drop the item at inventory position POS."
   (let ((item (/item-at self pos)))
     (when item
@@ -689,7 +711,7 @@ Return ITEM if successful, nil otherwise."
 
 ;;; Finding and manipulating objects
 
-(define-method find cell (&key (direction :here) (index :top) category)
+(define-method find gcell (&key (direction :here) (index :top) category)
   (let ((world *world*))
     (multiple-value-bind (nrow ncol)
 	(step-in-direction <row> <column> direction)
@@ -698,7 +720,7 @@ Return ITEM if successful, nil otherwise."
 	    (let* ((cells (/cells-at world nrow ncol))
 		   (index2 (cond 
 			     ((not (null category))
-				(setf cell (/category-at-p world nrow ncol category))
+				(setf gcell (/category-at-p world nrow ncol category))
 				(position cell cells :test 'eq))
 			     ((and (eq :top index) (eq :here direction))
 			      ;; skip yourself and instead get the item you're standing on
@@ -709,17 +731,17 @@ Return ITEM if successful, nil otherwise."
 			      (when (array-in-bounds-p cells index)
 				index)))))
 	      (message "INDEX2: ~A" index2)
-	      (setf cell (aref cells index2))
+	      (setf gcell (aref cells index2))
 	      (values cell nrow ncol index2)))))))
 
-(define-method clear-location cell ()
+(define-method clear-location gcell ()
   (setf <row> nil <column> nil))
 
-(define-method delete-from-world cell ()
+(define-method delete-from-world gcell ()
   (/delete-cell *world* self <row> <column>))
 ;;  (/clear-location self))
 		       
-(define-method take cell (&key (direction :here) index category)
+(define-method take gcell (&key (direction :here) index category)
   "Take the item and return non-nil if successful."
   (multiple-value-bind (cell row column)
       (/find self :direction direction :index index :category category)
@@ -730,13 +752,13 @@ Return ITEM if successful, nil otherwise."
 	(/delete-from-world cell)
 	(/add-item self cell)))))
 
-(define-method use cell (user)
+(define-method use gcell (user)
   "Return non-nil if cell is used up and should disappear."
   (declare (ignore user))
   (prog1 nil
     (/say self "Nothing happens.")))
     
-(define-method resolve cell (reference &optional category)
+(define-method resolve gcell (reference &optional category)
   "Accept a REFERENCE to a cell, and try to get the real cell.
 The REFERENCE may be an object, one of the `*compass-directions*', an
 equipment slot keyword, or an integer denoting the nth inventory
@@ -765,34 +787,34 @@ slot."
 
 ;;; Equipment
 
-(define-method is-equipment cell ()
+(define-method is-equipment gcell ()
   "Return non-nil if this cell is a piece of equipment."
   (/in-category self :equipment))
 
-(define-method equipment-slot cell (slot)
+(define-method equipment-slot gcell (slot)
   "Return the equipment item (if any) in the slot named SLOT."
   (assert (member slot <equipment-slots>))
   (getf <equipment> slot))
 
-(define-method equipment-match cell (item)
+(define-method equipment-match gcell (item)
   "Return a list of possible slots on which this cell could equip
 ITEM. Returns nil if no such match is possible."
   (when (/is-equipment item)
     (intersection <equipment-slots> 
 		  (field-value :equip-for item))))
 
-(define-method add-equipment cell (item &optional slot)
+(define-method add-equipment gcell (item &optional slot)
   (let ((match (/equipment-match self item)))
     (setf (getf <equipment> 
 		(or slot (first match)))
 	  item)))
   		
-(define-method delete-equipment cell (slot)
+(define-method delete-equipment gcell (slot)
   (setf (getf <equipment> slot) nil))
 
 ;; todo rewrite this and decouple the messaging
 
-(define-method equip cell (&optional reference slot)
+(define-method equip gcell (&optional reference slot)
   (unless reference
     (error "Cannot resolve null reference during equipping."))
   ;; (unless (keywordp slot)
@@ -830,7 +852,7 @@ ITEM. Returns nil if no such match is possible."
 		   (/>>say :narrator "This can only be equipped in one of: ~A"
 			  (field-value :equip-for item)))))))))))
     
-(define-method dequip cell (slot)
+(define-method dequip gcell (slot)
   ;; TODO document
   ;; TODO narration
   (let ((item (getf <equipment> slot)))
@@ -844,7 +866,7 @@ ITEM. Returns nil if no such match is possible."
 ;; Automatic inventory and equipment loadout for new cells.
 ;; See how this is used in worlds.lisp.
 
-(define-method loadout cell ()
+(define-method loadout gcell ()
   "This is called for cells after being dropped in a world, with a
 non-nil :loadout argument. It can also be triggered manually.  Use
 `loadout' for things that have to be done while in a world. (During
@@ -854,17 +876,17 @@ world or have a location."
 
 ;;;; Starting
 
-(define-method start cell ()
+(define-method start gcell ()
   "This method is invoked on cells whenever a new world map is visited."
   nil)
 
 ;;; Combat
 
-(define-method attack cell (target)
+(define-method attack gcell (target)
   (if (null <attacking-with>)
       (/>>say :narrator "No attack method specified.")
       (let* ((weapon (/equipment-slot self <attacking-with>))
-	     (target-cell (/resolve self target))
+	     (target-gcell (/resolve self target))
 	     (target-name (field-value :name target-cell)))
 	(if (null weapon)
 	    (when (/is-player self)
@@ -891,7 +913,7 @@ world or have a location."
 		    (when (/is-player self)
 		      (/>>narrateln :narrator "You missed.")))))))))
   
-(define-method fire cell (direction)
+(define-method fire gcell (direction)
   (let ((weapon (/equipment-slot self <firing-with>)))
     (if weapon
 	(progn 
@@ -899,7 +921,7 @@ world or have a location."
 	  (/fire weapon direction))
 	(/>>narrateln :narrator "Nothing to fire with."))))
 
-(define-method damage cell (damage-points)
+(define-method damage gcell (damage-points)
   (when (has-field :hit-points self)
     (progn 
       (/stat-effect self :hit-points (- damage-points))
@@ -908,7 +930,7 @@ world or have a location."
       ;; (when (/is-player self)
       ;; 	(/>>say :narrator "You take ~D hit points of damage." damage-points)))))
 	
-(define-method die cell ()
+(define-method die gcell ()
   "Abandon this cell to the garbage collector."
   (if (/in-category self :dead)
       (message "Warning: called die on dead cell!")
@@ -917,19 +939,19 @@ world or have a location."
 	(/add-category self :dead)
 	(/delete-from-world self))))
 
-(define-method cancel cell ()
+(define-method cancel gcell ()
   "This cell was scheduled for drop and possible loadout in a world,
 but this was canceled. A canceled cell should update any global state
 to reflect its disappearance; this is different from a dying cell." nil)
 
-(define-method expend-energy cell (amount)
+(define-method expend-energy gcell (amount)
   (when (< amount (/stat-value self :energy))
     (prog1 t
       (/stat-effect self :energy (- amount)))))
 
 (defparameter *default-sample-hearing-range* 15)
 
-(define-method play-sample cell (sample-name)
+(define-method play-sample gcell (sample-name)
   "Play the sample SAMPLE-NAME.
 May be affected by the player's :hearing-range stat, if any."
   (when (/get-player *world*)
@@ -945,7 +967,7 @@ May be affected by the player's :hearing-range stat, if any."
       (when (> range dist)
 	(play-sample sample-name)))))
 
-(define-method say cell (format-string &rest args)
+(define-method say gcell (format-string &rest args)
   "Print a string to the message narration window. Arguments
 are as with `format'."
   (unless (/in-category self :dead)
@@ -958,26 +980,26 @@ are as with `format'."
       (when (> range dist)
 	(apply #'send-queue self :say :narrator format-string args)))))
 
-(define-method viewport-coordinates cell ()
+(define-method viewport-coordinates gcell ()
   "Return as values X,Y the world coordinates of CELL."
   (assert (and <row> <column>))
   (/get-viewport-coordinates (field-value :viewport *world*)
                             <row> <column>))
 
-(define-method image-coordinates cell ()
+(define-method image-coordinates gcell ()
   "Return as values X,Y the viewport image coordinates of CELL."
   (assert (and <row> <column>))
   (/get-image-coordinates (field-value :viewport *world*)
                          <row> <column>))
 
-(define-method screen-coordinates cell ()
+(define-method screen-coordinates gcell ()
   "Return as values X,Y the screen coordinates of CELL."
   (assert (and <row> <column>))
   (/get-screen-coordinates (field-value :viewport *world*)
 			  <row> <column>))
 
 ;; TODO is this needed?
-(define-method deserialize cell ()
+(define-method deserialize gcell ()
   (with-field-values (equipment) self
     (when (listp equipment)
       (loop while equipment do
@@ -987,20 +1009,20 @@ are as with `format'."
 	    (setf (field-value :equipper item)
 		  self)))))))
 
-(define-method hit cell (&optional other) nil)
+(define-method hit gcell (&optional other) nil)
 
-(define-method can-see-player cell ()
+(define-method can-see-player gcell ()
   (/line-of-sight *world* <row> <column> (/player-row *world*) (/player-column *world*)))
 
-(define-method can-see cell (cell &optional category)
+(define-method can-see gcell (cell &optional category)
   (/line-of-sight *world* <row> <column> (field-value :row cell) (field-value :column cell) category))
 
-(define-method can-see-* cell (r c &optional category)
+(define-method can-see-* gcell (r c &optional category)
   (/line-of-sight *world* <row> <column> r c category))
 
 ;;; User Interaction with keyboard and mouse
 
-(define-method select cell ()
+(define-method select gcell ()
   (/describe self))
 
 ;;; The asterisk cell is a wildcard
@@ -1045,8 +1067,8 @@ world, and collision detection is performed between sprites and cells.")
 (defun is-sprite (ob)
   (when (eq :sprite (field-value :type ob))))
 
-(defun is-cell (ob)
-  (when (eq :cell (field-value :type ob))))
+(defun is-gcell (ob)
+  (when (eq :gcell (field-value :type ob))))
 
 (define-method update-dimensions sprite ()
   (clon:with-fields (image height width) self
@@ -1170,7 +1192,7 @@ world, and collision detection is performed between sprites and cells.")
 	  ;; is left to right of other right?
 	  (< o-right x)))))
 
-(define-method do-collision cell (object)
+(define-method do-collision gcell (object)
   "Respond to a collision detected with OBJECT."
   nil)
 
@@ -1194,14 +1216,14 @@ world, and collision detection is performed between sprites and cells.")
   (/get-viewport-coordinates-* (field-value :viewport *world*)
 			      <x> <y>))
 
-(define-method grid-coordinates cell ()
+(define-method grid-coordinates gcell ()
   (values <row> <column>))
 
 (define-method grid-coordinates sprite ()
   (values (truncate (/ <y> (field-value :tile-size *world*)))
 	  (truncate (/ <x> (field-value :tile-size *world*)))))
 
-(define-method xy-coordinates cell ()
+(define-method xy-coordinates gcell ()
   (values (* <column> (field-value :tile-size *world*))
 	  (* <row> (field-value :tile-size *world*))))
 
@@ -1211,7 +1233,7 @@ world, and collision detection is performed between sprites and cells.")
 (define-method drop sprite (cell &optional (delta-row 0) (delta-column 0))
   (multiple-value-bind (r c)
       (/grid-coordinates self)
-    (/drop-cell *world* cell (+ r delta-row) (+ c delta-column))))
+    (/drop-cell *world* gcell (+ r delta-row) (+ c delta-column))))
   
 ;;; Popup text balloons
 
@@ -1275,7 +1297,7 @@ world, and collision detection is performed between sprites and cells.")
     (when (minusp (decf <timeout>))
       (/die self))))
 
-(define-method emote cell (text &key (timeout 8.0) (style :clear))
+(define-method emote gcell (text &key (timeout 8.0) (style :clear))
   (let* ((ftext (if (stringp text) (list (list (list text)))
 		    text))
 	 (balloon (clone =balloon= :text ftext :timeout timeout 

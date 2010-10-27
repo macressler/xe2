@@ -126,7 +126,7 @@ draw-pixel *user-keyboard-layout* *fullscreen* draw-circle
 set-field-option-value =pager= =pager-prompt= load-module
 =sprite-special= field-options world set-frame-rate *frame-rate*
 =stack= *workbook* set-resource-modified-p *pak-file-extension*
-*window-title* *window-position* =split= set-timer-interval
+*window-title* *window-position* =split= set-timer-interval =gcell= defgcell
 *message-logging* overlay poll-joystick-axis poll-joystick-button reset-joystick
 set-screen-width =universe= *universe* *play-args* set-screen-height
 genseq *zoom-factor* zoom-image is-zoomed-resource *timer-interval*
