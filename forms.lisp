@@ -20,6 +20,256 @@
 
 (in-package :xe2)
 
+;;; Pages are grids of cells.
+;;; Pages also ARE cells!
+
+(defparameter *default-page-z-size* 8)
+
+(defcell page 
+  (name :initform nil :documentation "Name of the page.")
+  (width :initform 16) 
+  (height :initform 16)
+  (modified :initform nil)
+  ;; cells 
+  (grid :documentation "A two-dimensional array of adjustable vectors of cells.")
+  (serialized-grid :documentation "A serialized sexp version.")
+  ;; forms processing
+  (variables :initform nil :documentation "Hash table mapping values to values, local to the form.")
+  ;; queueing 
+  (message-queue :initform (make-queue))
+  (excluded-fields :initform '(:grid)))
+
+(define-method initialize page (&key height width)
+    (when height (setf <height> height))
+    (when width (setf <width> width))
+    (setf <variables> (make-hash-table :test 'equal))
+    (/create-default-grid self))
+  
+(define-method make page (&rest parameters)
+  (/initialize self))
+
+(define-method make-with-parameters page (parameters)
+  (apply #'send self :make self parameters))
+
+(define-method set page (var value)
+  (setf (gethash var <variables>) value))
+
+(define-method get page (var)
+  (gethash var <variables>))
+
+(defun local-variable-value (var-name)
+  (/get *page* var-name))
+
+(defun set-local-variable-value (var-name value)
+  (/set *page* var-name value))
+
+(defsetf local-variable-value set-local-variable-value)
+
+(defmacro with-locals (vars &rest body)
+  (labels ((make-clause (sym)
+	     `(,sym (local-variable-value ,(make-keyword sym)))))
+    (let* ((symbols (mapcar #'make-non-keyword vars))
+	   (clauses (mapcar #'make-clause symbols)))
+      `(symbol-macrolet ,clauses ,@body))))
+
+(define-method grid-location page (row column)
+  "Return the vector of cells at ROW, COLUMN in the page SELF."
+  (when (array-in-bounds-p <grid> row column)
+    (aref <grid> row column)))
+
+(define-method grid-location-list page (row column)
+  (coerce (/grid-location self row column)
+	  'list))
+
+(define-method category-at-p page (row column category)
+  "Returns non-nil if there is any cell in CATEGORY at ROW, COLUMN.
+CATEGORY may be a list of keyword symbols or one keyword symbol."
+  (declare (optimize (speed 3)))
+  (let ((catlist (etypecase category
+		   (keyword (list category))
+		   (list category)))
+	(grid <grid>))
+    (declare (type (simple-array vector (* *)) grid))
+    (and (array-in-bounds-p grid row column)
+	 (some #'(lambda (cell)
+		   (when (intersection catlist
+				       (field-value :categories cell))
+		     cell))
+	       (aref grid row column)))))
+
+(define-method in-bounds-p page (row column)
+  "Return non-nil if ROW and COLUMN are valid coordinates."
+  (array-in-bounds-p <grid> row column))
+
+(define-method nth-cell page (n row column)
+  (aref (aref <grid> row column) n))
+
+(define-method top-cell page (row column)
+  (let ((cells (/grid-location self row column)))
+    (when (and cells (not (zerop (fill-pointer cells))))
+      (aref cells (- (fill-pointer cells) 1)))))
+
+(define-method drop-cell page (cell row column)
+  (vector-push-extend cell (aref <grid> row column)))
+
+(define-method replace-cell page (cell new-cell row column
+					&optional &key loadout no-collisions)
+  "Replace the CELL with NEW-CELL at ROW, COLUMN in this page."
+  (let* ((cells (/grid-location self row column))
+	 (pos (position cell cells)))
+    (if (numberp pos)
+	(setf (aref cells pos) new-cell)
+	(error "Could not find cell to replace."))))
+
+(define-method replace-cells-at page (row column data)
+  "Destroy the cells at ROW, COLUMN, invoking CANCEL on each,
+replacing them with the single cell (or vector of cells) DATA."
+  (when (array-in-bounds-p <grid> row column)
+    (do-cells (cell (aref <grid> row column))
+      (/cancel cell))
+    (setf (aref <grid> row column)
+	  (etypecase data
+	    (vector data)
+	    (clon:object (let ((cells (make-array *default-page-z-size* 
+						  :adjustable t
+						  :fill-pointer 0)))
+			   (prog1 cells
+			     (vector-push-extend data cells))))))
+    (do-cells (cell (aref <grid> row column))
+      (/set-location cell row column))))
+
+(define-method delete-cell page (cell row column)
+  "Delete CELL from the grid at ROW, COLUMN."
+  (ecase (field-value :type cell)
+    (:cell
+       (let* ((grid <grid>)
+	      (square (aref grid row column))
+	      (start (position cell square :test #'eq)))
+	 (declare (type (simple-array vector (* *)) grid) 
+		  (optimize (speed 3)))
+	 (when start
+	   (replace square square :start1 start :start2 (1+ start))
+	   (decf (fill-pointer square)))))
+    (:sprite
+       (/remove-sprite self cell))))
+    
+(define-method move page (cell row column)
+  "Move CELL to ROW, COLUMN."
+  (let* ((old-row (field-value :row cell))
+	 (old-column (field-value :column cell)))
+    (/delete-cell self cell old-row old-column)
+    (/drop-cell self cell row column)))
+
+(define-method delete-category-at page (row column category)
+  "Delete all cells in CATEGORY at ROW, COLUMN in the grid.
+The cells' :cancel method is invoked."
+  (let* ((grid <grid>))
+    (declare (type (simple-array vector (* *)) grid)
+	     (optimize (speed 3)))
+    (when (array-in-bounds-p grid row column)
+      (setf (aref grid row column)
+	    (delete-if #'(lambda (c) (when (/in-category c category)
+				       (prog1 t (/cancel c))))
+		       (aref grid row column))))))
+ 
+(define-method serialize page ()
+  (clon:with-field-values (width height) self
+    (let ((grid <grid>)
+	  (sgrid (make-array (list height width) :initial-element nil :adjustable nil)))
+      (dotimes (i height)
+	(dotimes (j width)
+	  (map nil #'(lambda (cell)
+		       (when cell 
+			 (push (clon:serialize cell) 
+			       (aref sgrid i j))))
+	       (aref grid i j))))
+      (setf <serialized-grid> sgrid))))
+    
+(define-method deserialize page ()
+    (/create-default-grid self)
+    (clon:with-field-values (width height grid sprites serialized-grid) self
+      (dotimes (i height)
+	(dotimes (j width)
+	  (map nil #'(lambda (cell)
+		       (when cell
+			 (vector-push-extend (clon:deserialize cell)
+					     (aref grid i j))))
+	       (reverse (aref serialized-grid i j)))))
+      (setf <serialized-grid> nil)))
+
+  
+(define-method create-grid page (&key width height)
+  "Initialize all the arrays for a page of WIDTH by HEIGHT cells."
+  (let ((dims (list height width)))
+    (let ((grid (make-array dims 
+		 :element-type 'vector :adjustable nil)))
+      ;; now put a vector in each square to represent the z-axis
+      (dotimes (i height)
+	(dotimes (j width)
+	  (setf (aref grid i j)
+		(make-array *default-page-z-size* 
+			    :adjustable t
+			    :fill-pointer 0))))
+      (setf <grid> grid
+	    <height> height
+	    <width> width)
+      ;; we need a grid of integers for the lighting map.
+      (setf <light-grid> (make-array dims
+				     :element-type 'integer
+				     :initial-element 0))
+      ;; and a grid of special objects for the environment map.
+      ;; (let ((environment (make-array dims)))
+      ;; 	(setf <environment-grid> environment)
+      ;; 	(dotimes (i height)
+      ;; 	  (dotimes (j width)
+      ;; 	    (setf (aref environment i j) (clone =environment=)))))
+      ;; sprite intersection data grid
+      (let ((sprite-grid (make-array dims :element-type 'vector :adjustable t)))
+	;; now put a vector in each square to collect intersecting sprites
+	(dotimes (i height)
+	  (dotimes (j width)
+	    (setf (aref sprite-grid i j)
+		(make-array *default-page-z-size* 
+			    :adjustable t
+			    :fill-pointer 0))))
+	(setf <sprite-grid> sprite-grid)
+	(setf <sprite-table> (make-hash-table :test 'equal))))))
+
+(define-method create-default-grid page ()
+  "If height and width have been set in a page's definition,
+initialize the arrays for a page of the size specified there."
+  (if (and (numberp <width>)
+	   (numberp <height>))
+      (/create-grid self :width <width> :height <height>)
+      (error "Cannot create default grid without height and width set.")))
+
+(define-method paste-region page (other-page dest-row dest-column source-row source-column source-height source-width 
+					       &optional deepcopy)
+    (loop for row from 0 to source-height
+	  do (loop for column from 0 to source-width
+		   do (let* ((cells (/grid-location other-page (+ row source-row) (+ column source-column)))
+			     (n 0))
+			(when (vectorp cells)
+			  (loop while (< n (fill-pointer cells)) do
+			    (let* ((cell (aref cells n))
+				   (proto (object-parent cell))
+				   (new-cell (if (or deepcopy (field-value :auto-deepcopy cell))
+						 ;; create a distinct object with the same local field values.
+						 (deserialize (serialize cell))
+						 ;; create a similar object
+						 (clone proto))))
+			      (/drop-cell self new-cell (+ row dest-row) (+ column dest-column) :exclusive nil))
+			    (incf n)))))))
+
+(define-method clone-onto page (other-page &optional deepcopy)
+  (let ((other (etypecase other-page
+		 (string (find-resource-object other-page))
+		 (clon:object other-page))))
+    (with-fields (height width) other
+      (/create-grid self :height height :width width)
+      (let ((*page* other))
+	(/paste-region self other 0 0 0 0 height width deepcopy)))))
+
 (defun generate-page-name (page)
   (concatenate 'string (get-some-object-name page) "-" (format nil "~S" (genseq))))
 
@@ -28,7 +278,7 @@
     (prog1 page
       (setf (field-value :name page)
 	    (or name (generate-page-name page)))
-      (/generate page))))
+      [make page])))
 
 (defun find-page (page)
   (etypecase page
@@ -47,7 +297,7 @@
        ;; it's an address
        (destructuring-bind (prototype-name &rest parameters) page
 	 (let ((page (clone (symbol-value prototype-name))))
-	   (/generate-with page parameters)
+	   [make-with-parameters page parameters]
 	   (find-page page))))
     (string (or (find-resource-object page :noerror)
 		(progn (make-object-resource page (create-blank-page :name page))
@@ -265,7 +515,7 @@
 		 (string (list newdata)))))
     (setf <buffer> lines)))
      
-;;; The form widget browses workbook pages composed of cells
+;;; The form GUI widget browses workbook pages composed of cells
 
 (defparameter *form-cursor-blink-time* 10)
 
@@ -313,9 +563,9 @@
       (send-parent self :initialize self)
       (/visit self page))))
 
-(define-method generate form (&rest parameters)
-  "Invoke the current page's default :generate method, passing PARAMETERS."
-  (/generate-with <page> parameters))
+(define-method blank form (&rest parameters)
+  "Invoke the current page's default :make method, passing PARAMETERS."
+  (/make-with-parameters <page> parameters))
 
 (define-method set-tool form (tool)
   "Set the current sheet's selected tool to TOOL."
@@ -413,7 +663,7 @@ See also CREATE-PAGE."
     (/clear-mark self)
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <cursor-row> (min <rows> <cursor-row>))
-    (setf <tile-size> (field-value :tile-size page))
+;;    (setf <tile-size> (field-value :tile-size page))
     (setf <cursor-column> (min <columns> <cursor-column>))
     (setf <column-widths> (make-array (+ 1 <columns>) :initial-element 0)
 	  <row-heights> (make-array (+ 1 <rows>) :initial-element 0)
@@ -422,7 +672,7 @@ See also CREATE-PAGE."
 
 (define-method cell-at form (row column)
   (assert (and (integerp row) (integerp column)))
-  (/top-cell-at <page> row column))
+  (/top-cell <page> row column))
 
 (define-method set-prompt form (prompt)
   (setf <prompt> prompt))

@@ -21,7 +21,8 @@
 (in-package :xe2)
 
 (define-prototype world
-    (:documentation "An XE2 game world filled with cells and sprites.
+    (:parent =page=
+	     :documentation "An XE2 game world filled with cells and sprites.
 Worlds are the focus of the action in XE2. A world is a 3-D grid of
 interacting cells. The world object performs the following tasks:
 
@@ -56,15 +57,10 @@ required for travel here." )
   (player :documentation "The player cell (or sprite).")
   (width :initform 16 :documentation "The width of the world map, measured in tiles.")
   (height :initform 16 :documentation "The height of the world map, measured in tiles.")
-  ;; cells 
-  (grid :documentation "A two-dimensional array of adjustable vectors of cells.")
-  (serialized-grid :documentation "A serialized sexp version.")
   ;; sprite cells
   (sprites :initform nil :documentation "A list of sprites.")
   (sprite-grid :initform nil :documentation "Grid for collecting sprite collision information.")
   (sprite-table :initform nil :documentation "Hash table to prevent redundant collisions.")
-  ;; forms processing
-  (variables :initform nil :documentation "Hash table mapping values to values, local to the form.")
   ;; environment 
   (environment-grid :documentation "A two-dimensional array of environment data cells.")
   ;; lighting 
@@ -78,8 +74,6 @@ At the moment, only 0=off and 1=on are supported.")
   ;; action-points 
   (phase-number :initform 1 :documentation "Integer number of current phase.")
   (turn-number :initform 1 :documentation "Integer number of elapsed user turns (actions).")
-  ;; queueing 
-  (message-queue :initform (make-queue))
   ;; narration 
   (narrator :documentation "The narration widget object.")
   ;; browsing 
@@ -101,32 +95,11 @@ At the moment, only 0=off and 1=on are supported.")
 (defparameter *default-world-axis-size* 10)
 (defparameter *default-world-z-size* 4)
 
-(define-method initialize world (&key height width)
-  (when height (setf <height> height))
-  (when width (setf <width> width))
-  (setf <variables> (make-hash-table :test 'equal))
-  (/create-default-grid self))
-
-(define-method set-variable world (var value)
-  (setf (gethash var <variables>) value))
-
-(define-method get-variable world (var)
-  (gethash var <variables>))
-
-(defun local-variable-value (var-name)
-  (/get-variable *world* var-name))
-
-(defun set-local-variable-value (var-name value)
-  (/set-variable *world* var-name value))
-
-(defsetf local-variable-value set-local-variable-value)
-
-(defmacro with-locals (vars &rest body)
-  (labels ((make-clause (sym)
-	     `(,sym (local-variable-value ,(make-keyword sym)))))
-    (let* ((symbols (mapcar #'make-non-keyword vars))
-	   (clauses (mapcar #'make-clause symbols)))
-      `(symbol-macrolet ,clauses ,@body))))
+;; (define-method initialize world (&key height width)
+;;   (when height (setf <height> height))
+;;   (when width (setf <width> width))
+;;   (setf <variables> (make-hash-table :test 'equal))
+;;   (/create-default-grid self))
 
 (define-method in-category world (category)
   "Returns non-nil when the cell SELF is in the category CATEGORY."
@@ -149,105 +122,8 @@ At the moment, only 0=off and 1=on are supported.")
   (pressure :initform nil :documentation "Atmospheric pressure, in multiples of Earth's.")
   (overlay :initform nil 
 	   :documentation "Possibly transparent image overlay to be drawn at this location."))
-  
-(define-method create-grid world (&key width height)
-  "Initialize all the arrays for a world of WIDTH by HEIGHT cells."
-  (let ((dims (list height width)))
-    (let ((grid (make-array dims 
-		 :element-type 'vector :adjustable nil)))
-      ;; now put a vector in each square to represent the z-axis
-      (dotimes (i height)
-	(dotimes (j width)
-	  (setf (aref grid i j)
-		(make-array *default-world-z-size* 
-			    :adjustable t
-			    :fill-pointer 0))))
-      (setf <grid> grid
-	    <height> height
-	    <width> width)
-      ;; we need a grid of integers for the lighting map.
-      (setf <light-grid> (make-array dims
-				     :element-type 'integer
-				     :initial-element 0))
-      ;; and a grid of special objects for the environment map.
-      ;; (let ((environment (make-array dims)))
-      ;; 	(setf <environment-grid> environment)
-      ;; 	(dotimes (i height)
-      ;; 	  (dotimes (j width)
-      ;; 	    (setf (aref environment i j) (clone =environment=)))))
-      ;; sprite intersection data grid
-      (let ((sprite-grid (make-array dims :element-type 'vector :adjustable t)))
-	;; now put a vector in each square to collect intersecting sprites
-	(dotimes (i height)
-	  (dotimes (j width)
-	    (setf (aref sprite-grid i j)
-		(make-array *default-world-z-size* 
-			    :adjustable t
-			    :fill-pointer 0))))
-	(setf <sprite-grid> sprite-grid)
-	(setf <sprite-table> (make-hash-table :test 'equal))))))
-
-(define-method paste-region world (other-world dest-row dest-column source-row source-column source-height source-width 
-					       &optional deepcopy)
-    (loop for row from 0 to source-height
-	  do (loop for column from 0 to source-width
-		   do (let* ((cells (/cells-at other-world (+ row source-row) (+ column source-column)))
-			     (n 0))
-			(when (vectorp cells)
-			  (loop while (< n (fill-pointer cells)) do
-			    (let* ((cell (aref cells n))
-				   (proto (object-parent cell))
-				   (new-cell (if (or deepcopy (field-value :auto-deepcopy cell))
-						 ;; create a distinct object with the same local field values.
-						 (deserialize (serialize cell))
-						 ;; create a similar object
-						 (clone proto))))
-			      (/drop-cell self new-cell (+ row dest-row) (+ column dest-column) :exclusive nil))
-			    (incf n)))))))
-
-(define-method clone-onto world (other-world &optional deepcopy)
-  (let ((other (etypecase other-world
-		 (string (find-resource-object other-world))
-		 (clon:object other-world))))
-    (with-fields (height width) other
-      (/create-grid self :height height :width width)
-      (let ((*world* other))
-	(/paste-region self other 0 0 0 0 height width deepcopy)))))
 
 ;; TODO define-method import-region (does not clone)
-
-(define-method serialize world ()
-  (clon:with-field-values (width height) self
-    (let ((grid <grid>)
-	  (sgrid (make-array (list height width) :initial-element nil :adjustable nil)))
-      (dotimes (i height)
-	(dotimes (j width)
-	  (map nil #'(lambda (cell)
-		       (when cell 
-			 (push (clon:serialize cell) 
-			       (aref sgrid i j))))
-	       (aref grid i j))))
-      (setf <serialized-grid> sgrid))))
-    
-(define-method deserialize world ()
-    (/create-default-grid self)
-    (clon:with-field-values (width height grid sprites serialized-grid) self
-      (dotimes (i height)
-	(dotimes (j width)
-	  (map nil #'(lambda (cell)
-		       (when cell
-			 (vector-push-extend (clon:deserialize cell)
-					     (aref grid i j))))
-	       (reverse (aref serialized-grid i j)))))
-      (setf <serialized-grid> nil)))
-
-(define-method create-default-grid world ()
-  "If height and width have been set in a world's definition,
-initialize the arrays for a world of the size specified there."
-  (if (and (numberp <width>)
-	   (numberp <height>))
-      (/create-grid self :width <width> :height <height>)
-      (error "Cannot create default grid without height and width set.")))
 
 (define-method resize-to-background world ()
   (with-fields (background tile-size height width) self
@@ -402,16 +278,6 @@ is the integer on the top of the stack."
 (define-method set-browser world (browser)
   (setf <browser> browser))
 
-(define-method cells-at world (row column)
-  "Return the vector of cells at ROW, COLUMN in the world SELF."
-  (when (array-in-bounds-p <grid> row column)
-    (aref <grid> row column)))
-
-(define-method top-cell-at world (row column)
-  (let ((cells (/cells-at self row column)))
-    (when (and cells (not (zerop (fill-pointer cells))))
-      (aref cells (- (fill-pointer cells) 1)))))
-
 (define-method random-place world (&optional &key avoiding distance)
   (clon:with-field-values (width height) self
     (let ((limit 10000)
@@ -428,24 +294,7 @@ is the integer on the top of the stack."
 	    while (and (not found) 
 		       (< n limit)))
       (values r c found))))
-		  
-(define-method replace-cells-at world (row column data)
-  "Destroy the cells at ROW, COLUMN, invoking CANCEL on each,
-replacing them with the single cell (or vector of cells) DATA."
-  (when (array-in-bounds-p <grid> row column)
-    (do-cells (cell (aref <grid> row column))
-      (/cancel cell))
-    (setf (aref <grid> row column)
-	  (etypecase data
-	    (vector data)
-	    (clon:object (let ((cells (make-array *default-world-z-size* 
-						  :adjustable t
-						  :fill-pointer 0)))
-			   (prog1 cells
-			     (vector-push-extend data cells))))))
-    (do-cells (cell (aref <grid> row column))
-      (/set-location cell row column))))
-    
+		      
 (define-method drop-sprite world (sprite x y &key no-collisions loadout)
   "Add a sprite to the world. When NO-COLLISIONS is non-nil, then the
 object will not be dropped when there is an obstacle. When LOADOUT is
@@ -515,15 +364,6 @@ cell is placed; nil otherwise."
 			    (* column tile-size)
 			    (* row tile-size)))))))
   
-(define-method replace-cell world (cell new-cell row column
-					&optional &key loadout no-collisions)
-  "Replace the CELL with NEW-CELL at ROW, COLUMN in this world."
-  (let* ((cells (/cells-at self row column))
-	 (pos (position cell cells)))
-    (if (numberp pos)
-	(setf (aref cells pos) new-cell)
-	(error "Could not find cell to replace."))))
-
 (define-method drop-player-at-entry world (player)
   "Drop the PLAYER at the first entry point."
   (with-field-values (width height grid tile-size) self
@@ -545,9 +385,6 @@ cell is placed; nil otherwise."
   (setf <player> player)
   (/drop-cell self player <player-exit-row> <player-exit-column>))
   
-(define-method nth-cell world (n row column)
-  (aref (aref <grid> row column) n))
-
 (define-method get-player world ()
   <player>)
 
@@ -590,31 +427,11 @@ cell is placed; nil otherwise."
 		  cell))
 	    (aref <grid> row column))))
 
-(define-method category-at-p world (row column category)
-  "Returns non-nil if there is any cell in CATEGORY at ROW, COLUMN.
-CATEGORY may be a list of keyword symbols or one keyword symbol."
-  (declare (optimize (speed 3)))
-  (let ((catlist (etypecase category
-		   (keyword (list category))
-		   (list category)))
-	(grid <grid>))
-    (declare (type (simple-array vector (* *)) grid))
-    (and (array-in-bounds-p grid row column)
-	 (some #'(lambda (cell)
-		   (when (intersection catlist
-				       (field-value :categories cell))
-		     cell))
-	       (aref grid row column)))))
-
 (define-method enemy-at-p world (row column)
   (/category-at-p self row column :enemy))
 
 ;; (define-method category-at-xy-p world (x y category)
 ;;   (let ((
-
-(define-method in-bounds-p world (row column)
-  "Return non-nil if ROW and COLUMN are valid coordinates."
-  (array-in-bounds-p <grid> row column))
 
 (define-method direction-to-player world (row column)
   "Return the general compass direction of the player from ROW, COLUMN."
@@ -925,33 +742,6 @@ sources and ray casting."
 (define-method set-viewport world (viewport)
   "Set the viewport widget."
   (setf <viewport> viewport))
-
-(define-method delete-cell world (cell row column)
-  "Delete CELL from the grid at ROW, COLUMN."
-  (ecase (field-value :type cell)
-    (:cell
-       (let* ((grid <grid>)
-	      (square (aref grid row column))
-	      (start (position cell square :test #'eq)))
-	 (declare (type (simple-array vector (* *)) grid) 
-		  (optimize (speed 3)))
-	 (when start
-	   (replace square square :start1 start :start2 (1+ start))
-	   (decf (fill-pointer square)))))
-    (:sprite
-       (/remove-sprite self cell))))
-    
-(define-method delete-category-at world (row column category)
-  "Delete all cells in CATEGORY at ROW, COLUMN in the grid.
-The cells' :cancel method is invoked."
-  (let* ((grid <grid>))
-    (declare (type (simple-array vector (* *)) grid)
-	     (optimize (speed 3)))
-    (when (array-in-bounds-p grid row column)
-      (setf (aref grid row column)
-	    (delete-if #'(lambda (c) (when (/in-category c category)
-				       (prog1 t (/cancel c))))
-		       (aref grid row column))))))
 	
 (define-method line-of-sight world (r1 c1 r2 c2 &optional (category :obstacle))
   "Return non-nil when there is a direct Bresenham's line of sight
@@ -988,13 +778,6 @@ along grid squares between R1,C1 and R2,C2."
 				(incf i)))
 			    (return-from tracing t))))
 	      (prog1 retval nil))))))))
-
-(define-method move-cell world (cell row column)
-  "Move CELL to ROW, COLUMN."
-  (let* ((old-row (field-value :row cell))
-	 (old-column (field-value :column cell)))
-    (/delete-cell self cell old-row old-column)
-    (/drop-cell self cell row column)))
 
 ;;; The sprite layer. See also viewport.lisp
 
@@ -1271,6 +1054,5 @@ prototype declaration. This is a convenience macro for defining new
 worlds."
   `(define-prototype ,name (:parent =world=)
      ,@args))
-
 
 ;;; worlds.lisp ends here

@@ -82,42 +82,28 @@
 (defparameter *window-width* 1280)
 (defparameter *window-height* 720)
 (defparameter *prompt-height* 20)
-(defparameter *quickhelp-height* 100)
+(defparameter *quickhelp-height* 140)
 (defparameter *quickhelp-width* 390)
 (defparameter *quickhelp-spacer* 0)
 (defparameter *terminal-height* 100)
 (defparameter *pager-height* 20)
-(defparameter *sidebar-width* 400)
-
+(defparameter *sidebar-width* 200)
+(defparameter *status-height* (* 32 3))
+(defparameter *modes* '(:stomp :track :puzzle))
+(defvar *mode* :stomp)
 (defvar *form*)
 (defvar *terminal*)
 (defvar *prompt*)
 (defvar *pager*)
-(defvar *forms*)
+(defvar *frame*)
+(defvar *track*)
 
 (defun handle-xiobeat-command (command)
   (assert (stringp command))
-  (/insert *prompt* command)
-  (/execute *prompt*))
+  [insert *prompt* command]
+  [execute *prompt*])
 
 (setf xe2:*form-command-handler-function* #'handle-xiobeat-command)
-
-(define-prototype help-prompt (:parent =prompt=)
-  (default-keybindings :initform '(("N" nil "page-down .")
-				   ("P" nil "page-up ."))))
-
-(define-prototype help-textbox (:parent =textbox=))
-
-(define-method render help-textbox ()
-  (/parent>>render self)
-  (/message *pager* 
-	   (list (format nil " --- Showing lines ~A-~A of ~A. Use PAGE UP and PAGE DOWN to scroll the text." 
-			 <point-row> (+ <point-row> <max-displayed-rows>) (length <buffer>)))))
-
-(add-hook '*after-load-module-hook* (lambda ()
-				      (/message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*)))
-				      (when (string= *module* "xiobeat")
-					(/visit *form* "FrontPage"))))
 
 (define-prototype xiobeat-prompt (:parent xe2:=prompt=))
 
@@ -125,8 +111,8 @@
   (apply #'send nil :say *terminal* args))
 
 (define-method goto xiobeat-prompt ()
-  (/unfocus (/left-form *forms*))
-  (/unfocus (/right-form *forms*))
+  (/unfocus (/left-form *frame*))
+  (/unfocus (/right-form *frame*))
   (setf <mode> :direct))
 
 (define-method do-after-execute xiobeat-prompt ()
@@ -135,9 +121,9 @@
 
 (define-method exit xiobeat-prompt ()
   (/parent>>exit self)
-  (/refocus *forms*))
+  (/refocus *frame*))
 
-(define-prototype xiobeat-split (:parent xe2:=split=))
+(define-prototype xiobeat-frame (:parent xe2:=split=))
 
 (defparameter *qwerty-keybindings*
   '(;; arrow key cursor movement
@@ -156,10 +142,10 @@
     ("PAGEUP" nil :move-beginning-of-column)
     ("PAGEDOWN" nil :move-end-of-column)
     ;; switching windows
-    ("TAB" nil :switch-panes)
-    ("TAB" (:control) :switch-panes)
-    ("LEFT" (:control) :left-pane)
-    ("RIGHT" (:control) :right-pane)
+    ("TAB" nil :switch-pages)
+    ("TAB" (:control) :switch-pages)
+    ("LEFT" (:control) :left-page)
+    ("RIGHT" (:control) :right-page)
     ;; dropping commonly-used cells
     ("1" (:control) :drop-data-cell)
     ("2" (:control) :drop-command-cell)
@@ -179,8 +165,8 @@
     ("KP6" nil :move-cursor-right)
     ("KP8" (:control) :apply-right)
     ("KP2" (:control) :apply-left)
-    ("KP4" (:control) :left-pane)
-    ("KP6" (:control) :right-pane)
+    ("KP4" (:control) :left-page)
+    ("KP6" (:control) :right-page)
     ;; entering data and confirm/cancel
     ("RETURN" nil :enter)
     ("RETURN" (:control) :exit) ;; see also handle-key
@@ -195,72 +181,72 @@
     ("X" (:meta) :goto-prompt)
     ("T" (:control) :next-tool)))
 
-(define-method install-keybindings xiobeat-split ()
+(define-method install-keybindings xiobeat-frame ()
   (dolist (binding (case *user-keyboard-layout*
 		     (:qwerty *qwerty-keybindings*)
 		     (otherwise *qwerty-keybindings*)))
     (/generic-keybind self binding)))
 
-(define-method left-form xiobeat-split ()
+(define-method left-form xiobeat-frame ()
   (nth 0 <children>))
 
-(define-method right-form xiobeat-split ()
+(define-method right-form xiobeat-frame ()
   (nth 1 <children>))
 
-(define-method other-form xiobeat-split ()
+(define-method other-form xiobeat-frame ()
   (ecase <focus>
     (0 (/right-form self))
     (1 (/left-form self))))
 
-(define-method left-world xiobeat-split ()
+(define-method left-world xiobeat-frame ()
   (field-value :world (/left-form self)))
 
-(define-method right-world xiobeat-split ()
+(define-method right-world xiobeat-frame ()
   (field-value :world (/right-form self)))
 
-(define-method selected-form xiobeat-split ()
+(define-method selected-form xiobeat-frame ()
   (nth <focus> <children>))
 
-(define-method left-selected-data xiobeat-split ()
+(define-method left-selected-data xiobeat-frame ()
   (/get-selected-cell-data (/left-form self)))
 
-(define-method right-selected-data xiobeat-split ()
+(define-method right-selected-data xiobeat-frame ()
   (/get-selected-cell-data (/right-form self)))
 
-(define-method focus-left xiobeat-split ()
+(define-method focus-left xiobeat-frame ()
   (/focus (/left-form self))
   (/unfocus (/right-form self)))
 
-(define-method focus-right xiobeat-split ()
+(define-method focus-right xiobeat-frame ()
   (/focus (/right-form self))
   (/unfocus (/left-form self)))
 
-(define-method refocus xiobeat-split ()
+(define-method refocus xiobeat-frame ()
   (ecase <focus>
     (0 (/focus-left self))
     (1 (/focus-right self))))
 
-(define-method left-pane xiobeat-split ()
-  "Select the left spreadsheet pane."
-  (/say self "Selecting left pane.")
+(define-method left-page xiobeat-frame ()
+  "Select the left spreadsheet page."
+  (/say self "Selecting left page.")
   (/focus-left self)
   (setf <focus> 0))
 
-(define-method right-pane xiobeat-split ()
-  "Select the right spreadsheet pane."
-  (/say self "Selecting right pane.")
+(define-method right-page xiobeat-frame ()
+  "Select the right spreadsheet page."
+  (/say self "Selecting right page.")
   (/focus-right self)
   (setf <focus> 1))
 
-(define-method switch-panes xiobeat-split ()
+(define-method switch-pages xiobeat-frame ()
   (let ((newpos (mod (1+ <focus>) (length <children>))))
     (setf <focus> newpos)
     (ecase newpos
-      (0 (/left-pane self))
-      (1 (/right-pane self)))))
+      (0 (/left-page self))
+      (1 (/right-page self)))))
 
-(define-method apply-left xiobeat-split ()
-  "Move data LEFTWARD from right pane to left pane, applying current
+(define-method apply-left xiobeat-frame ()
+  "Move data LEFTWARD from right page to left page, applying current
 left side tool to the right side data."
   (let* ((form (/left-form self))
 	 (tool (field-value :tool form))
@@ -268,8 +254,8 @@ left side tool to the right side data."
     (/say self (format nil "Applying LEFT tool ~S to data ~S in LEFT form." tool data))
     (/apply-tool form data)))
 
-(define-method apply-right xiobeat-split ()
-  "Move data RIGHTWARD from left pane to right pane, applying current
+(define-method apply-right xiobeat-frame ()
+  "Move data RIGHTWARD from left page to right page, applying current
 right side tool to the left side data."
   (let* ((form (/right-form self))
 	 (tool (field-value :tool form))
@@ -277,7 +263,7 @@ right side tool to the left side data."
     (/say self (format nil "Applying RIGHT tool ~S to data ~S in RIGHT form." tool data))
     (/apply-tool form data)))
 
-(define-method paste xiobeat-split (&optional page)
+(define-method paste xiobeat-frame (&optional page)
   (let ((source (if page 
 		    (find-page page)
 		    (field-value :world (/other-form self))))
@@ -301,9 +287,9 @@ right side tool to the left side data."
 		   (sc (or left0 0)))
 	      (/paste-region destination source r0 c0 sr sc height width))))))))
   
-(define-method commands xiobeat-split ()
+(define-method commands xiobeat-frame ()
   "Syntax: command-name arg1 arg2 ...
-Available commands: HELP EVAL SWITCH-PANES LEFT-PANE RIGHT-PANE
+Available commands: HELP EVAL SWITCH-PAGES LEFT-PAGE RIGHT-PAGE
 NEXT-TOOL SET-TOOL APPLY-LEFT APPLY-RIGHT VISIT SELECT SAVE-ALL
 SAVE-MODULE LOAD-MODULE TILE-VIEW LABEL-VIEW QUIT VISIT APPLY-TOOL
 CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
@@ -420,12 +406,17 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 
 ;;; Displaying arrows as icons
 
-(defparameter *icon-height* 64)
-(defparameter *icon-width* 64)
+(defparameter *icon-height* 32)
+(defparameter *icon-width* 32)
+
+;; (defparameter *icon-images* 
+;;   '(:up "up" :left "left" :right "right" :down "down"
+;;     :a "a" :x "x" :y "y" :b "b" :period "period" :prompt "prompt"))
 
 (defparameter *icon-images* 
-  '(:up "up" :left "left" :right "right" :down "down"
-    :a "a" :x "x" :y "y" :b "b" :period "period" :prompt "prompt"))
+  '(:up "up-medium" :left "left-medium" :right "right-medium" :down "down-medium"
+    :a "a-medium" :x "x-medium" :y "y-medium" :b "b-medium" 
+    :period "period-medium" :prompt "prompt-medium"))
 
 (defun arrow-icon-image (arrow)
   (getf *icon-images* arrow))
@@ -433,29 +424,18 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 (defun arrow-icon-formatted-string (arrow)
   (list nil :image (arrow-icon-image arrow)))
 
-;;; Modes
-
-(defparameter *modes* '(:stomp :track :puzzle))
-
-(defvar *mode* :stomp)
-
-;;; Initial window size
-
-(defparameter *xiobeat-window-width* 800)
-(defparameter *xiobeat-window-height* 600)
-
 ;;; System status display widget
 
 (defparameter *margin-size* 16)
 
 (define-prototype status (:parent xe2:=widget=)
-  (height :initform *xiobeat-window-height*)
+  (height :initform *window-height*)
   (width :initform (+  (* 3 *icon-width*)
 			(* 2 *margin-size*))))
 
 (define-method render status ()
   (with-fields (image width height) self
-    (draw-box 0 0 width height :stroke-color ".gray10" :color ".gray10" 
+    (draw-box 0 0 width height :stroke-color ".forest green" :color ".forest green" 
 	      :destination image)
     (let ((x 0) 
 	  (y 0))
@@ -525,7 +505,6 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 (define-method up stomper ()
   (/insert *commander* :up)
   (play-sample "ting"))
-;  (play-sample "snare"))
 
 (define-method down stomper ()
   (play-sample "scratch")
@@ -539,35 +518,49 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
   (/insert *commander* :right)
   (play-sample "cymb"))
 
-(defun xiobeat ()
-  (xe2:message "Initializing Xiobeat...")
-  (setf xe2:*window-title* "Xiobeat")
-  (setf xe2:*output-chunksize* 128)
-  (xe2:set-screen-height *xiobeat-window-height*)
-  (xe2:set-screen-width *xiobeat-window-width*)
-  (let* ((prompt (clone =stomper=))
-	 (status (clone =status=))
-	 (commander (clone =commander=)))
-    [resize status :height 600 :width 200]
-    [move status :x 0 :y 0]
-    [resize prompt :height 20 :width 100]
-    [move prompt :x 200 :y 0]
-    [show prompt]
-    [resize commander :height 550 :width 580]
-    [move commander :x 200 :y 25]
-    [show commander]
-    (setf *commander* commander)
-    [set-receiver prompt prompt]
-    [install-keybindings prompt]
-    (xe2:reset-joystick)
-    (set-music-volume 255)
-    [insert *commander* :prompt]
-    (xe2:install-widgets status prompt commander)
-    (xe2:enable-classic-key-repeat 100 100)))
+;; (defun xiobeat ()
+;;   (xe2:message "Initializing Xiobeat...")
+;;   (setf xe2:*window-title* "Xiobeat")
+;;   (setf xe2:*output-chunksize* 128)
+;;   (xe2:set-screen-height *xiobeat-window-height*)
+;;   (xe2:set-screen-width *xiobeat-window-width*)
+;;   (let* ((engine (clone =stomper=))
+;; 	 (status (clone =status=))
+;; 	 (commander (clone =commander=)))
+;;     [resize status :height 600 :width 200]
+;;     [move status :x 0 :y 0]
+;;     [resize engine :height 20 :width 100]
+;;     [move engine :x 200 :y 0]
+;;     [show engine]
+;;     [resize commander :height 550 :width 580]
+;;     [move commander :x 200 :y 25]
+;;     [show commander]
+;;     (setf *commander* commander)
+;;     [set-receiver engine engine]
+;;     [install-keybindings engine]
+;;     (xe2:reset-joystick)
+;;     (set-music-volume 255)
+;;     (xe2:install-widgets status engine commander)
+;;     (xe2:enable-classic-key-repeat 100 100)))
+
+(define-prototype help-prompt (:parent =prompt=)
+  (default-keybindings :initform '(("N" nil "page-down .")
+				   ("P" nil "page-up ."))))
+
+(define-prototype help-textbox (:parent =textbox=))
+
+(define-method render help-textbox ()
+  (/parent>>render self)
+  (/message *pager* 
+	   (list (format nil " --- Showing lines ~A-~A of ~A. Use PAGE UP and PAGE DOWN to scroll the text." 
+			 <point-row> (+ <point-row> <max-displayed-rows>) (length <buffer>)))))
+
+(add-hook '*after-load-module-hook* (lambda ()
+				      (/message *pager* (list (format nil "  CURRENT MODULE: ~S." *module*)))
+				      (when (string= *module* "xiobeat")
+					(/visit *form* "FrontPage"))))
 
 (defun xiobeat ()
-  (setf xe2:*screen-width* *window-width*)
-  (setf xe2:*screen-height* *window-height*)
   (xe2:message "Initializing XIOBEAT...")
   (setf xe2:*window-title* "XIOBEAT")
   (clon:initialize)
@@ -579,26 +572,49 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
 	 (form2 (clone =form= "*scratch*"))
+	 (engine (clone =stomper=))
+ 	 (status (clone =status=))
+ 	 (commander (clone =commander=))
 	 (terminal (clone =narrator=))
-	 (split (clone =xiobeat-split=))
+	 (frame (clone =xiobeat-frame=))
 	 (stack (clone =stack=)))
     ;;
     (setf *form* form)
     (setf *prompt* prompt)
     (setf *terminal* terminal)
-    (setf *forms* split)
+    (setf *frame* frame)
     (labels ((resize-widgets ()
 	       (/say terminal "Resizing to ~S" (list :width *screen-width* :height *screen-height*))
 	       (/resize prompt :height *prompt-height* :width *screen-width*)
 	       (/resize form :height (- *screen-height* *terminal-height* 
+					*status-height*
 				       *prompt-height* *pager-height*) 
 		       :width (- *screen-width* *sidebar-width* 2))
-	       (/resize form2 :height (- *screen-height* *terminal-height* *prompt-height* *pager-height*) :width (- *sidebar-width* 2))
+	       (/resize form2 :height (- *screen-height* 
+					 *status-height* 
+					 *terminal-height* 
+					 *prompt-height* 
+					 *pager-height*) 
+			:width (- *sidebar-width* 2))
 	       (/resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*)
 	       (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
-	       (/resize split :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*))
+	       (/resize frame :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*))
 	       (/resize terminal :height *terminal-height* :width *screen-width*)
 	       (/resize quickhelp :height *quickhelp-height* :width *quickhelp-width*)
+	       ;;
+	       [resize status :height *status-height* :width *window-width*]
+	       [move status :x 0 :y 0]
+	       [show status]
+	       (setf *status* status)
+	       [resize engine :height 20 :width 100]
+	       [move engine :x 200 :y 0]
+	       [show engine]
+	       [resize commander :height 550 :width 580]
+	       [move commander :x 200 :y 25]
+	       [show commander]
+	       (setf *commander* commander)
+	       ;;	           [set-receiver prompt engine]
+	       [install-keybindings engine]
 	       (/move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*))
 	       (/auto-position *pager*)))
       (add-hook 'xe2:*resize-hook* #'resize-widgets))
@@ -607,10 +623,10 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     (/move prompt :x 0 :y 0)
     (/show prompt)
     (/install-keybindings prompt)
-    (/install-keybindings split)
+    (/install-keybindings frame)
     (/say prompt "Welcome to XIOBEAT. Press ALT-X to enter command mode, or F1 for help.")
     (/set-mode prompt :forward) ;; don't start with prompt on
-    (/set-receiver prompt split)
+    (/set-receiver prompt frame)
     ;; 
     (/resize form :height (- *screen-height* *terminal-height* 
 			    *prompt-height* *pager-height*) 
@@ -656,11 +672,11 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     ;;
     (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
     (/move stack :x 0 :y 0)
-    (/set-children stack (list split terminal prompt))
+    (/set-children stack (list frame status terminal prompt))
     ;;
-    (/resize split :width *screen-width* :height (- *screen-height* *pager-height* *terminal-height* *prompt-height*))
-    (/move split :x 0 :y 0)
-    (/set-children split (list form form2))
+    (/resize frame :width *screen-width* :height (- *screen-height* *pager-height* *terminal-height* *prompt-height*))
+    (/move frame :x 0 :y 0)
+    (/set-children frame (list form form2))
     ;;
     (/resize terminal :height *terminal-height* :width *screen-width*)
     (/move terminal :x 0 :y (- *screen-height* *terminal-height*))
@@ -670,13 +686,13 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     (setf *pager* (clone =pager=))
     (/auto-position *pager*)
     ;;
-    (/add-page *pager* :edit (list prompt stack split terminal quickhelp))
+    (/add-page *pager* :edit (list prompt stack frame terminal status quickhelp))
     (/add-page *pager* :help (list help-prompt help))
     (/select *pager* :edit)
+    (xe2:reset-joystick)
     (xe2:enable-classic-key-repeat 100 100)
-    (in-package :xe2)
-    (/focus-left *forms*)
-;;    (run-hook 'xe2:*resize-hook*)
+    [focus-left *frame*]
+    (run-hook 'xe2:*resize-hook*)
 ))
 
 (xiobeat)

@@ -27,12 +27,13 @@
 	       (:file "widgets")
 	       (:file "viewport")
 	       (:file "cells")
+	       (:file "gcells")
 	       (:file "narration")
 	       (:file "browser")
 	       (:file "mission")
+	       (:file "forms")
 	       (:file "worlds")
 	       (:file "path")
-	       (:file "util")
-	       (:file "forms")))
+	       (:file "util")))
 	       
 	       
