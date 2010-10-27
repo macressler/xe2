@@ -57,17 +57,17 @@
 (define-method get page (var)
   (gethash var <variables>))
 
-(defun local-variable-value (var-name)
+(defun page-variable (var-name)
   (/get *page* var-name))
 
-(defun set-local-variable-value (var-name value)
+(defun set-page-variable (var-name value)
   (/set *page* var-name value))
 
-(defsetf local-variable-value set-local-variable-value)
+(defsetf page-variable set-page-variable)
 
-(defmacro with-locals (vars &rest body)
+(defmacro with-page-variables (vars &rest body)
   (labels ((make-clause (sym)
-	     `(,sym (local-variable-value ,(make-keyword sym)))))
+	     `(,sym (page-variable ,(make-keyword sym)))))
     (let* ((symbols (mapcar #'make-non-keyword vars))
 	   (clauses (mapcar #'make-clause symbols)))
       `(symbol-macrolet ,clauses ,@body))))
@@ -508,7 +508,7 @@ initialize the arrays for a page of the size specified there."
   (mark-row :initform nil)
   (mark-column :initform nil)
   (scroll-margin :initform 0)
-  (view-style :initform :label)
+  (display-style :initform :label)
   (cursor-color :initform ".yellow")
   (focused :initform nil)
   (cursor-blink-color :initform ".magenta")
@@ -658,18 +658,18 @@ See also CREATE-PAGE."
 (define-method install-keybindings form ()
   nil)
 
-(define-method set-view-style form (style)
+(define-method set-display-style form (style)
   "Set the rendering style of the current form to STYLE.
 Must be one of (:image :label)."
-  (setf <view-style> style))
+  (setf <display-style> style))
 
 (define-method image-view form ()
   "Switch to image view in the current form."
-  (/set-view-style self :image))
+  (/set-display-style self :image))
 
 (define-method label-view form ()
   "Switch to label view in the current form."
-  (/set-view-style self :label))
+  (/set-display-style self :label))
 
 (define-method goto-prompt form ()
   "Jump to the command prompt."
@@ -791,7 +791,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
       (setf cell (/cell-at self row column))
       (when cell
 	(setf height (max height (/height cell)))))
-    (ecase <view-style>
+    (ecase <display-style>
       (:label (max (formatted-string-height *blank-cell-string*) height))
       (:image height))))
 	
@@ -801,7 +801,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
       (setf cell (/cell-at self row column))
       (when cell
 	(setf width (max width (/width cell)))))
-    (ecase <view-style> 
+    (ecase <display-style> 
       (:label (max width (formatted-string-width *blank-cell-string*)))
       (:image width))))
 
@@ -813,7 +813,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
   (dotimes (row <rows>)
     (setf (aref <row-heights> row)
 	  (/row-height self row))))
-
+    
 (defparameter *even-columns-format* '(:background ".gray50" :foreground ".gray10"))
 (defparameter *odd-columns-format* '(:background ".gray45" :foreground ".gray10"))
 
@@ -875,7 +875,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
     (with-field-values (cursor-row cursor-column row-heights page page-name 
 				   origin-row origin-column header-line status-line
 				   mark-row mark-column width height
-				   view-style header-style tool tool-methods entered focused
+				   display-style header-style tool tool-methods entered focused
 				   row-spacing rows columns draw-blanks column-widths) self
       (when <computing> (/compute self))
       (/compute-geometry self)
@@ -952,7 +952,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 				  :destination image))
 		      ;; see also cells.lisp
 		      (progn 
-			(ecase view-style
+			(ecase display-style
 			  (:label (/render cell image x y column-width))
 			  (:image (if (/in-category cell :drawn)
 				     (push (list cell x y) pending-draws)
@@ -987,7 +987,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		  ;; move to next column right
 		  (incf x (aref column-widths column))))
 	      ;; move to next row down ;; TODO fix row-spacing
-	      (incf y (+ (if (eq :image view-style)
+	      (incf y (+ (if (eq :image display-style)
 			     0 0) (aref row-heights row))))
 	    ;; draw any pending drawn cells
 	    (dolist (args pending-draws)

@@ -1,5 +1,4 @@
 
-
 ;; Copyright (C) 2010  David O'Toole
 
 ;; Author: David O'Toole <dto@gnu.org>

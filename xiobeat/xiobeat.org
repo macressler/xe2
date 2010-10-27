@@ -1,11 +1,16 @@
 * Tasks
 
-** TODO OpenAL http://www.devmaster.net/articles.php?catID=6
-** TODO register-music-finished
+* TODO indicate measures/rows 
+* TODO detect jump arrows
+* TODO right side pane browses/chooses patterns in module
+* TODO use expanded view to acommodate 8th and 16th notes (each row is a 
+* TODO background color of arrow gives 8th or 16th etc
+** TODO speed up forms display
 ** TODO audio resource browser
 ** TODO be able to change backing track 
-** TODO creating a module
-** TODO speed up forms display
+** TODO creating/saving a module
+** TODO OpenAL http://www.devmaster.net/articles.php?catID=6
+** TODO register-music-finished
 
 * Features
 

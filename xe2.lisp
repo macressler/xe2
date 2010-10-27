@@ -65,6 +65,7 @@
 generic-keybind *default-world-z-size* =browser= install-widgets
 =balloon= =form= keyboard-held-p keyboard-pressed-p keyboard-released-p
 keyboard-time-in-current-state keyboard-time-in-previous-state
+*timesteps*
 keyboard-down-p keyboard-keys-down keyboard-modifier-down-p
 keyboard-modifiers get-keys *module-package-name* module-package-name
 *form-command-handler-function* =data-cell= =var-cell= =option-cell=
@@ -134,8 +135,8 @@ genseq *zoom-factor* zoom-image is-zoomed-resource *timer-interval*
 save-modified-objects enable-timer disable-timer while defmission
 enable-held-keys disable-held-keys do-cells draw-box *resizable* achieve
 *resize-hook* draw-rectangle *quitting* *after-load-module-hook* *mission*
-mission-variable-value set-mission-variable-value with-mission-locals =mission=
-local-variable-value set-local-variable-value with-locals with-mission-locals
+mission-variable set-mission-variable with-mission-locals =mission=
+page-variable set-page-variable with-pages with-mission-locals
 *module* quit reset))
 
 (in-package :xe2)

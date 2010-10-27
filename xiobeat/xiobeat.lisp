@@ -127,11 +127,16 @@
     ;; switching windows
     ("TAB" nil :switch-pages)
     ("TAB" (:control) :switch-pages)
-    ("LEFT" (:control) :left-page)
-    ("RIGHT" (:control) :right-page)
+    ("LEFT" (:control) :select-left-page)
+    ("RIGHT" (:control) :select-right-page)
     ;; dropping commonly-used cells
     ("1" (:control) :drop-data-cell)
     ("2" (:control) :drop-command-cell)
+    ;; toggling arrows
+    ("1" nil :toggle-left)
+    ("2" nil :toggle-down)
+    ("3" nil :toggle-up)
+    ("4" nil :toggle-right)
     ;; performing operations like clone, erase
     ("UP" (:control) :apply-right)
     ("DOWN" (:control) :apply-left)
@@ -148,8 +153,8 @@
     ("KP6" nil :move-cursor-right)
     ("KP8" (:control) :apply-right)
     ("KP2" (:control) :apply-left)
-    ("KP4" (:control) :left-page)
-    ("KP6" (:control) :right-page)
+    ("KP4" (:control) :select-left-page)
+    ("KP6" (:control) :select-right-page)
     ;; entering data and confirm/cancel
     ("RETURN" nil :enter)
     ("RETURN" (:control) :exit) ;; see also handle-key
@@ -181,11 +186,11 @@
     (0 (/right-form self))
     (1 (/left-form self))))
 
-(define-method left-world xiobeat-frame ()
-  (field-value :world (/left-form self)))
+(define-method left-page xiobeat-frame ()
+  (field-value :page (/left-form self)))
 
-(define-method right-world xiobeat-frame ()
-  (field-value :world (/right-form self)))
+(define-method right-page xiobeat-frame ()
+  (field-value :page (/right-form self)))
 
 (define-method selected-form xiobeat-frame ()
   (nth <focus> <children>))
@@ -209,13 +214,13 @@
     (0 (/focus-left self))
     (1 (/focus-right self))))
 
-(define-method left-page xiobeat-frame ()
+(define-method select-left-page xiobeat-frame ()
   "Select the left spreadsheet page."
   (/say self "Selecting left page.")
   (/focus-left self)
   (setf <focus> 0))
 
-(define-method right-page xiobeat-frame ()
+(define-method select-right-page xiobeat-frame ()
   "Select the right spreadsheet page."
   (/say self "Selecting right page.")
   (/focus-right self)
@@ -249,8 +254,8 @@ right side tool to the left side data."
 (define-method paste xiobeat-frame (&optional page)
   (let ((source (if page 
 		    (find-page page)
-		    (field-value :world (/other-form self))))
-	(destination (field-value :world (/selected-form self))))
+		    (field-value :page (/other-form self))))
+	(destination (field-value :page (/selected-form self))))
     (multiple-value-bind (top left bottom right) (/mark-region (/selected-form self))
       (multiple-value-bind (top0 left0 bottom0 right0) (/mark-region (/other-form self))
 	(let ((source-height (field-value :height source))
@@ -275,8 +280,22 @@ right side tool to the left side data."
 Available commands: HELP EVAL SWITCH-PAGES LEFT-PAGE RIGHT-PAGE
 NEXT-TOOL SET-TOOL APPLY-LEFT APPLY-RIGHT VISIT SELECT SAVE-ALL
 SAVE-MODULE LOAD-MODULE IMAGE-VIEW LABEL-VIEW QUIT VISIT APPLY-TOOL
-CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
+CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
  nil)
+
+;;; Toggling arrows in the form editor
+
+(define-method toggle-left xiobeat-frame ()
+  (/toggle (/cell-at self (field-value :cursor-row (/selected-form self)) 0)))
+
+(define-method toggle-down xiobeat-frame ()
+  (/toggle (/cell-at self (field-value :cursor-row (/selected-form self)) 1)))
+
+(define-method toggle-up xiobeat-frame ()
+  (/toggle (/cell-at self (field-value :cursor-row (/selected-form self)) 2)))
+
+(define-method toggle-right xiobeat-frame ()
+  (/toggle (/cell-at self (field-value :cursor-row (/selected-form self)) 3)))
 
 ;;; Main command prompt
 
@@ -326,14 +345,15 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 ;; A dance phrase is a sequence of dance pad button presses. Each
 ;; phrase consists of an optional command prefix (one of the corner
 ;; buttons, with each one controlling a separate system function)
-;; followed by zero or more of the dance arrows (up, down, left, or
-;; right.) A phrase is terminated by a "period" (represented by a
+;; followed by zero or more dance arrows (up, down, left, or right) or
+;; jumps (:up-left, :up-right, :up-down, :left-right, :down-left,
+;; :down-right) A phrase is terminated by a "period" (represented by a
 ;; circle) which can be entered using any of the four corner
 ;; buttons. The period immediately executes the command (if any). You
 ;; can enter each of the four system menus by double stomping a corner
 ;; arrow, i.e. a command phrase with no arrows in it.
 
-(defparameter *dance-arrows* '(:left :right :up :down))
+(defparameter *dance-arrows* '(:left :down :up :right)) ;; in standard order
 
 (defparameter *corner-buttons* '(:a :b :x :y))
 
@@ -475,7 +495,8 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 ;;; Step charts are pages full of steps
 
 (defcell step
-  (arrow :initform :blank))
+  (arrow :initform :blank)
+  (state :iniform nil))
 
 (define-method get step () <arrow>)
 
@@ -484,6 +505,23 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
   (with-fields (arrow image) self
     (setf arrow new-arrow)
     (setf image (arrow-icon-image new-arrow))))
+
+(define-method is-active step ()
+  <state>)
+
+(define-method activate step ()
+  (setf <state> t)
+  (setf <image> (arrow-icon-image <arrow>)))
+
+(define-method deactivate step ()
+  (setf <state> nil)
+  (setf <image> (arrow-icon-image :blank)))
+
+(define-method toggle step ()
+  (with-fields (state) self
+    (if [is-active self]
+	[deactivate self]
+	[activate self])))
 
 (define-method print step ()
   (format nil "~S" <arrow>))
@@ -494,17 +532,24 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     (setf <arrow> input)))
 
 (define-method initialize step (&optional (arrow :blank))
-  (/set self arrow))
+  (/set self arrow)
+  [deactivate self])
 
-(define-prototype chart (:parent =page=))
+(define-prototype chart (:parent =page=))  
 
-(define-method make chart (&rest parameters)
-  (apply #'/initialize self parameters)
+(define-method make chart (&key (zoom 2) (bars 2))
+  (/initialize self 
+	       :width (length *dance-arrows*)
+	       :height (* 4 zoom bars))
   (with-field-values (height width grid) self
-    (dotimes (i height)
-      (dotimes (j width)
-	(vector-push-extend (clone =step=)
-			    (aref grid i j))))))
+    (setf (page-variable :zoom) zoom)
+    (setf (page-variable :bars) bars)
+    (dotimes (row height)
+      (dotimes (column width)
+	(let ((step (clone =step=)))
+	  (/set step (nth column *dance-arrows*)) 
+	  (/deactivate step)
+	  (vector-push-extend step (aref grid row column)))))))
 
 ;;; Stomp mode is the basic functionality the other modes build on.
 
@@ -731,7 +776,8 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
     (/select *pager* :edit)
     (xe2:reset-joystick)
     (xe2:enable-classic-key-repeat 100 100)
-    [focus-left *frame*]
+    (/focus-left *frame*)
+    (/image-view (/left-form *frame*))
     (run-hook 'xe2:*resize-hook*)
 ))
 
