@@ -1,6 +1,11 @@
 * Tasks
-** TODO  
 
+** TODO OpenAL http://www.devmaster.net/articles.php?catID=6
+** TODO register-music-finished
+** TODO audio resource browser
+** TODO be able to change backing track 
+** TODO creating a module
+** TODO speed up forms display
 
 * Features
 
@@ -9,7 +14,8 @@
 ** Backing tracks can be XM or 
 ** Dance gesture input system
 *** Instead of navigating menus, you use short sequences of dance steps to trigger actions.
-**** Could mean a learning curve, but dance game fans might be interested in that.
+**** Could mean a learning curve, but dance game fans might be interested in
+ that.
 *** un-prefixed dance steps (:up :down :left :right) in sequence trigger song-specific actions
 *** the phrases have a simple onscreen representation as an icon with a title
 *** you don't have to memorize the phrases, but it helps 
