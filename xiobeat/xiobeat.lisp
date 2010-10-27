@@ -105,24 +105,6 @@
 
 (setf xe2:*form-command-handler-function* #'handle-xiobeat-command)
 
-(define-prototype xiobeat-prompt (:parent xe2:=prompt=))
-
-(define-method say xiobeat-prompt (&rest args)
-  (apply #'send nil :say *terminal* args))
-
-(define-method goto xiobeat-prompt ()
-  (/unfocus (/left-form *frame*))
-  (/unfocus (/right-form *frame*))
-  (setf <mode> :direct))
-
-(define-method do-after-execute xiobeat-prompt ()
-  (/clear-line self)  
-  (setf <mode> :forward))
-
-(define-method exit xiobeat-prompt ()
-  (/parent>>exit self)
-  (/refocus *frame*))
-
 (define-prototype xiobeat-frame (:parent xe2:=split=))
 
 (defparameter *qwerty-keybindings*
@@ -295,6 +277,26 @@ SAVE-MODULE LOAD-MODULE TILE-VIEW LABEL-VIEW QUIT VISIT APPLY-TOOL
 CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
  nil)
 
+;;; Main command prompt
+
+(define-prototype xiobeat-prompt (:parent xe2:=prompt=))
+
+(define-method say xiobeat-prompt (&rest args)
+  (apply #'send nil :say *terminal* args))
+
+(define-method goto xiobeat-prompt ()
+  (/unfocus (/left-form *frame*))
+  (/unfocus (/right-form *frame*))
+  (setf <mode> :direct))
+
+(define-method do-after-execute xiobeat-prompt ()
+  (/clear-line self)  
+  (setf <mode> :forward))
+
+(define-method exit xiobeat-prompt ()
+  (/parent>>exit self)
+  (/refocus *frame*))
+
 ;;; Dance pad layout
 
 ;;    The diagram below gives the intended dance pad layout for
@@ -381,8 +383,8 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 ;; Other commands must be configured per layout, currently there are
 ;; none.
 
-(defparameter *qwerty-keybindings*
-  (append *basic-keybindings* nil))
+;; (defparameter *qwerty-keybindings*
+;;   (append *basic-keybindings* nil))
 
 ;; Including configurations for common dance pads is a good idea.
 ;; Eventually we need a real configuration menu (for the beta.)
@@ -597,7 +599,6 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 					 *pager-height*) 
 			:width (- *sidebar-width* 2))
 	       (/resize-to-scroll help :height (- *screen-height* *pager-height*) :width *screen-width*)
-	       (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
 	       (/resize frame :width (- *screen-width* 1) :height (- *screen-height* *pager-height* *prompt-height* *terminal-height*))
 	       (/resize terminal :height *terminal-height* :width *screen-width*)
 	       (/resize quickhelp :height *quickhelp-height* :width *quickhelp-width*)
@@ -614,6 +615,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 	       [show commander]
 	       (setf *commander* commander)
 	       ;;	           [set-receiver prompt engine]
+	       (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
 	       [install-keybindings engine]
 	       (/move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*))
 	       (/auto-position *pager*)))
