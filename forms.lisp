@@ -255,8 +255,7 @@ initialize the arrays for a page of the size specified there."
   (let ((page (clone =page= :height height :width width)))
     (prog1 page
       (setf (field-value :name page)
-	    (or name (generate-page-name page)))
-      [make page])))
+	    (or name (generate-page-name page))))))
 
 (defun find-page (page)
   (etypecase page
@@ -725,6 +724,7 @@ Type HELP :COMMANDS for a list of available commands."
 If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
   (let ((page (or object (create-blank-page :height height :width width :name name))))
     (when name (setf (field-value :name page) name))
+    (/make page)
     (/visit self page)))
 
 (define-method enter form ()

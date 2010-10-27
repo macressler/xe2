@@ -492,11 +492,11 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 
 (define-method make chart (&rest parameters)
   (apply #'/initialize self parameters)
-  (with-field-values (height width) self
+  (with-field-values (height width grid) self
     (dotimes (i height)
       (dotimes (j width)
 	(vector-push-extend (clone =step=)
-			    (/grid-location self i j))))))
+			    (aref grid i j))))))
 
 ;;; Stomp mode is the basic functionality the other modes build on.
 

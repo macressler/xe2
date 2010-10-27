@@ -32,14 +32,15 @@
   (categories :initform nil :documentation "List of category keyword symbols")
   (label :initform nil :documentation "Optional string or formatted line to display.")
   row column
+  (widget :initform nil)
   (image :initform nil :documentation "Image to display. either a resource name string, or an XE2 image object."))
   
-(defparameter *default-cell-width* 64)
+(defparameter *default-cell-width* 32)
 
 (define-method width cell () 
-  (with-field-values (widget image) self
-    (cond (widget (image-height (field-value :image widget)))
-	  (image (image-height image))
+  (with-field-values (widget image label) self
+    (cond (widget (image-width (field-value :image widget)))
+	  (image (image-width image))
 	  (label (formatted-line-width (/label self)))
 	  (t *default-cell-width*))))
 
@@ -51,7 +52,7 @@
 	  (t *default-cell-width*))))
 
 (define-method render cell (dest x y width)
-  (with-field-values (widget image)
+  (with-field-values (widget image) self
       (cond (widget 
 	     (/render widget)
 	     (draw-image (field-value :image widget)
