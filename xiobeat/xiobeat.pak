@@ -36,6 +36,7 @@
  (:name "y" :type :image :file "y.png")
  (:name "prompt" :type :image :file "prompt.png")
  (:name "period" :type :image :file "period.png")
+ (:name "blank" :type :image :file "blank.png")
 
  (:name "up-medium" :type :image :file "up-medium.png")
  (:name "down-medium" :type :image :file "down-medium.png")
@@ -47,6 +48,7 @@
  (:name "y-medium" :type :image :file "y-medium.png")
  (:name "prompt-medium" :type :image :file "prompt-medium.png")
  (:name "period-medium" :type :image :file "period-medium.png")
+ (:name "blank-medium" :type :image :file "blank-medium.png")
 
  (:name "xiobeat-help-message" :type :text :file "README")
  (:name "xiobeat-quickhelp-message" :type :formatted-text :file	 "quickhelp.text")

@@ -1,4 +1,4 @@
-;;; xiobeat --- freestyle video dance engine
+;;; xiobeat --- free video dance engine
 
 ;;       _       _                _   
 ;; __  _(_) ___ | |__   ___  __ _| |_ 
@@ -28,9 +28,9 @@
 
 ;; XIOBEAT is a "video dance engine", at once both a rhythm game and a
 ;; music creation tool, and suitable for solo freestyling and group
-;; performance. Between one and four players may use the numeric
-;; keypad, USB dance pads, or virtually any other standard USB
-;; joystick for controlling and performing sounds, and multiple
+;; performance. Between one and four players may use the keyboard,
+;; mouse, USB dance pads, or virtually any other standard USB
+;; controller for creating and performing sounds, and multiple
 ;; simultaneous input devices are supported. XIOBEAT is fully
 ;; extensible in Common Lisp.
 
@@ -101,8 +101,8 @@
 
 (defun handle-xiobeat-command (command)
   (assert (stringp command))
-  [insert *prompt* command]
-  [execute *prompt*])
+  (/insert *prompt* command)
+  (/execute *prompt*))
 
 (setf xe2:*form-command-handler-function* #'handle-xiobeat-command)
 
@@ -295,12 +295,12 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
   (setf <mode> :forward))
 
 (define-method exit xiobeat-prompt ()
-  (/parent>>exit self)
+  [parent>>exit self]
   (/refocus *frame*))
 
 ;;; Dance pad layout
 
-;;    The diagram below gives the intended dance pad layout for
+;;    The diagram below gives the standard dance pad layout for
 ;;    XIOBEAT. Many generic USB and/or game console compatible dance
 ;;    pads are marked this way. (Some pads are printed with "back"
 ;;    instead of "select").
@@ -339,8 +339,10 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 
 (defparameter *function-buttons* '(:select :start))
 
+(defparameter *punctuation* '(:period :blank))
+
 (defparameter *dance-phrase-symbols*
-  (append *dance-arrows* *corner-buttons* *function-buttons*))
+  (append *punctuation* *dance-arrows* *corner-buttons* *function-buttons*))
 
 ;; Track-specific phrases have no command prefix. These trigger sounds
 ;; or other events.
@@ -358,7 +360,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 ;; The dance pad layout shown above is also available on the numeric
 ;; keypad.
 
-(defparameter *basic-keybindings* 
+(defparameter *dance-keybindings* 
   '(("Q" (:control) "quit .")
     ("KP8" nil "up .")
     ("KP4" nil "left .")
@@ -419,7 +421,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 (defparameter *icon-images* 
   '(:up "up-medium" :left "left-medium" :right "right-medium" :down "down-medium"
     :a "a-medium" :x "x-medium" :y "y-medium" :b "b-medium" 
-    :period "period-medium" :prompt "prompt-medium"))
+    :period "period-medium" :prompt "prompt-medium" :blank "blank-medium"))
 
 (defun arrow-icon-image (arrow)
   (getf *icon-images* arrow))
@@ -470,12 +472,38 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 (define-method insert commander (arrow)
   (/print-formatted-string self (arrow-icon-formatted-string arrow)))
 
+;;; Step charts are pages full of steps
+
+(defcell step
+  (arrow :initform :blank))
+
+(define-method get step () <arrow>)
+
+(define-method set step (new-arrow)
+  (assert (member new-arrow *dance-phrase-symbols*))
+  (with-fields (arrow image) self
+    (setf arrow new-arrow)
+    (setf image (arrow-icon-image new-arrow))))
+
+(define-method initialize step (&optional (arrow :blank))
+  (/set self arrow))
+
+(define-prototype chart (:parent =page=))
+
+(define-method make chart (&rest parameters)
+  (apply #'/initialize self parameters)
+  (with-field-values (height width) self
+    (dotimes (i height)
+      (dotimes (j width)
+	(vector-push-extend (clone =step=)
+			    (/grid-location self i j))))))
+
 ;;; Stomp mode is the basic functionality the other modes build on.
 
 (define-prototype stomper (:parent xe2:=prompt=))
   
 (define-method install-keybindings stomper ()
-  (dolist (k *basic-keybindings*)
+  (dolist (k *dance-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
 
 (define-method quit stomper ()
@@ -553,7 +581,7 @@ CLONE ERASE CREATE-WORLD PASTE QUIT ENTER EXIT"
 (define-prototype help-textbox (:parent =textbox=))
 
 (define-method render help-textbox ()
-  (/parent>>render self)
+  [parent>>render self]
   (/message *pager* 
 	   (list (format nil " --- Showing lines ~A-~A of ~A. Use PAGE UP and PAGE DOWN to scroll the text." 
 			 <point-row> (+ <point-row> <max-displayed-rows>) (length <buffer>)))))

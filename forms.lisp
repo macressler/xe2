@@ -196,7 +196,6 @@ The cells' :cancel method is invoked."
 					     (aref grid i j))))
 	       (reverse (aref serialized-grid i j)))))
       (setf <serialized-grid> nil)))
-
   
 (define-method create-grid page (&key width height)
   "Initialize all the arrays for a page of WIDTH by HEIGHT cells."
@@ -212,28 +211,7 @@ The cells' :cancel method is invoked."
 			    :fill-pointer 0))))
       (setf <grid> grid
 	    <height> height
-	    <width> width)
-      ;; we need a grid of integers for the lighting map.
-      (setf <light-grid> (make-array dims
-				     :element-type 'integer
-				     :initial-element 0))
-      ;; and a grid of special objects for the environment map.
-      ;; (let ((environment (make-array dims)))
-      ;; 	(setf <environment-grid> environment)
-      ;; 	(dotimes (i height)
-      ;; 	  (dotimes (j width)
-      ;; 	    (setf (aref environment i j) (clone =environment=)))))
-      ;; sprite intersection data grid
-      (let ((sprite-grid (make-array dims :element-type 'vector :adjustable t)))
-	;; now put a vector in each square to collect intersecting sprites
-	(dotimes (i height)
-	  (dotimes (j width)
-	    (setf (aref sprite-grid i j)
-		(make-array *default-page-z-size* 
-			    :adjustable t
-			    :fill-pointer 0))))
-	(setf <sprite-grid> sprite-grid)
-	(setf <sprite-table> (make-hash-table :test 'equal))))))
+	    <width> width))))
 
 (define-method create-default-grid page ()
   "If height and width have been set in a page's definition,
@@ -727,7 +705,7 @@ Type HELP :COMMANDS for a list of available commands."
     (with-field-values (prompt) self
       (when prompt
 	(/print-data prompt (format nil "Command name: ~A" command) :comment)
-	(/print-data prompt (format nil "Arguments: ~S" (if (eq arglist :not-available)
+	(/print-data prompt (format nil "Arguments: ~a" (if (eq arglist :not-available)
 					       :none arglist))
 		    :comment)
 	(/print-data prompt (format nil" ~A" docstring) :comment)))))
@@ -814,7 +792,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
     (dotimes (column <columns>)
       (setf cell (/cell-at self row column))
       (when cell
-	(setf height (max height (/form-height cell)))))
+	(setf height (max height (/height cell)))))
     (ecase <view-style>
       (:label (max (formatted-string-height *blank-cell-string*) height))
       (:tile <tile-size>))))
@@ -1163,6 +1141,5 @@ DIRECTION is one of :up :down :right :left."
 
 (define-method drop-command-cell form ()
   (/drop-at-cursor self =command-cell=))
-
 
 ;;; forms.lisp ends here
