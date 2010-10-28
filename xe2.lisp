@@ -138,7 +138,7 @@ draw-rectangle *quitting* *after-load-module-hook* *mission*
 mission-variable set-mission-variable with-mission-locals =mission=
 set-sample-callback set-music-callback cffi-chunk-buffer
 convert-cffi-sample get-sample-buffer register-sample-generator
-=voice= =looper=
+=voice= register-voice unregister-voice register-voice-mixer mix-voices
 convert-cffi-sample-to-internal convert-internal-sample-to-cffi
 page-variable set-page-variable with-pages with-mission-locals
 *module* quit reset seek-music))

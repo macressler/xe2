@@ -133,7 +133,8 @@ When the variable `*message-logging*' is nil, this output is
 disabled."
   (when *message-logging*
     (apply #'format t format-string args)
-    (fresh-line)))
+    (fresh-line)
+    (force-output)))
 
 ;;; Sequence numbers
 
@@ -1393,7 +1394,7 @@ object save directory (by setting the current `*module*'. See also
   (run-hook '*after-load-module-hook*)
   (setf *package* (find-package (module-package-name))))
 
-;;; Software looping sampler
+;;; Custom audio generation
 
 (defvar *frequency* 44100)
 
@@ -1402,6 +1403,30 @@ object save directory (by setting the current `*module*'. See also
 (defvar *output-channels* 2)
 
 (defvar *sample-format* SDL-CFFI::AUDIO-S16LSB)
+
+;;; Voice objects
+
+(defvar *voices* nil)
+
+(define-prototype voice () output)
+
+(define-method initialize voice (&optional (size *output-chunksize*))
+  (setf <output> (make-array size :element-type 'float :initial-element 0.0))
+  (register-voice self))
+
+(define-method get-output voice ()
+  <output>)
+
+(define-method play voice (&rest parameters))
+(define-method halt voice ())
+(define-method run voice ())
+
+(defun register-voice (voice)
+  (pushnew voice *voices* :test 'eq))
+
+(defun unregister-voice (voice)
+  (setf *voices*
+	(delete voice *voices* :test 'eq)))
 
 (defun cffi-sample-type (sdl-sample-type)
   (ecase sdl-sample-type
@@ -1438,19 +1463,44 @@ object save directory (by setting the current `*module*'. See also
 
 (defun convert-internal-sample-to-cffi (input output &optional limit)
   (let ((type (cffi-sample-type *sample-format*)))
-    (dotimes (n (or limit (length input)))
+    (dotimes (n 128)
       (setf (cffi:mem-aref output type n)
 	    (truncate (* (cffi:mem-aref input type n)
 			 32768.0))))))
 
 (defvar *buffer* (make-array 10000 :element-type 'float :initial-element 0.0))
 
+(defvar *sample-generator* nil)
+
+(defun music-mixer-callback (user output size)
+  (when *sample-generator*
+    (message "Generating samples")
+    (funcall generator *buffer*)
+    (message "Converting samples to output format...")
+    (convert-internal-sample-to-cffi *buffer* output size)
+    ))
+
 (defun register-sample-generator (generator)
-  (labels ((converting (output)
-	     (let ((size (buffer-length output)))
-	       (funcall generator *buffer* size)
-	       (convert-internal-sample-to-cffi output *buffer* size))))
-    (sdl-mixer:register-music-mixer #'converting)))
+  (message "Registering sample generator...")
+  (setf *sample-generator* generator))
+
+(defun mix-voices (output)
+  (message "Mixing voices...")
+  ;; create silence
+  ;; (dotimes (n *output-chunksize*)
+  ;;   (setf (aref output n) 0.0))
+  ;; mix in voices
+  (dolist (voice *voices*)
+    (/run voice)
+    (let ((input (/get-output voice)))
+      (dotimes (n *output-chunksize*)
+	(incf (aref output n)
+	      (aref input n))))))
+
+(defun register-voice-mixer () 
+  (message "Registering voice mixer...")
+  (setf *voices* nil)
+  (register-sample-generator #'mix-voices))
 
 (defvar *buffer-cache* nil)
 
@@ -1461,63 +1511,12 @@ object save directory (by setting the current `*module*'. See also
   (let ((chunk (if (stringp sample)
 		   (find-resource-object sample)
 		   sample)))
-    (when (null *buffer-cache*)
-      (initialize-buffer-cache))
-    ;; is it cached?
-    (or (gethash chunk *sample-buffers*)
-	(setf (gethash chunk *sample-buffers*)
-	      (convert-cffi-sample-to-internal chunk)))))
-
-;;; Voice objects
-
-(define-prototype voice () buffer)
-
-(define-method initialize voice (&optional (size *output-chunksize*))
-  (setf <buffer> (make-array size :element-type 'float :initial-element 0.0)))
-
-(define-method get-buffer voice ()
-  <buffer>)
-
-(define-method play voice (&rest parameters))
-(define-method halt voice ())
-(define-method run voice ())
-
-;;; Looper voice
-
-(define-prototype looper (:parent =voice=)
-  sample 
-  (point :initform 0)
-  playing 
-  (output :initform (make-array 4096 :element-type 'float :initial-element 0.0)))
-
-(define-method play voice (&optional sample)
-  (setf <sample> sample)
-  (setf <point> 0)
-  (setf <playing> t))
-
-(define-method halt looper ()
-  (with-field-values (output) self
-    (unless (not <playing>)
-      (setf <playing> nil)
-      (dotimes (n (length output))
-	(setf (aref output n) 0.0)))))
-
-(define-method run looper ()
-  (with-field-values (output playing) self
-    (when playing
-      (let* ((input (get-sample-buffer sample))
-	     (input-size (length input))
-	     (output-size (length output))
-	     (p <point>))
-	(dotimes (n output-size)
-	  (when (= p size)
-	    (setf p 0)
-	    (setf (aref output n)
-		  (aref input p))
-	    (incf p)))
-	(setf <point> p)))))
-
-
+    ;; (when (null *buffer-cache*)
+    ;;   (initialize-buffer-cache))
+    ;; ;; is it cached?
+    ;; (or (gethash chunk *sample-buffers*)
+    ;; 	(setf (gethash chunk *sample-buffers*)
+	      (convert-cffi-sample-to-internal chunk)))
 
 ;;; Regular music/sample functions
 
@@ -1847,6 +1846,7 @@ and its .startup resource is loaded."
 		       (setf *use-sound* nil))
 		     ;; set to mix lots of sounds
 		     (sdl-mixer:allocate-channels *channels*)
+		     (sdl-mixer:register-music-mixer #'music-mixer-callback)
 		     (message "Setting sample callback...")
 		     (sdl-mixer:register-sample-finished #'(lambda (channel)
 							     (message "CALLBACK 000")

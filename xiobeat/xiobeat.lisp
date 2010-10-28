@@ -465,6 +465,8 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 ;;; System status display widget
 
+(defvar *status* nil)
+
 (defparameter *margin-size* 16)
 
 (define-prototype status (:parent xe2:=widget=)
@@ -565,9 +567,44 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (/deactivate step)
 	  (vector-push-extend step (aref grid row column)))))))
 
+;;; Looping samples
+
+(define-prototype looper (:parent =voice=)
+  sample 
+  (point :initform 0)
+  playing)
+
+(define-method play voice (&optional sample)
+  (setf <sample> sample)
+  (setf <point> 0)
+  (setf <playing> t))
+
+(define-method halt looper ()
+  (with-field-values (output) self
+    (unless (not <playing>)
+      (setf <playing> nil)
+      (dotimes (n (length output))
+	(setf (aref output n) 0.0)))))
+
+(define-method run looper ()
+  (with-field-values (output playing) self
+    (when (and <sample> playing)
+      (let* ((input (get-sample-buffer <sample>))
+	     (input-size (length input))
+	     (output-size (length output))
+	     (p <point>))
+	(dotimes (n output-size)
+	  (when (= p (- input-size 1))
+	    (setf p 0)
+	    (setf (aref output n)
+		  (aref input p))
+	    (incf p)))
+	(setf <point> p)))))
+
 ;;; Stomp mode is the basic functionality the other modes build on.
 
 (define-prototype stomper (:parent xe2:=prompt=))
+;;  (voice :initform (clone =looper=)))
 
 (define-method handle-key stomper (event)
   (let ((func (gethash event <keymap>)))
@@ -586,10 +623,10 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (define-method start stomper ())
 
 (define-method button-y stomper ()
-  (queue-loop "electron1"))
+  (/play <voice> "electron1"))
 
 (define-method button-x stomper ()
-  (queue-loop "electron2"))
+  (/play <voice> "electron2"))
 
 (define-method button-b stomper ())
 
@@ -651,14 +688,13 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 				      (when (string= *module* "xiobeat")
 					(/visit *form* "FrontPage"))))
 
-(setf xe2:*output-chunksize* 128)
+(setf xe2:*output-chunksize* 512)
 
 (defun xiobeat ()
   (xe2:message "Initializing XIOBEAT...")
   (setf xe2:*window-title* "XIOBEAT")
   (clon:initialize)
-  (set-sample-callback #'loop-callback)
-  (setf *physics-function* #'update-loop)
+;  (setf *physics-function* #'update-loop)
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
   (let* ((prompt (clone =xiobeat-prompt=))
@@ -789,8 +825,9 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (xe2:enable-classic-key-repeat 100 100)
     (/focus-left *frame*)
     (/image-view (/left-form *frame*))
-    (setf *loop-sound* nil)
     (run-hook 'xe2:*resize-hook*)
+    (register-voice-mixer)
+
 ))
 
 (xiobeat)
