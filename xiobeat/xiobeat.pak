@@ -1,10 +1,11 @@
 (
  (:name ".default-font" :type :font :properties (:height 14 :width 7) :data "7x14b")
  (:name "electron" :type :music :file "electron.xm" :properties (:volume 255))
+ (:name "electron1" :type :sample :file "electron1.wav" :properties (:volume 255))
+ (:name "electron2" :type :sample :file "electron2.wav" :properties (:volume 255))
  (:name "xiox" :type :music :file "xiox.ogg" :properties (:volume 200))
  (:name "beatup" :type :music :file "beatup.ogg" :properties (:volume 255))
  (:name "phong" :type :music :file "phong.ogg" :properties (:volume 255))
- (:name "electron2" :type :music :file "electron2.ogg" :properties (:volume 240))
  (:name "xiophant" :type :music :file "xiophant.ogg" :properties (:volume 200))
  (:name "bip" :type :sample :file "bip.wav" :properties (:volume 120))
  (:name "ka" :type :sample :file "ka.wav" :properties (:volume 120))

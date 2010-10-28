@@ -33,16 +33,3 @@
 *** slight audio latency will not be a big problem
 ** usb camera for making freestyle videos
 
-* Audience
-
-** Stepmania fans who already own PC compatible pads
-*** They can just download the game and plug in their dance pad.
-** Dance game fans who already own PS2 compatible pads
-*** Not all these have enough arrows (the cheap konami ones that come with home versions of DDR don't have :X and :Y in the lower two corners.
-*** Intermediate and advanced players usually own nicer pads that are compatible with USB as well as multiple game consoles.
-*** I can refer others to amazon or ddrgame.com for confirmed compatible pads and/or dance pad adaptors; roughly USD$20 plus shipping
-*** back-of-the-game-box-style icons with text to show device and OS compatibility
-*** "USB Keyboard" "USB Mouse" "USB Camera" "10-button USB Dance pad" "USB Midi Keyboard"
-
-  
-   

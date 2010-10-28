@@ -581,32 +581,35 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (define-method quit stomper ()
   (xe2:quit))
 
-(define-method select stomper ()
-  (play-music "electron" :loop t))
+(define-method select stomper ())
 
-(define-method start stomper ()
-  (/insert *commander* :period)
-  (/newline *commander*)
-  (/insert *commander* :prompt))
+(define-method start stomper ())
 
+(defvar *loop-sound* nil)
+(defvar *loop-channel* nil)
+
+(defun loop-callback (channel)
+  (message "LOOP CALLBACK ~S" channel)
+  (when (and *loop-sound* (= channel *loop-channel*))
+    (message "CHANNEL: ~S" (setf *loop-channel* (play-sample *loop-sound*)))))
+
+(defun queue-loop (sound)
+  (when (null *loop-sound*)
+    (message "CHANNEL: ~S" (setf *loop-channel* (play-sample sound))))
+  (setf *loop-sound* sound))
+		      
 (define-method button-y stomper ()
-  (/insert *commander* :y))
+  (queue-loop "electron1"))
 
 (define-method button-x stomper ()
-;;  (/insert *commander* :x)
-;  (play-sample "scratch")
-  (/start self))
+  (queue-loop "electron2"))
 
-(define-method button-b stomper ()
-;;  (/insert *commander* :b)
-  (/start self))
+(define-method button-b stomper ())
 
 (define-method button-a stomper ()
-  (/insert *commander* :a)
-  (play-sample "bass"))
+  (play-sample "ka"))
 
 (define-method up stomper ()
-  (/insert *commander* :up)
   (play-sample "ting"))
 
 (define-method down stomper ()
@@ -614,11 +617,9 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (/insert *commander* :down))
 
 (define-method left stomper ()
-  (/insert *commander* :left)
   (play-sample "snare3"))
 
 (define-method right stomper ()
-  (/insert *commander* :right)
   (play-sample "cymb"))
 
 ;; (defun xiobeat ()
@@ -667,6 +668,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (xe2:message "Initializing XIOBEAT...")
   (setf xe2:*window-title* "XIOBEAT")
   (clon:initialize)
+  (set-sample-callback #'loop-callback)
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
   (let* ((prompt (clone =xiobeat-prompt=))
@@ -685,6 +687,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (setf *form* form)
     (setf *engine* engine)
     (setf *prompt* prompt)
+    (setf xe2:*output-chunksize* 128)
     (setf *terminal* terminal)
     (setf *frame* frame)
     (labels ((resize-widgets ()
@@ -797,6 +800,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (xe2:enable-classic-key-repeat 100 100)
     (/focus-left *frame*)
     (/image-view (/left-form *frame*))
+    (setf *loop-sound* nil)
     (run-hook 'xe2:*resize-hook*)
 ))
 

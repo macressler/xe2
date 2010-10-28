@@ -136,8 +136,9 @@ save-modified-objects enable-timer disable-timer while defmission
 enable-held-keys disable-held-keys do-cells draw-box *resizable* achieve
 *resize-hook* draw-rectangle *quitting* *after-load-module-hook* *mission*
 mission-variable set-mission-variable with-mission-locals =mission=
+set-sample-callback set-music-callback
 page-variable set-page-variable with-pages with-mission-locals
-*module* quit reset))
+*module* quit reset seek-music))
 
 (in-package :xe2)
 

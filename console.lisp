@@ -1403,6 +1403,18 @@ object save directory (by setting the current `*module*'. See also
 
 (defvar *sample-format* SDL-CFFI::AUDIO-S16LSB)
 
+(defvar *sample-callback* nil)
+
+(defun set-sample-callback (func)
+  (assert (functionp func))
+  (setf *sample-callback* func))
+
+(defvar *music-callback* nil)
+
+(defun set-music-callback (func)
+  (assert (functionp func))
+  (setf *music-callback* func))
+
 (defun cffi-sample-type (sdl-sample-type)
   (ecase sdl-sample-type
     (SDL-CFFI::AUDIO-U8 :uint8) ; Unsigned 8-bit samples
@@ -1457,6 +1469,9 @@ of the music."
       (apply #'sdl-mixer:play-music 
 	     (resource-object resource)
 	     args))))
+
+(defun seek-music (position)
+  (sdl-mixer:music-position position))
 
 (defun halt-music (fade-milliseconds)
   "Stop all music playing."
@@ -1747,10 +1762,16 @@ and its .startup resource is loaded."
 		       (message "Could not open audio driver. Disabling sound effects and music.")
 		       (setf *use-sound* nil))
 		     ;; set to mix lots of sounds
-		     (sdl-mixer:allocate-channels *channels*))
-			(index-module "standard") 
-			(load-module *next-module*)
-		      (find-resource *startup*)
+		     (sdl-mixer:allocate-channels *channels*)
+		     (message "Setting sample callback...")
+		     (sdl-mixer:register-sample-finished #'(lambda (channel)
+							     (message "CALLBACK 000")
+							     (when *sample-callback*
+							       (funcall *sample-callback* channel)))))
+		   (index-module "standard") 
+		   (load-module *next-module*)
+		   
+		   (find-resource *startup*)
 		      (run-main-loop)))
 	  ;; close audio if crash
 	  (when *use-sound* 
