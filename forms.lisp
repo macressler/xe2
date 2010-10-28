@@ -429,9 +429,9 @@ initialize the arrays for a page of the size specified there."
 
 ;;; Command cell executes some prompt command
 
-(defparameter *command-cell-style* '(:foreground ".yellow" :background ".red"))
+(defparameter *command-cell-style* '(:foreground ".white" :background ".gray20"))
 
-(defparameter *command-cell-highlight-style* '(:foreground ".red" :background ".white"))
+(defparameter *command-cell-highlight-style* '(:foreground ".yellow" :background ".red"))
 
 (defparameter *command-cell-highlight-time* 15)
 
@@ -440,7 +440,7 @@ initialize the arrays for a page of the size specified there."
 (defcell command-cell command (clock :initform 0))
   
 (define-method initialize command-cell ()
-  (setf <label> (list (cons "Enter command here..." *command-cell-style*))))
+  (setf <label> (list (list "..."))))
 
 (define-method set command-cell (command)
   (setf <command> command)
@@ -540,7 +540,7 @@ initialize the arrays for a page of the size specified there."
       (/visit self page))))
 
 (define-method blank form (&rest parameters)
-  "Invoke the current page's default :make method, passing PARAMETERS."
+  "Invoke the current page's default :make method, passing PARAMETER."
   (/make-with-parameters <page> parameters))
 
 (define-method set-tool form (tool)
@@ -727,6 +727,11 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
     (/make page)
     (/visit self page)))
 
+(define-method enter-or-exit form ()
+  (if <entered>
+      (/exit self)
+      (/enter self)))
+
 (define-method enter form ()
   "Begin entering LISP data into the current cell."
   (unless <entered>
@@ -787,25 +792,25 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 
 (defparameter *blank-cell-string* '(" ........ "))
 
-(define-method row-height form (row)
-  (let ((height 0) cell)
-    (dotimes (column <columns>)
-      (setf cell (/cell-at self row column))
-      (when cell
-	(setf height (max height (/height cell)))))
-    (ecase <display-style>
-      (:label (max (formatted-string-height *blank-cell-string*) height))
-      (:image height))))
+;; (define-method row-height form (row)
+;;   (let ((height 0) cell)
+;;     (dotimes (column <columns>)
+;;       (setf cell (/cell-at self row column))
+;;       (when cell
+;; 	(setf height (max height (/height cell)))))
+;;     (ecase <display-style>
+;;       (:label (max (formatted-string-height *blank-cell-string*) height))
+;;       (:image height))))
 
-(define-method column-width form (column)
-  (let ((width 0) cell)
-    (dotimes (row <rows>)
-      (setf cell (/cell-at self row column))
-      (when cell
-	(setf width (max width (/width cell)))))
-    (ecase <display-style> 
-      (:label (max width (formatted-string-width *blank-cell-string*)))
-      (:image width))))
+;; (define-method column-width form (column)
+;;   (let ((width 0) cell)
+;;     (dotimes (row <rows>)
+;;       (setf cell (/cell-at self row column))
+;;       (when cell
+;; 	(setf width (max width (/width cell)))))
+;;     (ecase <display-style> 
+;;       (:label (max width (formatted-string-width *blank-cell-string*)))
+;;       (:image width))))
 
 (define-method compute-geometry form ()
   (with-field-values (rows columns display-style page
@@ -909,7 +914,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 				   display-style header-style tool tool-methods entered focused
 				   row-spacing rows columns draw-blanks column-widths) self
       (when <computing> (/compute self))
-      ;;      (/compute-geometry self)
+;;      (/compute-geometry self)
       (let* ((image <image>)
 	     (widget-width <width>)
 	     (widget-height <height>)

@@ -170,8 +170,8 @@
     ("KP4" (:control) :select-left-page)
     ("KP6" (:control) :select-right-page)
     ;; entering data and confirm/cancel
-    ("RETURN" nil :enter)
-    ("RETURN" (:control) :exit) ;; see also handle-key
+    ("RETURN" nil :enter-or-exit)
+;;    ("RETURN" (:control) nil :exit) ;; see also handle-key
     ("ESCAPE" nil :cancel)
     ("G" (:control) :cancel)
     ;; view mode
@@ -539,6 +539,12 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	[deactivate self]
 	[activate self])))
 
+;; (define-method height step ()
+;;   (image-height <image>))
+
+;; (define-method width step ()
+;;   (image-width <image>))
+
 (define-method print step ()
   (format nil "~S" <arrow>))
 
@@ -555,13 +561,15 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 (define-method make chart (&key (zoom 2) (bars 2))
   (/initialize self 
-	       :width (length *dance-arrows*)
-	       :height (* 4 zoom bars))
+	       :width (1+ (length *dance-arrows*))
+	       :height (* 4 zoom bars)) 
   (with-field-values (height width grid) self
     (setf (page-variable :zoom) zoom)
     (setf (page-variable :bars) bars)
     (dotimes (row height)
-      (dotimes (column width)
+      (vector-push-extend (clone =command-cell=)
+      			  (aref grid row (1- width)))
+      (dotimes (column (1- width))
 	(let ((step (clone =step=)))
 	  (/set step (nth column *dance-arrows*)) 
 	  (/deactivate step)
@@ -601,7 +609,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	    (incf p)))
 	(setf <point> p)))))
 
-;;; Stomp mode is the basic functionality the other modes build on.
+;;; Stomp mode is the basic functionality the other modes build on
 
 (define-prototype stomper (:parent xe2:=prompt=))
 ;;  (voice :initform (clone =looper=)))
@@ -637,8 +645,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (play-sample "ting"))
 
 (define-method down stomper ()
-  (play-sample "scratch")
-  (/insert *commander* :down))
+  (play-sample "scratch"))
 
 (define-method left stomper ()
   (play-sample "snare3"))
@@ -824,10 +831,10 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (xe2:reset-joystick)
     (xe2:enable-classic-key-repeat 100 100)
     (/focus-left *frame*)
-    (/image-view (/left-form *frame*))
+    (/label-view (/left-form *frame*))
     (run-hook 'xe2:*resize-hook*)
-    (register-voice-mixer)
-
+;;    (play-music "electron")
+;;    (register-voice-mixer)
 ))
 
 (xiobeat)

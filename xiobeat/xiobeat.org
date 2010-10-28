@@ -1,5 +1,6 @@
 * Tasks
 
+* TODO page vars go in right form
 * TODO indicate measures/rows 
 * TODO detect jump arrows
 * TODO indicate match progress

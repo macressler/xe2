@@ -1472,7 +1472,16 @@ object save directory (by setting the current `*module*'. See also
 
 (defvar *sample-generator* nil)
 
-(defun music-mixer-callback (user output size))
+(defvar *foo* nil)
+
+(defun music-mixer-callback (user output size)
+  (setf *foo* t)
+  (format t "XXXX ~S" *foo*))
+
+  ;; (let ((type (cffi-sample-type *sample-format*)))
+  ;;   (dotimes (n size)
+  ;;     (setf (cffi:mem-aref output type n) 0))))
+
   ;; (when *sample-generator*
   ;;   (message "Generating samples")
   ;;   (funcall generator *buffer*)
@@ -1482,13 +1491,14 @@ object save directory (by setting the current `*module*'. See also
 
 (defun register-sample-generator (generator)
   (message "Registering sample generator...")
-  (setf *sample-generator* generator))
+  (setf *sample-generator* generator)
+  (sdl-mixer:register-music-mixer #'music-mixer-callback))
 
 (defun mix-voices (output)
   (message "Mixing voices...")
   ;; create silence
-  ;; (dotimes (n *output-chunksize*)
-  ;;   (setf (aref output n) 0.0))
+  (dotimes (n *output-chunksize*)
+    (setf (aref output n) 0.0))
   ;; mix in voices
   (dolist (voice *voices*)
     (/run voice)
@@ -1845,15 +1855,12 @@ and its .startup resource is loaded."
 		       (message "Could not open audio driver. Disabling sound effects and music.")
 		       (setf *use-sound* nil))
 		     ;; set to mix lots of sounds
-		     (sdl-mixer:allocate-channels *channels*)
-		     (sdl-mixer:register-music-mixer #'music-mixer-callback))
+		     (sdl-mixer:allocate-channels *channels*))
 		     ;; (message "Setting sample callback...")
-		     ;; (sdl-mixer:register-sample-finished #'(lambda (channel)
-		     ;; 					     (message "CALLBACK 000")
-		     ;; 					     (when *sample-callback*
-		     ;; 					       (funcall *sample-callback* channel))))
-		     ;; (message "REGISTER: ~S" (list *sample-callback* sdl-mixer::*channel-finished*)))
-		   ;;
+		     ;; (sdl-mixer:register-music-finished #'(lambda (channel)
+		     ;; 					     (message "MUSIC FINISHED CALLBACK")
+		     ;; 					     (when *music-callback*
+		     ;; 					       (funcall *music-callback* channel)))))
 		   (index-module "standard") 
 		   (load-module *next-module*)
 		   

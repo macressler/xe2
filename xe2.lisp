@@ -136,7 +136,7 @@ enable-timer disable-timer while defmission enable-held-keys
 disable-held-keys do-cells draw-box *resizable* achieve *resize-hook*
 draw-rectangle *quitting* *after-load-module-hook* *mission*
 mission-variable set-mission-variable with-mission-locals =mission=
-set-sample-callback set-music-callback cffi-chunk-buffer
+set-sample-callback set-music-callback cffi-chunk-buffer =command-cell=
 convert-cffi-sample get-sample-buffer register-sample-generator
 =voice= register-voice unregister-voice register-voice-mixer mix-voices
 convert-cffi-sample-to-internal convert-internal-sample-to-cffi

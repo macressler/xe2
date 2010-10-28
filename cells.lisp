@@ -33,12 +33,13 @@
   (label :initform nil :documentation "Optional string or formatted line to display.")
   row column
   (widget :initform nil)
-  (image :initform nil :documentation "Image to display. either a resource name string, or an XE2 image object."))
+  (image :initform nil :documentation "Image to display. either a resource name string, or an XE2 image object.")
+  (excluded-fields :initform '(:widget :image)))
   
 (define-method in-category cell (category)
   (member category <categories>))
 
-(defparameter *default-cell-width* 32)
+(defparameter *default-cell-width* 16)
 
 (define-method get cell ())
 
@@ -50,14 +51,14 @@
   (with-field-values (widget image label) self
     (cond (widget (image-width (field-value :image widget)))
 	  (image (image-width image))
-	  (label (formatted-line-width (/label self)))
+	  (label (formatted-line-width label))
 	  (t *default-cell-width*))))
 
 (define-method height cell () 
   (with-field-values (widget image label) self
     (cond (widget (image-height (field-value :image widget)))
 	  (image (image-height image))
-	  (label (formatted-line-height (/label self)))
+	  (label (formatted-line-height label))
 	  (t *default-cell-width*))))
 
 (define-method render cell (dest x y width)
@@ -73,7 +74,7 @@
 		 (draw-image image x y :destination dest)))
 	    (<label>
 	     ;; we have a formatted line
-	     (let ((label (/form-label self)))
+	     (let ((label <label>))
 	       (when (listp label)
 		 (let*
 		     ((shortfall (- width (formatted-line-width label)))
