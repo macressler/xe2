@@ -1846,13 +1846,13 @@ and its .startup resource is loaded."
 		       (setf *use-sound* nil))
 		     ;; set to mix lots of sounds
 		     (sdl-mixer:allocate-channels *channels*)
-		     (sdl-mixer:register-music-mixer #'music-mixer-callback)
-		     (message "Setting sample callback...")
-		     (sdl-mixer:register-sample-finished #'(lambda (channel)
-							     (message "CALLBACK 000")
-							     (when *sample-callback*
-							       (funcall *sample-callback* channel))))
-		     (message "REGISTER: ~S" (list *sample-callback* sdl-mixer::*channel-finished*)))
+		     (sdl-mixer:register-music-mixer #'music-mixer-callback))
+		     ;; (message "Setting sample callback...")
+		     ;; (sdl-mixer:register-sample-finished #'(lambda (channel)
+		     ;; 					     (message "CALLBACK 000")
+		     ;; 					     (when *sample-callback*
+		     ;; 					       (funcall *sample-callback* channel))))
+		     ;; (message "REGISTER: ~S" (list *sample-callback* sdl-mixer::*channel-finished*)))
 		   ;;
 		   (index-module "standard") 
 		   (load-module *next-module*)
