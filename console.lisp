@@ -1472,13 +1472,13 @@ object save directory (by setting the current `*module*'. See also
 
 (defvar *sample-generator* nil)
 
-(defun music-mixer-callback (user output size)
-  (when *sample-generator*
-    (message "Generating samples")
-    (funcall generator *buffer*)
-    (message "Converting samples to output format...")
-    (convert-internal-sample-to-cffi *buffer* output size)
-    ))
+(defun music-mixer-callback (user output size))
+  ;; (when *sample-generator*
+  ;;   (message "Generating samples")
+  ;;   (funcall generator *buffer*)
+  ;;   (message "Converting samples to output format...")
+  ;;   (convert-internal-sample-to-cffi *buffer* output size)
+  ;;   ))
 
 (defun register-sample-generator (generator)
   (message "Registering sample generator...")
