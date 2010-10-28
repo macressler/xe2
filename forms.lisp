@@ -643,7 +643,8 @@ See also CREATE-PAGE."
     (setf <column-widths> (make-array (+ 1 <columns>) :initial-element 0)
 	  <row-heights> (make-array (+ 1 <rows>) :initial-element 0)
 	  <column-styles> (make-array (+ 1 <columns>))
-	  <row-styles> (make-array (+ 1 <rows>)))))
+	  <row-styles> (make-array (+ 1 <rows>)))
+    (/compute-geometry self)))
 
 (define-method cell-at form (row column)
   (assert (and (integerp row) (integerp column)))
@@ -661,7 +662,8 @@ See also CREATE-PAGE."
 (define-method set-display-style form (style)
   "Set the rendering style of the current form to STYLE.
 Must be one of (:image :label)."
-  (setf <display-style> style))
+  (setf <display-style> style)
+  (/compute-geometry self))
 
 (define-method image-view form ()
   "Switch to image view in the current form."
@@ -830,35 +832,36 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		(setf location (aref grid row column))
 		(when (and location (not (zerop (fill-pointer location))))
 		  (setf cell (aref location (- (fill-pointer location) 1)))
-		  (update-height row (/height cell))
-		  (update-width column (/width cell)))))))))))
+		  (setf height 
+			(ecase display-style
+			  (:label (formatted-string-width *blank-cell-string*))
+			  (:image (/height cell))))
+		  (update-height row height)
+		  (setf width 
+			(ecase display-style
+			  (:label (formatted-string-width *blank-cell-string*))
+			  (:image (/width cell))))
+		  (update-width column width))))))))))
 
-;; (define-method compute-geometry form ()
-;;   ;; TODO this could obviously be sped up
-;;   (dotimes (column <columns>)
-;;     (setf (aref <column-widths> column)
-;; 	  (/column-width self column)))
-;;   (dotimes (row <rows>)
-;;     (setf (aref <row-heights> row)
-;; 	  (/row-height self row))))
-    
 (defparameter *even-columns-format* '(:background ".gray50" :foreground ".gray10"))
 (defparameter *odd-columns-format* '(:background ".gray45" :foreground ".gray10"))
 
 (define-method handle-key form (event)
   ;; possibly forward event to current cell. used for the event cell, see below.
-  (if (or (and (equal "RETURN" (first event))
-	       (equal :control (second event)))
-	  (equal "ESCAPE" (first event)))
-      (send-parent self :initialize self)
-      (let* ((cell (/selected-cell self))
-	     (widget (when cell (field-value :widget cell))))
-	(cond ((and cell (has-method :handle-key cell))
-	       (or (/handle-key cell event)
-		   (send-parent self :handle-key self event)))
-	      ((and widget <entered>)
-	       (/handle-key widget event))
-	      (t (send-parent self :handle-key self event))))))
+  (prog1
+      (if (or (and (equal "RETURN" (first event))
+		   (equal :control (second event)))
+	      (equal "ESCAPE" (first event)))
+	  (send-parent self :initialize self)
+	  (let* ((cell (/selected-cell self))
+		 (widget (when cell (field-value :widget cell))))
+	    (cond ((and cell (has-method :handle-key cell))
+		   (or (/handle-key cell event)
+		       (send-parent self :handle-key self event)))
+		  ((and widget <entered>)
+		   (/handle-key widget event))
+		  (t (send-parent self :handle-key self event)))))
+    (/compute-geometry self)))
 
 (define-method hit form (x0 y0) 
   (with-field-values (row-heights column-widths origin-row origin-column rows columns x y width height)
@@ -906,7 +909,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 				   display-style header-style tool tool-methods entered focused
 				   row-spacing rows columns draw-blanks column-widths) self
       (when <computing> (/compute self))
-      (/compute-geometry self)
+      ;;      (/compute-geometry self)
       (let* ((image <image>)
 	     (widget-width <width>)
 	     (widget-height <height>)

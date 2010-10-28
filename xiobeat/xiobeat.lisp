@@ -664,6 +664,8 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 				      (when (string= *module* "xiobeat")
 					(/visit *form* "FrontPage"))))
 
+(setf xe2:*output-chunksize* 128)
+
 (defun xiobeat ()
   (xe2:message "Initializing XIOBEAT...")
   (setf xe2:*window-title* "XIOBEAT")
@@ -687,7 +689,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (setf *form* form)
     (setf *engine* engine)
     (setf *prompt* prompt)
-    (setf xe2:*output-chunksize* 128)
     (setf *terminal* terminal)
     (setf *frame* frame)
     (labels ((resize-widgets ()
