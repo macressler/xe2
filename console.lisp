@@ -1420,6 +1420,10 @@ object save directory (by setting the current `*module*'. See also
 (defun cffi-chunk-buffer (chunk)
   (sdl:fp chunk))
 
+(defun buffer-length (buffer)
+  (let ((type (cffi-sample-type *sample-format*)))
+    (length (cffi:mem-ref buffer type))))
+
 (defun convert-cffi-sample-to-internal (chunk)
   (let* ((input-buffer (cffi-chunk-buffer chunk))
 	 (type (cffi-sample-type *sample-format*))
@@ -1442,12 +1446,11 @@ object save directory (by setting the current `*module*'. See also
 (defvar *buffer* (make-array 10000 :element-type 'float :initial-element 0.0))
 
 (defun register-sample-generator (generator)
-  (let ((type (cffi-sample-type *sample-format*)))
-    (labels ((converting (output)
-	       (let ((size (length (cffi:mem-ref output type))))
-		 (funcall generator *buffer* size)
-		 (convert-internal-sample-to-cffi output *buffer* size))))
-      (sdl-mixer:register-music-mixer #'converting))))
+  (labels ((converting (output)
+	     (let ((size (buffer-length output)))
+	       (funcall generator *buffer* size)
+	       (convert-internal-sample-to-cffi output *buffer* size))))
+    (sdl-mixer:register-music-mixer #'converting)))
 
 (defvar *buffer-cache* nil)
 
@@ -1465,12 +1468,56 @@ object save directory (by setting the current `*module*'. See also
 	(setf (gethash chunk *sample-buffers*)
 	      (convert-cffi-sample-to-internal chunk)))))
 
+;;; Voice objects
+
 (define-prototype voice () buffer)
 
 (define-method initialize voice (&optional (size *output-chunksize*))
   (setf <buffer> (make-array size :element-type 'float :initial-element 0.0)))
 
-;; FIXME
+(define-method get-buffer voice ()
+  <buffer>)
+
+(define-method play voice (&rest parameters))
+(define-method halt voice ())
+(define-method run voice ())
+
+;;; Looper voice
+
+(define-prototype looper (:parent =voice=)
+  sample 
+  (point :initform 0)
+  playing 
+  (output :initform (make-array 4096 :element-type 'float :initial-element 0.0)))
+
+(define-method play voice (&optional sample)
+  (setf <sample> sample)
+  (setf <point> 0)
+  (setf <playing> t))
+
+(define-method halt looper ()
+  (with-field-values (output) self
+    (unless (not <playing>)
+      (setf <playing> nil)
+      (dotimes (n (length output))
+	(setf (aref output n) 0.0)))))
+
+(define-method run looper ()
+  (with-field-values (output playing) self
+    (when playing
+      (let* ((input (get-sample-buffer sample))
+	     (input-size (length input))
+	     (output-size (length output))
+	     (p <point>))
+	(dotimes (n output-size)
+	  (when (= p size)
+	    (setf p 0)
+	    (setf (aref output n)
+		  (aref input p))
+	    (incf p)))
+	(setf <point> p)))))
+
+
 
 ;;; Regular music/sample functions
 

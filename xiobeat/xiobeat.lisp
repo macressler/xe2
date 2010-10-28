@@ -585,36 +585,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 (define-method start stomper ())
 
-(defvar *loop-sound* nil)
-(defvar *next-sound* nil)
-(defvar *loop-pending* nil)
-(defvar *loop-channel* nil)
-
-(defun stop-loop ()
-  (halt-sample *loop-channel*))
-
-(defun start-loop (sample)
-  (setf *loop-channel* (play-sample sample))
-  (setf *loop-sound* sample))
-
-(defparameter *callback-count* 0)
-
-(defun loop-callback (channel)
-  (incf *callback-count*)
-  (when (= channel *loop-channel*)
-    (setf *loop-pending* t)))
-
-(defun update-loop ()
-  (message "CALLBACKS: ~A" *callback-count*)
-  (when *loop-pending*
-    (start-loop *next-sound*)
-    (setf *loop-pending* nil)))
-    
-(defun queue-loop (sound)
-  (if (null *loop-sound*)
-      (start-loop sound)
-      (setf *next-sound* sound)))
- 
 (define-method button-y stomper ()
   (queue-loop "electron1"))
 
