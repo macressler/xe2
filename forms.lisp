@@ -794,7 +794,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
     (ecase <display-style>
       (:label (max (formatted-string-height *blank-cell-string*) height))
       (:image height))))
-	
+
 (define-method column-width form (column)
   (let ((width 0) cell)
     (dotimes (row <rows>)
@@ -806,13 +806,41 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
       (:image width))))
 
 (define-method compute-geometry form ()
-  ;; TODO this could obviously be sped up
-  (dotimes (column <columns>)
-    (setf (aref <column-widths> column)
-	  (/column-width self column)))
-  (dotimes (row <rows>)
-    (setf (aref <row-heights> row)
-	  (/row-height self row))))
+  (with-field-values (rows columns display-style page
+			   column-widths row-heights) self
+    (when page
+      (with-field-values (grid) page
+	(let ((height 0)
+	      (width 0)
+	      cell location)
+	  (labels ((update-height (row pixels)
+		     (setf (aref row-heights row)
+			   (max (aref row-heights row) pixels)))
+		   (update-width (column pixels)
+		     (setf (aref column-widths column)
+			   (max (aref column-widths column) pixels))))
+	    ;; reset geometry
+	    (dotimes (row rows)
+	      (update-height row 0))
+	    (dotimes (column columns)
+	      (update-width column 0))
+	    ;; now measure
+	    (dotimes (row rows)
+	      (dotimes (column columns)
+		(setf location (aref grid row column))
+		(when (and location (not (zerop (fill-pointer location))))
+		  (setf cell (aref location (- (fill-pointer location) 1)))
+		  (update-height row (/height cell))
+		  (update-width column (/width cell)))))))))))
+
+;; (define-method compute-geometry form ()
+;;   ;; TODO this could obviously be sped up
+;;   (dotimes (column <columns>)
+;;     (setf (aref <column-widths> column)
+;; 	  (/column-width self column)))
+;;   (dotimes (row <rows>)
+;;     (setf (aref <row-heights> row)
+;; 	  (/row-height self row))))
     
 (defparameter *even-columns-format* '(:background ".gray50" :foreground ".gray10"))
 (defparameter *odd-columns-format* '(:background ".gray45" :foreground ".gray10"))
