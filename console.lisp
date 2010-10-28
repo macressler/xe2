@@ -1393,27 +1393,15 @@ object save directory (by setting the current `*module*'. See also
   (run-hook '*after-load-module-hook*)
   (setf *package* (find-package (module-package-name))))
 
-;;; Playing music and sound effects
+;;; Software looping sampler
 
 (defvar *frequency* 44100)
 
-(defvar *output-chunksize* 1024)
+(defvar *output-chunksize* 256)
 
 (defvar *output-channels* 2)
 
 (defvar *sample-format* SDL-CFFI::AUDIO-S16LSB)
-
-(defvar *sample-callback* nil)
-
-(defun set-sample-callback (func)
-  (assert (functionp func))
-  (setf *sample-callback* func))
-
-(defvar *music-callback* nil)
-
-(defun set-music-callback (func)
-  (assert (functionp func))
-  (setf *music-callback* func))
 
 (defun cffi-sample-type (sdl-sample-type)
   (ecase sdl-sample-type
@@ -1432,7 +1420,7 @@ object save directory (by setting the current `*module*'. See also
 (defun cffi-chunk-buffer (chunk)
   (sdl:fp chunk))
 
-(defun convert-cffi-sample (chunk)
+(defun convert-cffi-sample-to-internal (chunk)
   (let* ((input-buffer (cffi-chunk-buffer chunk))
 	 (type (cffi-sample-type *sample-format*))
 	 (size (length (cffi:mem-ref input-buffer type))))
@@ -1444,11 +1432,59 @@ object save directory (by setting the current `*module*'. See also
 		  (/ (float (cffi:mem-aref input-buffer type n))
 		     32768.0)))))))
 
-;(defun convert-internal-audio (input-buffer output-stream)
+(defun convert-internal-sample-to-cffi (input output &optional limit)
+  (let ((type (cffi-sample-type *sample-format*)))
+    (dotimes (n (or limit (length input)))
+      (setf (cffi:mem-aref output type n)
+	    (truncate (* (cffi:mem-aref input type n)
+			 32768.0))))))
 
-;; (REGISTER-MUSIC-MIXER 
-;;     (lambda (user stream len)
-;;       &#039;FILL-THE-AUDIO-OUTPUT-BUFFER))
+(defvar *buffer* (make-array 10000 :element-type 'float :initial-element 0.0))
+
+(defun register-sample-generator (generator)
+  (let ((type (cffi-sample-type *sample-format*)))
+    (labels ((converting (output)
+	       (let ((size (length (cffi:mem-ref output type))))
+		 (funcall generator *buffer* size)
+		 (convert-internal-sample-to-cffi output *buffer* size))))
+      (sdl-mixer:register-music-mixer #'converting))))
+
+(defvar *buffer-cache* nil)
+
+(defun initialize-buffer-cache ()
+  (setf *buffer-cache* (make-hash-table :test 'eq)))
+
+(defun get-sample-buffer (sample)
+  (let ((chunk (if (stringp sample)
+		   (find-resource-object sample)
+		   sample)))
+    (when (null *buffer-cache*)
+      (initialize-buffer-cache))
+    ;; is it cached?
+    (or (gethash chunk *sample-buffers*)
+	(setf (gethash chunk *sample-buffers*)
+	      (convert-cffi-sample-to-internal chunk)))))
+
+(define-prototype voice () buffer)
+
+(define-method initialize voice (&optional (size *output-chunksize*))
+  (setf <buffer> (make-array size :element-type 'float :initial-element 0.0)))
+
+;; FIXME
+
+;;; Regular music/sample functions
+
+(defvar *sample-callback* nil)
+
+(defun set-sample-callback (func)
+  (assert (functionp func))
+  (setf *sample-callback* func))
+
+(defvar *music-callback* nil)
+
+(defun set-music-callback (func)
+  (assert (functionp func))
+  (setf *music-callback* func))
 
 (defvar *channels* 128 "Number of audio mixer channels to use.")
 
@@ -1756,6 +1792,7 @@ and its .startup resource is loaded."
 		     ;; try opening sound
 		     (when (null (sdl-mixer:open-audio :frequency *frequency*
 						       :chunksize *output-chunksize*
+						       :enable-callbacks t
 						       :format *sample-format*
 						       :channels *output-channels*))
 		       ;; if that didn't work, disable effects/music
@@ -1767,7 +1804,9 @@ and its .startup resource is loaded."
 		     (sdl-mixer:register-sample-finished #'(lambda (channel)
 							     (message "CALLBACK 000")
 							     (when *sample-callback*
-							       (funcall *sample-callback* channel)))))
+							       (funcall *sample-callback* channel))))
+		     (message "REGISTER: ~S" (list *sample-callback* sdl-mixer::*channel-finished*)))
+		   ;;
 		   (index-module "standard") 
 		   (load-module *next-module*)
 		   

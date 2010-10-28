@@ -586,18 +586,35 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (define-method start stomper ())
 
 (defvar *loop-sound* nil)
+(defvar *next-sound* nil)
+(defvar *loop-pending* nil)
 (defvar *loop-channel* nil)
 
-(defun loop-callback (channel)
-  (message "LOOP CALLBACK ~S" channel)
-  (when (and *loop-sound* (= channel *loop-channel*))
-    (message "CHANNEL: ~S" (setf *loop-channel* (play-sample *loop-sound*)))))
+(defun stop-loop ()
+  (halt-sample *loop-channel*))
 
+(defun start-loop (sample)
+  (setf *loop-channel* (play-sample sample))
+  (setf *loop-sound* sample))
+
+(defparameter *callback-count* 0)
+
+(defun loop-callback (channel)
+  (incf *callback-count*)
+  (when (= channel *loop-channel*)
+    (setf *loop-pending* t)))
+
+(defun update-loop ()
+  (message "CALLBACKS: ~A" *callback-count*)
+  (when *loop-pending*
+    (start-loop *next-sound*)
+    (setf *loop-pending* nil)))
+    
 (defun queue-loop (sound)
-  (when (null *loop-sound*)
-    (message "CHANNEL: ~S" (setf *loop-channel* (play-sample sound))))
-  (setf *loop-sound* sound))
-		      
+  (if (null *loop-sound*)
+      (start-loop sound)
+      (setf *next-sound* sound)))
+ 
 (define-method button-y stomper ()
   (queue-loop "electron1"))
 
@@ -671,6 +688,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (setf xe2:*window-title* "XIOBEAT")
   (clon:initialize)
   (set-sample-callback #'loop-callback)
+  (setf *physics-function* #'update-loop)
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
   (let* ((prompt (clone =xiobeat-prompt=))

@@ -60,14 +60,14 @@
   (:nicknames :xe2)
   (:use :common-lisp :clon) 
   (:export *default-frame-width* *default-frame-height* =viewport=
-*frequency* *output-chunksize* *output-channels* halt-sample *dt* defgame
-*physics-function* =equipment= *default-world-axis-size*
+*frequency* *output-chunksize* *output-channels* halt-sample *dt*
+defgame *physics-function* =equipment= *default-world-axis-size*
 generic-keybind *default-world-z-size* =browser= install-widgets
-=balloon= =form= keyboard-held-p keyboard-pressed-p keyboard-released-p
-keyboard-time-in-current-state keyboard-time-in-previous-state
-*timesteps*
-keyboard-down-p keyboard-keys-down keyboard-modifier-down-p
-keyboard-modifiers get-keys *module-package-name* module-package-name
+=balloon= =form= keyboard-held-p keyboard-pressed-p
+keyboard-released-p keyboard-time-in-current-state
+keyboard-time-in-previous-state *timesteps* keyboard-down-p
+keyboard-keys-down keyboard-modifier-down-p keyboard-modifiers
+get-keys *module-package-name* module-package-name
 *form-command-handler-function* =data-cell= =var-cell= =option-cell=
 =toggle-cell= =event-cell= =buffer-cell= =comment-cell= install-widget
 uninstall-widget =button-cell= =image-cell= *initialization-hook*
@@ -86,37 +86,37 @@ set-browser find-page *windows* transform-field-reference
 *screen-height* =inventory= formatted-line-width *last-event*
 formatted-line-height formatted-string-height formatted-string-width
 get-color create-image draw-image play define-prototype has-field
-defcell defworld *choose-direction-menu* set-field-options field-option-value
-index-resource find-module-path index-module load-image-resource
-load-lisp-resource *executable* *resource-handlers* load-resource
-find-resource find-resource-object *colors* *world*
-load-user-init-file *module-directories* resource-to-plist *osx*
-*linux* make-resource make-object-resource make-event =widget=
-*active-widgets* bind-key-to-prompt-insertion make-field-initializer
-clone make-field-initializer-body make-key-modifier-symbol
-make-key-string normalize-event make-keyword make-object queue-head
-queue-max queue-count *sender* make-special-variable-name
-field-reference-p null-parent *message-send-symbol-suffix*
-*x11-color-data* object-name object-parent send send-super send-queue
-self opposite-direction object-address-string object step-in-direction
-direction-to =cell= plasma-rect subdivide-rect render-plasma add-hook
-run-hook queue-tail make-queue queue unqueue queue-message
-queued-messages-p unqueue-message send-queue field-value
-random-direction *resource-table* load-font-resource
-save-object-resource draw-string-solid read-pak
-initialize-resource-table percent-of-time render-formatted-paragraph
-make-formatted-string draw-string-shaded render-formatted-string
-render-formatted-line resource font-text-extents write-sexp-to-file
-with-message-sender *message-sender* =textbox= read-sexp-from-file
-with-fields with-field-values write-pak *grammar* one-of
-left-hand-side right-hand-side expansions generate
-send-event-to-widgets play-music halt-music seek-music
-*joystick-mapping* *generic-joystick-mapping* *ps3-joystick-mapping*
-*joystick-button-symbols*
-draw-resource-image *event-handler-function* *use-sound*
-trace-rectangle trace-row trace-column trace-octagon trace-line
-midpoint =asterisk= =gray-asterisk= self *module-widgets* defsprite
-=sprite= get-some-object-name transform-declaration-field-descriptor
+defcell defworld *choose-direction-menu* set-field-options
+field-option-value index-resource find-module-path index-module
+load-image-resource load-lisp-resource *executable*
+*resource-handlers* load-resource find-resource find-resource-object
+*colors* *world* load-user-init-file *module-directories*
+resource-to-plist *osx* *linux* make-resource make-object-resource
+make-event =widget= *active-widgets* bind-key-to-prompt-insertion
+make-field-initializer clone make-field-initializer-body
+make-key-modifier-symbol make-key-string normalize-event make-keyword
+make-object queue-head queue-max queue-count *sender*
+make-special-variable-name field-reference-p null-parent
+*message-send-symbol-suffix* *x11-color-data* object-name
+object-parent send send-super send-queue self opposite-direction
+object-address-string object step-in-direction direction-to =cell=
+plasma-rect subdivide-rect render-plasma add-hook run-hook queue-tail
+make-queue queue unqueue queue-message queued-messages-p
+unqueue-message send-queue field-value random-direction
+*resource-table* load-font-resource save-object-resource
+draw-string-solid read-pak initialize-resource-table percent-of-time
+render-formatted-paragraph make-formatted-string draw-string-shaded
+render-formatted-string render-formatted-line resource
+font-text-extents write-sexp-to-file with-message-sender
+*message-sender* =textbox= read-sexp-from-file with-fields
+with-field-values write-pak *grammar* one-of left-hand-side
+right-hand-side expansions generate send-event-to-widgets play-music
+halt-music seek-music *joystick-mapping* *generic-joystick-mapping*
+*ps3-joystick-mapping* *joystick-button-symbols* draw-resource-image
+*event-handler-function* *use-sound* trace-rectangle trace-row
+trace-column trace-octagon trace-line midpoint =asterisk=
+=gray-asterisk= self *module-widgets* defsprite =sprite=
+get-some-object-name transform-declaration-field-descriptor
 show-widgets no-such-field =narrator= find-modules-in-directory goal
 =mission= =gateway= =launchpad= =environment= directory-is-module-p
 find-all-modules *next-module* transform-tree stat-value draw-line
@@ -127,16 +127,19 @@ draw-pixel *user-keyboard-layout* *fullscreen* draw-circle
 set-field-option-value =pager= =pager-prompt= load-module
 =sprite-special= field-options world set-frame-rate *frame-rate*
 =stack= *workbook* set-resource-modified-p *pak-file-extension*
-*window-title* *window-position* =split= set-timer-interval =gcell= defgcell
-=page=
-*message-logging* overlay poll-joystick-axis poll-joystick-button reset-joystick
-set-screen-width =universe= *universe* *play-args* set-screen-height
-genseq *zoom-factor* zoom-image is-zoomed-resource *timer-interval*
-save-modified-objects enable-timer disable-timer while defmission
-enable-held-keys disable-held-keys do-cells draw-box *resizable* achieve
-*resize-hook* draw-rectangle *quitting* *after-load-module-hook* *mission*
+*window-title* *window-position* =split= set-timer-interval =gcell=
+defgcell =page= *message-logging* overlay poll-joystick-axis
+poll-joystick-button reset-joystick set-screen-width =universe=
+*universe* *play-args* set-screen-height genseq *zoom-factor*
+zoom-image is-zoomed-resource *timer-interval* save-modified-objects
+enable-timer disable-timer while defmission enable-held-keys
+disable-held-keys do-cells draw-box *resizable* achieve *resize-hook*
+draw-rectangle *quitting* *after-load-module-hook* *mission*
 mission-variable set-mission-variable with-mission-locals =mission=
-set-sample-callback set-music-callback
+set-sample-callback set-music-callback cffi-chunk-buffer
+convert-cffi-sample get-sample-buffer register-sample-generator
+=voice= =looper=
+convert-cffi-sample-to-internal convert-internal-sample-to-cffi
 page-variable set-page-variable with-pages with-mission-locals
 *module* quit reset seek-music))
 
