@@ -834,7 +834,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		  (setf cell (aref location (- (fill-pointer location) 1)))
 		  (setf height 
 			(ecase display-style
-			  (:label (formatted-string-width *blank-cell-string*))
+			  (:label (formatted-string-height *blank-cell-string*))
 			  (:image (/height cell))))
 		  (update-height row height)
 		  (setf width 

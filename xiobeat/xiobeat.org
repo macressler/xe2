@@ -2,7 +2,10 @@
 
 * TODO indicate measures/rows 
 * TODO detect jump arrows
+* TODO indicate match progress
+* TODO sdl:*ticks*
 * TODO right side pane browses/chooses patterns in module
+* TODO last column after steps---command text for event trigger
 * TODO use expanded view to acommodate 8th and 16th notes (each row is a 
 * TODO background color of arrow gives 8th or 16th etc
 ** TODO speed up forms display
@@ -30,6 +33,6 @@
 *** (:X :down) --> XM pattern change to 2 (like numeric keypad)
 *** (:X :A) --> XM pattern change to 9 (like numeric keypad)
 ** usb microphone for making noise
-*** slight audio latency will not be a big problem
+*** slight mic audio latency will not be a big problem
 ** usb camera for making freestyle videos
 
