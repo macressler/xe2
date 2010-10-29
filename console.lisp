@@ -1370,10 +1370,7 @@ found."
 (defvar *module-package-name* nil)
 
 (defun module-package-name (&optional (module-name *module*))
-  (let ((default-name (or *module-package-name* (make-keyword module-name))))
-    (prog1 default-name
-      (unless (find-package default-name)
-	(error "Cannot find package ~S" default-name)))))
+  (or *module-package-name* (make-keyword module-name)))
     
 (defun load-module (module &key (autoload t))
   "Load the module named MODULE. Load any resources marked with a
@@ -1392,7 +1389,9 @@ object save directory (by setting the current `*module*'. See also
       (message "Loading saved objects from ~S" object-index-file)
       (index-pak module object-index-file)))
   (run-hook '*after-load-module-hook*)
-  (setf *package* (find-package (module-package-name))))
+  (let ((package (find-package (module-package-name))))
+    (when package
+      (setf *package* package))))
 
 ;;; Custom audio generation
 

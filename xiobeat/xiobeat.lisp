@@ -146,11 +146,12 @@
     ;; dropping commonly-used cells
     ("1" (:control) :drop-data-cell)
     ("2" (:control) :drop-command-cell)
+    ("3" (:control) :drop-button-cell)
     ;; toggling arrows
-    ("1" nil :toggle-left)
-    ("2" nil :toggle-down)
-    ("3" nil :toggle-up)
-    ("4" nil :toggle-right)
+    ("1" (:alt) :toggle-left)
+    ("2" (:alt) :toggle-down)
+    ("3" (:alt) :toggle-up)
+    ("4" (:alt) :toggle-right)
     ;; performing operations like clone, erase
     ("UP" (:control) :apply-right)
     ("DOWN" (:control) :apply-left)
@@ -188,6 +189,12 @@
 		     (:qwerty *qwerty-keybindings*)
 		     (otherwise *qwerty-keybindings*)))
     (/generic-keybind self binding)))
+
+(define-method play xiobeat-frame (sample)
+  (play-sample sample))
+
+(define-method play-music xiobeat-frame (music)
+  (play-music music :loop t))
 
 (define-method left-form xiobeat-frame ()
   (nth 0 <children>))
@@ -288,7 +295,16 @@ right side tool to the left side data."
 		   (sr (or top0 0))
 		   (sc (or left0 0)))
 	      (/paste-region destination source r0 c0 sr sc height width))))))))
-  
+
+(define-method make-step-chart xiobeat-frame (&rest args)
+  (/create-page (/left-form self) :object (apply #'clone =chart= args)))
+
+(define-method view xiobeat-frame (chart)
+  (/visit (/left-form self) chart))
+
+(define-method stop-music xiobeat-frame ()
+  (halt-music 0))
+    
 (define-method commands xiobeat-frame ()
   "Syntax: command-name arg1 arg2 ...
 Available commands: HELP EVAL SWITCH-PAGES LEFT-PAGE RIGHT-PAGE
@@ -522,22 +538,25 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (setf arrow new-arrow)
     (setf image (arrow-icon-image new-arrow))))
 
-(define-method is-active step ()
+(define-method is-on step ()
   <state>)
 
-(define-method activate step ()
+(define-method on step ()
   (setf <state> t)
   (setf <image> (arrow-icon-image <arrow>)))
 
-(define-method deactivate step ()
+(define-method off step ()
   (setf <state> nil)
   (setf <image> (arrow-icon-image :blank)))
 
 (define-method toggle step ()
   (with-fields (state) self
-    (if [is-active self]
-	[deactivate self]
-	[activate self])))
+    (if [is-on self]
+	[off self]
+	[on self])))
+
+(define-method activate step ()
+  (/toggle self))
 
 (define-method print step ()
   (format nil "~S" <arrow>))
@@ -549,7 +568,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 (define-method initialize step (&optional (arrow :blank))
   (/set self arrow)
-  [deactivate self])
+  (/off self))
 
 (define-prototype chart (:parent =page=))  
 
@@ -566,9 +585,8 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
       (dotimes (column (1- width))
 	(let ((step (clone =step=)))
 	  (/set step (nth column *dance-arrows*)) 
-	  (/deactivate step)
+	  (/off step)
 	  (vector-push-extend step (aref grid row column)))))))
-    
 
 ;;; Looping samples
 
@@ -604,49 +622,71 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	    (incf p)))
 	(setf <point> p)))))
 
-;;; Stomp mode is the basic functionality the other modes build on
+;;; Tracker mode
 
-(define-prototype stomper (:parent xe2:=prompt=))
+(define-prototype tracker (:parent xe2:=prompt=))
 ;;  (voice :initform (clone =looper=)))
 
-(define-method handle-key stomper (event)
+(define-method handle-key tracker (event)
   (let ((func (gethash event <keymap>)))
     (when (functionp func)
       (prog1 t (funcall func)))))
   
-(define-method install-keybindings stomper ()
+(define-method install-keybindings tracker ()
   (dolist (k *dance-keybindings*)
       (apply #'bind-key-to-prompt-insertion self k)))
 
-(define-method quit stomper ()
+(define-method quit tracker ()
   (xe2:quit))
 
-(define-method select stomper ())
+(define-method select tracker ())
 
-(define-method start stomper ())
+(define-method start tracker ())
 
-(define-method button-y stomper ()
-  (/play <voice> "electron1"))
+(define-method left-shift-p tracker ()
+  (plusp (poll-joystick-button (get-button-index :y))))
 
-(define-method button-x stomper ()
-  (/play <voice> "electron2"))
+(define-method right-shift-p tracker ()
+  (plusp (poll-joystick-button (get-button-index :x))))
 
-(define-method button-b stomper ())
+(define-method button-y tracker ()
+  (message "COOOOO"))
 
-(define-method button-a stomper ()
-  (play-sample "ka"))
+  ;; TODO status widget displays meaning of modifier
 
-(define-method up stomper ()
-  (play-sample "ting"))
+(define-method button-x tracker ())
 
-(define-method down stomper ()
-  (play-sample "scratch"))
+(define-method button-b tracker ())
 
-(define-method left stomper ()
-  (play-sample "snare3"))
+(define-method button-a tracker ()
+  (let ((form (if (/right-shift-p self)
+		  (/right-form *frame*)
+		  (/left-form *frame*))))
+    (/activate form)))
 
-(define-method right stomper ()
-  (play-sample "cymb"))
+(define-method up tracker ()
+  (let ((form (if (/right-shift-p self)
+		  (/right-form *frame*)
+		  (/left-form *frame*))))
+    (/move-cursor-up form)))
+    
+(define-method down tracker ()
+  (let ((form (if (/right-shift-p self)
+		  (/right-form *frame*)
+		  (/left-form *frame*))))
+    (/move-cursor-down form)))
+
+(define-method left tracker ()
+  (let ((form (if (/right-shift-p self)
+		  (/right-form *frame*)
+		  (/left-form *frame*))))
+    (/move-cursor-left form)))
+
+(define-method right tracker ()
+  (let ((form (if (/right-shift-p self)
+		  (/right-form *frame*)
+		  (/left-form *frame*))))
+    (/move-cursor-right form)))
 
 ;; (defun xiobeat ()
 ;;   (xe2:message "Initializing Xiobeat...")
@@ -654,7 +694,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 ;;   (setf xe2:*output-chunksize* 128)
 ;;   (xe2:set-screen-height *xiobeat-window-height*)
 ;;   (xe2:set-screen-width *xiobeat-window-width*)
-;;   (let* ((engine (clone =stomper=))
+;;   (let* ((engine (clone =tracker=))
 ;; 	 (status (clone =status=))
 ;; 	 (commander (clone =commander=)))
 ;;     [resize status :height 600 :width 200]
@@ -705,7 +745,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	 (quickhelp (clone =formatter=))
 	 (form (clone =form=))
 	 (form2 (clone =form= "*scratch*"))
-	 (engine (clone =stomper=))
+	 (engine (clone =tracker=))
  	 (status (clone =status=))
  	 (commander (clone =commander=))
 	 (terminal (clone =narrator=))

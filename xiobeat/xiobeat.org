@@ -1,22 +1,33 @@
 * Tasks
 
-* TODO page vars go in right form
-* TODO indicate measures/rows 
-* TODO detect jump arrows
-* TODO indicate match progress
-* TODO sdl:*ticks*
-** TODO creating/saving a module
-* TODO right side pane creates/browses/chooses patterns in module
-* TODO modeline displays page variables
-* DONE last column after steps---command text for event trigger
-CLOSED: [2010-10-29 Fri 00:04]
-* TODO use expanded view to acommodate 8th and 16th notes (each row is a 
-* TODO background color of arrow gives 8th or 16th etc
-** TODO speed up forms display
+
+* TODO SIDEBAR: page vars go in right form, or pattern browser
+** TODO links to other pages on page, button /visit
+** TODO right side pane creates/browses/chooses patterns in module
 ** TODO audio resource browser
-** TODO be able to change backing track 
-** TODO OpenAL http://www.devmaster.net/articles.php?catID=6
-** TODO register-music-finished
+** TODO A button -track config be able to change/start/stop/backing track
+** TODO X button -switch to sidebar
+** TODO Y 
+** TODO MOUSE CLICKS --> select 
+* TODO new phrase idea, separate from chart
+*** TODO dance phrases as before, but BEGIN with any corner button
+*** TODO (:A :right)  "right-form ."
+*** TODO (:A :left) "left-form ."
+*** TODO (:B) "cursor-up 
+*** TODO (:Y) "cursor-down"
+*** ALTERNATIVELY you could Hold down B and press arrows to move cursor on left side, 
+*** hold down X and press arrows to move cursor on right side
+*** A for confirm
+*** B for cancel
+*** toggle arrows by pressing them
+
+* TODO [#A] sdl:*ticks*
+** TODO creating/saving a module
+* TODO [#A] detect jump arrows and arrow accuracy
+* TODO [#B] indicate match progress
+* TODO [#B] modeline displays page variables
+* TODO [#C] indicate measures/rows graphically
+* TODO [#B] background color of arrow gives 8th or 16th etc
 
 * Features
 

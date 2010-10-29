@@ -43,6 +43,8 @@
 
 (define-method get cell ())
 
+(define-method activate cell ())
+
 (define-method set cell (data))
 
 (define-method print cell () "")

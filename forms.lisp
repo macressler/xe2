@@ -363,7 +363,7 @@ initialize the arrays for a page of the size specified there."
 			      (concatenate 'string " " key " "))))
 		    *event-cell-style*))))
 
-(define-method select event-cell ()
+(define-method activate event-cell ()
   ;; capture next event
   (setf <capturing> t))
 
@@ -423,7 +423,7 @@ initialize the arrays for a page of the size specified there."
 	      *button-cell-highlight-style*
 	      *button-cell-style*))))
 
-(define-method select button-cell ()
+(define-method activate button-cell ()
   (funcall <closure>)
   (setf <clock> *button-cell-highlight-time*))
 
@@ -684,7 +684,7 @@ Must be one of (:image :label)."
 (define-method activate form ()
   (let ((cell (/selected-cell self)))
     (when cell
-      (/select cell))))
+      (/activate cell))))
 
 (define-method eval form (&rest args)
   "Evaluate all the ARGS and print the result."
@@ -1167,5 +1167,8 @@ DIRECTION is one of :up :down :right :left."
 
 (define-method drop-command-cell form ()
   (/drop-at-cursor self =command-cell=))
+
+(define-method drop-button-cell form ()
+  (/drop-at-cursor self =button-cell=))
 
 ;;; forms.lisp ends here
