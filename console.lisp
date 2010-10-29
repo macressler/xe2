@@ -702,7 +702,7 @@ display."
 					       (with-message-queue (field-value :message-queue *world*)
 						 (case button
 						   (1 (when (has-method :select object) 
-							(send nil :select object)))
+							(send nil :activate object)))
 						   (3 (when (has-method :activate object) 
 							(send nil :activate object)))))
 					       (send nil :process-messages *world*)))))))
@@ -1851,7 +1851,7 @@ and its .startup resource is loaded."
 						       :format *sample-format*
 						       :channels *output-channels*))
 		       ;; if that didn't work, disable effects/music
-		       (message "Could not open audio driver. Disabling sound effects and music.")
+		       (message "Could not open audio Driver. Disabling sound effects and music.")
 		       (setf *use-sound* nil))
 		     ;; set to mix lots of sounds
 		     (sdl-mixer:allocate-channels *channels*))
