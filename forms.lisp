@@ -440,7 +440,7 @@ initialize the arrays for a page of the size specified there."
 (defcell command-cell command (clock :initform 0))
   
 (define-method initialize command-cell ()
-  (setf <label> (list (list "..."))))
+  (setf <label> (list (list "                    "))))
 
 (define-method set command-cell (command)
   (setf <command> command)
@@ -837,16 +837,8 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		(setf location (aref grid row column))
 		(when (and location (not (zerop (fill-pointer location))))
 		  (setf cell (aref location (- (fill-pointer location) 1)))
-		  (setf height 
-			(ecase display-style
-			  (:label (formatted-string-height *blank-cell-string*))
-			  (:image (/height cell))))
-		  (update-height row height)
-		  (setf width 
-			(ecase display-style
-			  (:label (formatted-string-width *blank-cell-string*))
-			  (:image (/width cell))))
-		  (update-width column width))))))))))
+		  (update-height row (/height cell))
+		  (update-width column (/width cell)))))))))))
 
 (defparameter *even-columns-format* '(:background ".gray50" :foreground ".gray10"))
 (defparameter *odd-columns-format* '(:background ".gray45" :foreground ".gray10"))
