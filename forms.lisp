@@ -856,7 +856,7 @@ If OBJECT is specified, use the NAME but ignore the HEIGHT and WIDTH."
 		   (or (/handle-key cell event)
 		       (send-parent self :handle-key self event)))
 		  ((and widget <entered>)
-		   (/handle-key widget event))
+		   (prog1 nil (/handle-key widget event)))
 		  (t (send-parent self :handle-key self event)))))
     (/compute-geometry self)))
 

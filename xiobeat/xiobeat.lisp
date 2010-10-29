@@ -539,12 +539,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	[deactivate self]
 	[activate self])))
 
-;; (define-method height step ()
-;;   (image-height <image>))
-
-;; (define-method width step ()
-;;   (image-width <image>))
-
 (define-method print step ()
   (format nil "~S" <arrow>))
 
@@ -574,6 +568,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (/set step (nth column *dance-arrows*)) 
 	  (/deactivate step)
 	  (vector-push-extend step (aref grid row column)))))))
+    
 
 ;;; Looping samples
 

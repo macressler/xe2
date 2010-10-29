@@ -5,14 +5,16 @@
 * TODO detect jump arrows
 * TODO indicate match progress
 * TODO sdl:*ticks*
-* TODO right side pane browses/chooses patterns in module
-* TODO last column after steps---command text for event trigger
+** TODO creating/saving a module
+* TODO right side pane creates/browses/chooses patterns in module
+* TODO modeline displays page variables
+* DONE last column after steps---command text for event trigger
+CLOSED: [2010-10-29 Fri 00:04]
 * TODO use expanded view to acommodate 8th and 16th notes (each row is a 
 * TODO background color of arrow gives 8th or 16th etc
 ** TODO speed up forms display
 ** TODO audio resource browser
 ** TODO be able to change backing track 
-** TODO creating/saving a module
 ** TODO OpenAL http://www.devmaster.net/articles.php?catID=6
 ** TODO register-music-finished
 

@@ -34,7 +34,7 @@
   row column
   (widget :initform nil)
   (image :initform nil :documentation "Image to display. either a resource name string, or an XE2 image object.")
-  (excluded-fields :initform '(:widget :image)))
+  (excluded-fields :initform '(:widget)))
   
 (define-method in-category cell (category)
   (member category <categories>))
@@ -81,7 +81,7 @@
 		      (color (or (when (and (listp label)
 					    (listp (last label)))
 				   (getf (cdr (car (last label))) :background))
-				 ".cyan"))
+				 ".black"))
 		      (spacer (when (plusp shortfall) 
 				(list nil :width shortfall :background color)))
 		      (line (if spacer (append label (list spacer))
@@ -90,7 +90,7 @@
 
 (defvar *default-cell-label* '((" DEF ")))
 
-(define-method label cell ()
+(define-method get-label cell ()
   (when label 
     (etypecase label
       (string (list (list label)))
