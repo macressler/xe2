@@ -1,12 +1,12 @@
 * Tasks
-
-* TODO implement smooth scrolling for dance display
-** TODO auto adjust pattern zoom to arrow position
-** TODO not based on formatter, just have it read 
 * TODO new phrase idea, separate from chart
 *** TODO dance phrases as before, but BEGIN with any corner button
 * TODO [#A] sdl:*ticks*
 ** TODO creating/saving a module
+
+* TODO implement smooth scrolling for dance display
+** TODO auto adjust pattern zoom to arrow position
+** TODO not based on formatter, just have it read 
 * TODO [#A] detect jump arrows and arrow accuracy
 * TODO [#B] indicate match progress
 * TODO [#B] modeline displays page variables
