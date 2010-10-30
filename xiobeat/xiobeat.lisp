@@ -523,7 +523,24 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (incf x *icon-width*))
 	(incf y *icon-height*)))))
 
-;;; Arrow phrase tele-prompter
+;;; Dance step scrolling display
+
+;; 4 columns, use ABXY keys to select column, you can play a
+;; whole phrase to loop stuff and/or interrupt loops at any time
+;; left side is beat, right side is etc, up to 4 tracks.
+
+ ;; to do the freestyle UI
+ ;; well, after making the step charts, 
+ ;; can be 4 sets of ddr-style arrows scrolling up in 4 big columns 
+ ;; for the beat 
+ ;; for the pads
+ ;; for the bass
+ ;; or whatever the song requires then you
+ ;; can start something looping after you complete dancing the pattern
+ ;; successfully once and switch to another of the 4 tracks using one of
+ ;; the corner buttons.  change relative volumes of each track by holding
+ ;; corner button while pressing up/down left-right could be Pan
+ ;; ok then where do you see the step options as you freestyle? make an onscreen palette.
 
 (defvar *commander* nil)
 
