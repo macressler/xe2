@@ -83,15 +83,24 @@
 
 (defvar *beats-per-minute* 120)
 
-(defun ticks-per-beat (bpm)
-  (float (/ +ticks-per-minute+ bpm)))
-
 (defvar *position* 0.0 "Song position in ticks. Fractional ticks are allowed.")
 
 (defun position-seconds ()
   (float (/ *position* 1000)))
 
-(defvar *wall-ticks* 0)
+(defvar *ticks* 0)
+
+(defun ticks-per-beat (bpm)
+  (float (/ +ticks-per-minute+ bpm)))
+
+(defvar *beat* 0)
+
+(defun do-timestep ()
+  (setf *ticks* (xe2:get-ticks))
+  (let* ((minutes-per-tick (/ 1.0 +ticks-per-minute+)))
+    (setf *beat* (truncate (* *ticks* *beats-per-minute* minutes-per-tick)))))
+;; beats    minutes   beats   ticks = beat
+;; minute * tick    * tick  *  
 
 (defparameter *window-width* 1280)
 (defparameter *window-height* 720)
@@ -514,7 +523,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (incf x *icon-width*))
 	(incf y *icon-height*)))))
 
-;;; Arrow phrase command display/processor
+;;; Arrow phrase tele-prompter
 
 (defvar *commander* nil)
 
@@ -574,6 +583,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 (define-method make chart (&key (zoom 2) (bars 2))
   (/initialize self 
+	       ;; need rightmost row for actions
 	       :width (1+ (length *dance-arrows*))
 	       :height (* 4 zoom bars)) 
   (with-field-values (height width grid) self
@@ -587,6 +597,25 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (/set step (nth column *dance-arrows*)) 
 	  (/off step)
 	  (vector-push-extend step (aref grid row column)))))))
+
+(define-method row-steps chart (row)
+  (with-field-values (width) self
+    (let (steps)
+      (dotimes (column (length *dance-arrows*))
+	(let ((step (/top-cell row column)))
+	  (when (and step (/is-on step))
+	    (push (/get step) steps))))
+      (return steps))))
+	 
+(define-method row-command chart (row)
+  (with-field-values (width grid) self
+    (/top-cell self row (length *dance-arrows*))))
+
+;;; Sequences
+
+;; Sequences are lists of the form:
+;; ((TICKS . ARROW-OR-COMMAND))
+
 
 ;;; Looping samples
 
@@ -649,8 +678,11 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (define-method right-shift-p tracker ()
   (plusp (poll-joystick-button (get-button-index :x))))
 
-(define-method button-y tracker ()
-  (message "COOOOO"))
+(define-method either-shift-p tracker ()
+  (or (/left-shift-p self)
+      (/right-shift-p self)))
+
+(define-method button-y tracker ())
 
   ;; TODO status widget displays meaning of modifier
 
@@ -659,31 +691,31 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (define-method button-b tracker ())
 
 (define-method button-a tracker ()
-  (let ((form (if (/right-shift-p self)
+  (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/activate form)))
 
 (define-method up tracker ()
-  (let ((form (if (/right-shift-p self)
+  (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/move-cursor-up form)))
     
 (define-method down tracker ()
-  (let ((form (if (/right-shift-p self)
+  (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/move-cursor-down form)))
 
 (define-method left tracker ()
-  (let ((form (if (/right-shift-p self)
+  (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/move-cursor-left form)))
 
 (define-method right tracker ()
-  (let ((form (if (/right-shift-p self)
+  (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/move-cursor-right form)))
@@ -736,7 +768,8 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (xe2:message "Initializing XIOBEAT...")
   (setf xe2:*window-title* "XIOBEAT")
   (clon:initialize)
-;  (setf *physics-function* #'update-loop)
+  (setf *physics-function* #'do-timestep)
+  (setf *ticks* 0)
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
   (let* ((prompt (clone =xiobeat-prompt=))

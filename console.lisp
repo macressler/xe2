@@ -1720,6 +1720,11 @@ The default destination is the main window."
 		    destination)
   (sdl:draw-circle-* x y radius :surface destination :color (find-resource-object color)))
 
+;;; Millisecond clock
+
+(defun get-ticks ()
+  (sdl:sdl-get-ticks))
+
 ;;; Engine status
 
 (defun quit (&optional shutdown)

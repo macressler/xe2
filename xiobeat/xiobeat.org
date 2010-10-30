@@ -1,26 +1,10 @@
 * Tasks
 
-
-* TODO SIDEBAR: page vars go in right form, or pattern browser
-** TODO links to other pages on page, button /visit
-** TODO right side pane creates/browses/chooses patterns in module
-** TODO audio resource browser
-** TODO A button -track config be able to change/start/stop/backing track
-** TODO X button -switch to sidebar
-** TODO Y 
-** TODO MOUSE CLICKS --> select 
+* TODO implement smooth scrolling for dance display
+** TODO auto adjust pattern zoom to arrow position
+** TODO not based on formatter, just have it read 
 * TODO new phrase idea, separate from chart
 *** TODO dance phrases as before, but BEGIN with any corner button
-*** TODO (:A :right)  "right-form ."
-*** TODO (:A :left) "left-form ."
-*** TODO (:B) "cursor-up 
-*** TODO (:Y) "cursor-down"
-*** ALTERNATIVELY you could Hold down B and press arrows to move cursor on left side, 
-*** hold down X and press arrows to move cursor on right side
-*** A for confirm
-*** B for cancel
-*** toggle arrows by pressing them
-
 * TODO [#A] sdl:*ticks*
 ** TODO creating/saving a module
 * TODO [#A] detect jump arrows and arrow accuracy
@@ -28,6 +12,13 @@
 * TODO [#B] modeline displays page variables
 * TODO [#C] indicate measures/rows graphically
 * TODO [#B] background color of arrow gives 8th or 16th etc
+
+
+* TODO SIDEBAR: page vars go in right form, or pattern browser
+** TODO links to other pages on page, button /visit
+** TODO right side pane creates/browses/chooses patterns in module
+** TODO audio resource browser
+** TODO MOUSE CLICKS --> select 
 
 * Features
 

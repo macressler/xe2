@@ -140,6 +140,7 @@ set-sample-callback set-music-callback cffi-chunk-buffer =command-cell=
 convert-cffi-sample get-sample-buffer register-sample-generator
 =voice= register-voice unregister-voice register-voice-mixer mix-voices
 convert-cffi-sample-to-internal convert-internal-sample-to-cffi
+get-ticks
 page-variable set-page-variable with-pages with-mission-locals
 *module* quit reset seek-music))
 
