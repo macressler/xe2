@@ -1,0 +1,10 @@
+( 
+ (:name "voxelay" :type :music :file "voxelay.xm" :properties (:volume 255))
+ (:name "yeah1" :type :sample :file "yeah1.wav" :properties (:volume 255))
+ (:name "yeah2" :type :sample :file "yeah2.wav" :properties (:volume 255))
+ (:name "yeah3" :type :sample :file "yeah3.wav" :properties (:volume 255))
+ (:name "vox1" :type :sample :file "vox1.wav" :properties (:volume 255))
+ (:name "vox2" :type :sample :file "vox2.wav" :properties (:volume 255))
+ (:name "vox3" :type :sample :file "vox3.wav" :properties (:volume 255))
+ (:name "vox4" :type :sample :file "vox4.wav" :properties (:volume 255))
+)

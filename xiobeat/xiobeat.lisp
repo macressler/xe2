@@ -470,23 +470,31 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 ;;; Displaying arrows as icons
 
-(defparameter *icon-height* 32)
-(defparameter *icon-width* 32)
+(defparameter *large-arrow-height* 64)
+(defparameter *large-arrow-width* 64)
 
-;; (defparameter *icon-images* 
-;;   '(:up "up" :left "left" :right "right" :down "down"
-;;     :a "a" :x "x" :y "y" :b "b" :period "period" :prompt "prompt"))
+(defparameter *large-arrow-images* 
+  '(:up "up" :left "left" :right "right" :down "down"
+    :a "a" :x "x" :y "y" :b "b" 
+    :period "period" :prompt "prompt" :blank "blank"))
 
-(defparameter *icon-images* 
+(defparameter *medium-arrow-height* 32)
+(defparameter *medium-arrow-width* 32)
+
+(defparameter *medium-arrow-images* 
   '(:up "up-medium" :left "left-medium" :right "right-medium" :down "down-medium"
     :a "a-medium" :x "x-medium" :y "y-medium" :b "b-medium" 
     :period "period-medium" :prompt "prompt-medium" :blank "blank-medium"))
 
-(defun arrow-icon-image (arrow)
-  (getf *icon-images* arrow))
+(defun arrow-image (arrow); &optional (size :medium))
+  ;; TODO FIXME
+  ;; (let ((images (etypecase size
+  ;; 		  (:large *large-arrow-images*)
+  ;; 		  (:medium *medium-arrow-images*))))
+    (getf *medium-arrow-images* arrow))
 
-(defun arrow-icon-formatted-string (arrow)
-  (list nil :image (arrow-icon-image arrow)))
+(defun arrow-formatted-string (arrow)
+  (list nil :image (arrow-image arrow)))
 
 ;;; System status display widget
 
@@ -496,7 +504,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 (define-prototype status (:parent xe2:=widget=)
   (height :initform *window-height*)
-  (width :initform (+  (* 3 *icon-width*)
+  (width :initform (+  (* 3 *medium-arrow-width*)
 			(* 2 *margin-size*))))
 
 (define-method render status ()
@@ -511,17 +519,17 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	(setf x 0)
 	(dolist (button row)
 	  (when button
-	    (let ((icon (arrow-icon-image button))
+	    (let ((icon (arrow-image button))
 		  (index (get-button-index button)))
 	      ;; draw a rectangle if the button is pressed
 	      ;; TODO nice shaded glowing panels
 	      (when (plusp (poll-joystick-button index))
-		(draw-box x y *icon-height* *icon-height*
+		(draw-box x y *medium-arrow-height* *medium-arrow-height*
 			  :stroke-color ".dark orange" :color ".dark orange" :destination image))
 	      ;; draw the icon above the rectangle, if any
 	      (draw-resource-image icon x y :destination image)))
-	  (incf x *icon-width*))
-	(incf y *icon-height*)))))
+	  (incf x *medium-arrow-width*))
+	(incf y *medium-arrow-height*)))))
 
 ;;; Dance step scrolling display
 
@@ -529,18 +537,15 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 ;; whole phrase to loop stuff and/or interrupt loops at any time
 ;; left side is beat, right side is etc, up to 4 tracks.
 
- ;; to do the freestyle UI
- ;; well, after making the step charts, 
- ;; can be 4 sets of ddr-style arrows scrolling up in 4 big columns 
- ;; for the beat 
- ;; for the pads
- ;; for the bass
- ;; or whatever the song requires then you
- ;; can start something looping after you complete dancing the pattern
- ;; successfully once and switch to another of the 4 tracks using one of
- ;; the corner buttons.  change relative volumes of each track by holding
- ;; corner button while pressing up/down left-right could be Pan
- ;; ok then where do you see the step options as you freestyle? make an onscreen palette.
+ ;; to do the freestyle UI well, after making the step charts, can be
+ ;; 4 sets of ddr-style arrows scrolling up in 4 big columns for the
+ ;; beat for the pads for the bass or whatever the song requires then
+ ;; you can start something looping after you complete dancing the
+ ;; pattern successfully once and switch to another of the 4 tracks
+ ;; using one of the corner buttons.  change relative volumes of each
+ ;; track by holding corner button while pressing up/down left-right
+ ;; could be Pan ok then where do you see the step options as you
+ ;; freestyle? make an onscreen palette.
 
 (defvar *commander* nil)
 
@@ -548,7 +553,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (display-current-line :initform t))
 
 (define-method insert commander (arrow)
-  (/print-formatted-string self (arrow-icon-formatted-string arrow)))
+  (/print-formatted-string self (arrow-formatted-string arrow)))
 
 ;;; Step charts are pages full of steps
 
@@ -562,18 +567,18 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (assert (member new-arrow *dance-phrase-symbols*))
   (with-fields (arrow image) self
     (setf arrow new-arrow)
-    (setf image (arrow-icon-image new-arrow))))
+    (setf image (arrow-image new-arrow))))
 
 (define-method is-on step ()
   <state>)
 
 (define-method on step ()
   (setf <state> t)
-  (setf <image> (arrow-icon-image <arrow>)))
+  (setf <image> (arrow-image <arrow>)))
 
 (define-method off step ()
   (setf <state> nil)
-  (setf <image> (arrow-icon-image :blank)))
+  (setf <image> (arrow-image :blank)))
 
 (define-method toggle step ()
   (with-fields (state) self
