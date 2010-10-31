@@ -722,7 +722,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	(setf beat-position (/ position (ticks-per-beat beats-per-minute)))
 	(let* ((chart (find-resource-object chart-name))
 	       (zoom (or (/get chart :zoom) 1)))
-	  (let ((row (* zoom 
+	  (let ((row (* zoom
 			(/ (- time chart-start-time)
 			   (ticks-per-beat beats-per-minute)))))
 	    (setf chart-row (truncate row))
