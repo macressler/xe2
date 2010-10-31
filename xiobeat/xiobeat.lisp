@@ -706,7 +706,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (let ((time (get-ticks)))
     (setf <start-time> time)
     (setf <playing> t)
-    (/begin-chart self "maniac2")
+    (/begin-chart self "maniac3")
     (/update-timers self)
     (play-music "voxelay" :loop t)))
 

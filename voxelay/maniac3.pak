@@ -1,0 +1,1297 @@
+((:NAME "maniac3" :TYPE :OBJECT :PROPERTIES COMMON-LISP:NIL :FILE
+  COMMON-LISP:NIL :DATA
+  (:%CLON%OBJECT% :PARENT XIOBEAT::=CHART= :FIELDS
+   (:SERIALIZED-GRID
+    #2A((((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"scratch1\"")) :CLOCK 0 :COMMAND
+            ("play \"scratch1\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("")) :CLOCK 0 :COMMAND ("")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "up-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"snare\"")) :CLOCK 0 :COMMAND
+            ("play \"snare\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "down-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"scratch1\"")) :CLOCK 0 :COMMAND
+            ("play \"scratch1\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"snare\"")) :CLOCK 0 :COMMAND
+            ("play \"snare\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "up-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "down-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"boomclick\"")) :CLOCK 0 :COMMAND
+            ("play \"boomclick\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "up-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"yeah3\"")) :CLOCK 0 :COMMAND
+            ("play \"yeah3\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "up-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "up-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"scratch2\"")) :CLOCK 0 :COMMAND
+            ("play \"scratch2\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "down-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"snare\"")) :CLOCK 0 :COMMAND
+            ("play \"snare\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "up-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"snare\"")) :CLOCK 0 :COMMAND
+            ("play \"snare\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "down-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("play \"scratch1\"")) :CLOCK 0 :COMMAND
+            ("play \"scratch1\"")))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "up-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "down-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "right-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "left-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:T :IMAGE "up-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0))))
+        (((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :LEFT)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :DOWN)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :UP)))
+         ((:%CLON%OBJECT% :PARENT XIOBEAT::=STEP= :FIELDS
+           (:STATE COMMON-LISP:NIL :IMAGE "blank-medium" :ARROW :RIGHT)))
+         ((:%CLON%OBJECT% :PARENT XIOMACS-ENGINE-2:=COMMAND-CELL= :FIELDS
+           (:LABEL (("                    ")) :CLOCK 0)))))
+    :NAME "maniac3" :WIDTH 5 :HEIGHT 128 :VARIABLES
+    (:%CLON%HASH-TABLE% COMMON-LISP:EQUAL)))
+  :OBJECT COMMON-LISP:NIL))

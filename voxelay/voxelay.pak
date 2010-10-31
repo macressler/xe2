@@ -7,4 +7,8 @@
  (:name "vox2" :type :sample :file "vox2.wav" :properties (:volume 255))
  (:name "vox3" :type :sample :file "vox3.wav" :properties (:volume 255))
  (:name "vox4" :type :sample :file "vox4.wav" :properties (:volume 255))
+ (:name "scratch1" :type :sample :file "scratch1.wav" :properties (:volume 255))
+ (:name "scratch2" :type :sample :file "scratch2.wav" :properties (:volume 255))
+ (:name "boomclick" :type :sample :file "boomclick.wav" :properties (:volume 255))
+ (:name "snare" :type :sample :file "snare.wav" :properties (:volume 255))
 )
