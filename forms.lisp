@@ -450,6 +450,10 @@ initialize the arrays for a page of the size specified there."
 (define-method get command-cell () 
   <command>)
 
+(define-method command-string command-cell ()
+  (when <command> 
+    (apply #'concatenate 'string <command>)))
+
 (define-method compute command-cell () 
   (with-fields (label clock) self
     (unless (zerop clock)

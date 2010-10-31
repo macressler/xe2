@@ -606,7 +606,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (when (< row height)
       (let (steps)
 	(dotimes (column (length *dance-arrows*))
-	  (let ((step (/top-cell row column)))
+	  (let ((step (/top-cell self row column)))
 	    (when (and step (/is-on step))
 	      (push (/get step) steps))))
 	(sort steps #'string<)))))
@@ -662,7 +662,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 ;;; Tracker mode
 
-(defvar *jump-tolerance* 30) ;; milliseconds
+(defvar *step-tolerance* 50) ;; milliseconds
 
 (define-prototype tracker (:parent xe2:=prompt=)
   (beats-per-minute :initform 110) (row-remainder :initform 0.0) voice playing
@@ -725,11 +725,13 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (let ((row (* zoom
 			(/ (- time chart-start-time)
 			   (ticks-per-beat beats-per-minute)))))
-	    (setf chart-row (truncate row))
-	    (setf row-remainder (- row chart-row)))))
+	    (multiple-value-bind (quotient remainder)
+		(truncate row)
+	      (setf chart-row quotient)
+	      (setf row-remainder remainder)))))
       ;; expire button presses
       (labels ((expired (event)
-		 (< *jump-tolerance* 
+		 (< *step-tolerance* 
 		    (abs (- time (event-time event))))))
 	(setf events (remove-if #'expired events))))))
       
@@ -737,16 +739,29 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (/update-timers self)
   (let ((time (get-ticks)))
     (with-fields (events chart-name chart-row row-remainder) self
-      (push (cons time arrow) events)
-      ;; now test for hit
-      (labels ((pressed (arrow)
-		 (find arrow events :key #'cdr)))
-	(when (and (every #'pressed (/row-steps chart chart-row))
-		   (< row-remainder *jump-tolerance*))
-	  (message "HIT")
-	  (setf events nil)
-	  (let ((command (/row-command chart chart-row)))
-	    (when command (/execute command))))))))
+      (let ((chart (find-resource-object chart-name)))
+	(assert chart)
+	(push (cons time arrow) events)
+	;; now test for hit
+	(labels ((pressed (arrow)
+		   (find arrow events :key #'cdr)))
+	  (let ((steps (/row-steps chart chart-row)))
+	  (when (and steps (every #'pressed steps)
+		     ;; compare in milliseconds
+		     (< (* (/ 1 (ticks-per-beat <beats-per-minute>))
+			   row-remainder)
+			*step-tolerance*))
+	    (play-sample "vox4")
+	    (setf events nil)
+	    (let ((command (/row-command chart chart-row)))
+	      (when command 
+		(let ((command-string (/command-string command)))
+		  (when (plusp (length command-string))
+		    (/insert self command-string)
+		    (/execute self))))))))))))
+
+(define-method play tracker (sample)
+  (play-sample sample))
 
 (define-method button-y tracker ())
 
@@ -797,7 +812,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	   (row chart-row)
 	   (x 0)
 	   (y (if row-remainder 
-		  (truncate (- (/ row-remainder *large-arrow-height*)))
+		  (truncate (- (* row-remainder *large-arrow-height*)))
 		  0)))
       ;; draw targets
       (let ((images (if (< row-remainder 0.2)
@@ -805,11 +820,10 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 			*dark-target-arrow-images*)))
 	(dolist (arrow *dance-arrows*)
 	  (draw-resource-image (getf images arrow)
-			       x y :destination image)
+			       x 0 :destination image)
 	  (incf x *large-arrow-width*)))
       ;; draw step chart
       (when chart
-	(message "TYPE ~S" (type-of chart))
 	(loop until (>= y height) 
 	      do (setf x 0)
 		 (dolist (arrow (/row-list chart (truncate row)))
@@ -913,7 +927,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	       (/move status :x 0 :y 0)
 	       (/show status)
 	       (setf *status* status)
-	       (/resize engine :height 500 :width 500)
+	       (/resize engine :height 700 :width 500)
 	       (/move engine :x 0 :y 0)
 	       (/show engine)
 	       (/set-receiver engine engine)
