@@ -81,7 +81,9 @@
 
 (defconstant +ticks-per-minute+ 60000 "Each tick is one millisecond.")
 
-(defvar *beats-per-minute* 120)
+(defvar *beats-per-minute* 110)
+
+(defvar *beats-per-bar* 4)
 
 (defvar *position* 0.0 "Song position in ticks. Fractional ticks are allowed.")
 
@@ -94,13 +96,6 @@
   (float (/ +ticks-per-minute+ bpm)))
 
 (defvar *beat* 0)
-
-(defun do-timestep ()
-  (setf *ticks* (xe2:get-ticks))
-  (let* ((minutes-per-tick (/ 1.0 +ticks-per-minute+)))
-    (setf *beat* (truncate (* *ticks* *beats-per-minute* minutes-per-tick)))))
-;; beats    minutes   beats   ticks = beat
-;; minute * tick    * tick  *  
 
 (defparameter *window-width* 1280)
 (defparameter *window-height* 720)
@@ -486,6 +481,12 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     :a "a-medium" :x "x-medium" :y "y-medium" :b "b-medium" 
     :period "period-medium" :prompt "prompt-medium" :blank "blank-medium"))
 
+(defparameter *target-arrow-images*
+  '(:up "target-up" :down "target-down" :left "target-left" :right "target-right"))
+
+(defparameter *dark-target-arrow-images*
+  '(:up "dark-target-up" :down "dark-target-down" :left "dark-target-left" :right "dark-target-right"))
+
 (defun arrow-image (arrow); &optional (size :medium))
   ;; TODO FIXME
   ;; (let ((images (etypecase size
@@ -530,30 +531,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	      (draw-resource-image icon x y :destination image)))
 	  (incf x *medium-arrow-width*))
 	(incf y *medium-arrow-height*)))))
-
-;;; Dance step scrolling display
-
-;; 4 columns, use ABXY keys to select column, you can play a
-;; whole phrase to loop stuff and/or interrupt loops at any time
-;; left side is beat, right side is etc, up to 4 tracks.
-
- ;; to do the freestyle UI well, after making the step charts, can be
- ;; 4 sets of ddr-style arrows scrolling up in 4 big columns for the
- ;; beat for the pads for the bass or whatever the song requires then
- ;; you can start something looping after you complete dancing the
- ;; pattern successfully once and switch to another of the 4 tracks
- ;; using one of the corner buttons.  change relative volumes of each
- ;; track by holding corner button while pressing up/down left-right
- ;; could be Pan ok then where do you see the step options as you
- ;; freestyle? make an onscreen palette.
-
-(defvar *commander* nil)
-
-(define-prototype commander (:parent xe2:=formatter=)
-  (display-current-line :initform t))
-
-(define-method insert commander (arrow)
-  (/print-formatted-string self (arrow-formatted-string arrow)))
 
 ;;; Step charts are pages full of steps
 
@@ -603,11 +580,11 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 (define-prototype chart (:parent =page=))  
 
-(define-method make chart (&key (zoom 2) (bars 2))
+(define-method make chart (&key (zoom 1) (bars 2))
   (/initialize self 
 	       ;; need rightmost row for actions
 	       :width (1+ (length *dance-arrows*))
-	       :height (* 4 zoom bars)) 
+	       :height (* *beats-per-bar* zoom bars)) 
   (with-field-values (height width grid) self
     (setf (page-variable :zoom) zoom)
     (setf (page-variable :bars) bars)
@@ -621,23 +598,29 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (vector-push-extend step (aref grid row column)))))))
 
 (define-method row-steps chart (row)
-  (with-field-values (width) self
-    (let (steps)
-      (dotimes (column (length *dance-arrows*))
-	(let ((step (/top-cell row column)))
-	  (when (and step (/is-on step))
-	    (push (/get step) steps))))
-      (return steps))))
-	 
+  (with-field-values (width height) self
+    (when (< row height)
+      (let (steps)
+	(dotimes (column (length *dance-arrows*))
+	  (let ((step (/top-cell row column)))
+	    (when (and step (/is-on step))
+	      (push (/get step) steps))))
+	(return (sort steps #'string<))))))
+  
+(define-method row-list chart (row)
+  (with-field-values (width height) self
+    (when (< row height)
+      (let (steps)
+	(dotimes (column (length *dance-arrows*))
+	  (let ((step (/top-cell row column)))
+	    (if (/is-on step)
+		(push (/get step) steps)
+		(push nil steps))))
+	(return steps)))))
+
 (define-method row-command chart (row)
   (with-field-values (width grid) self
     (/top-cell self row (length *dance-arrows*))))
-
-;;; Sequences
-
-;; Sequences are lists of the form:
-;; ((TICKS . ARROW-OR-COMMAND))
-
 
 ;;; Looping samples
 
@@ -675,8 +658,14 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 ;;; Tracker mode
 
-(define-prototype tracker (:parent xe2:=prompt=))
-;;  (voice :initform (clone =looper=)))
+(defvar *jump-tolerance* 30) ;; milliseconds
+
+(define-prototype tracker (:parent xe2:=prompt=)
+  (beats-per-minute :initform 110) row-remainder voice playing
+   start-position position events chart-name)
+
+(defun event-time (event) (car event))
+(defun event-arrow (event) (cdr event)) 
 
 (define-method handle-key tracker (event)
   (let ((func (gethash event <keymap>)))
@@ -690,9 +679,22 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (define-method quit tracker ()
   (xe2:quit))
 
-(define-method select tracker ())
+(define-method select tracker ()
+  (setf <start-time> nil)
+  (setf <playing> nil))
 
-(define-method start tracker ())
+(define-method begin-chart tracker (chart-name)
+  (setf <chart-start-time> (get-ticks))
+  (setf <chart-name> chart-name)
+  (setf <chart-row> 0))
+
+(define-method start tracker ()
+  (let ((time (get-ticks)))
+    (setf <start-time> time)
+    (setf <playing> t)
+    (/update-timers self)
+    (/begin-chart self "maniac")
+    (play-music "voxelay" :loop t)))
 
 (define-method left-shift-p tracker ()
   (plusp (poll-joystick-button (get-button-index :y))))
@@ -706,8 +708,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 (define-method button-y tracker ())
 
-  ;; TODO status widget displays meaning of modifier
-
 (define-method button-x tracker ())
 
 (define-method button-b tracker ())
@@ -717,6 +717,43 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/activate form)))
+
+(define-method update-timers tracker ()
+  (with-fields (beats-per-minute beat-position playing events
+				 start-time position chart-name
+				 chart-start-time row-remainder
+				 chart-row) self
+    (let ((time (get-ticks))
+	  (minutes-per-tick (/ 1.0 +ticks-per-minute+)))
+      (setf position (- time start-time))
+      (setf beat-position (/ position (ticks-per-beat beats-per-minute)))
+      (let* ((chart (find-resource-object chart-name))
+	     (zoom (/get chart :zoom)))
+	(let ((row (* zoom 
+		      (/ (- time chart-start-time)
+			 (ticks-per-beat beats-per-minute)))))
+	  (setf chart-row (truncate row))
+	  (setf row-remainder (- row chart-row))
+	  ;; expire button presses
+	  (labels ((expired (event)
+		     (< *jump-tolerance* 
+			(abs (- time (event-time event))))))
+	    (setf events (remove-if #'expired events))))))))
+      
+(define-method do-arrow-event tracker (arrow)
+  (/update-timers self)
+  (let ((time (get-ticks)))
+    (with-fields (events chart-name chart-row row-remainder) self
+      (push (cons time arrow) events)
+      ;; now test for hit
+      (labels ((pressed (arrow)
+		 (find arrow events :key #'cdr)))
+	(when (and (every #'pressed (/row-steps chart chart-row))
+		   (< row-remainder *jump-tolerance*))
+	  (message "HIT")
+	  (setf events nil)
+	  (let ((command (/row-command chart chart-row)))
+	    (when command (/execute command))))))))
 
 (define-method up tracker ()
   (let ((form (if (/either-shift-p self)
@@ -741,6 +778,34 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/move-cursor-right form)))
+	  
+(define-method render tracker ()
+  (with-field-values (height width chart-name image chart-row
+			     row-remainder) self
+    (draw-box 0 0 width height :stroke-color ".black" :color ".black" 
+	      :destination image)
+    (let* ((chart (find-resource-object chart-name))
+	   (row chart-row)
+	   (x 0)
+	   (y (- (/ row-remainder *large-arrow-height*))))
+      ;; draw targets
+      (let ((images (if (< row-remainder 0.2)
+			*target-arrow-images*
+			*dark-target-arrow-images*)))
+	(dolist (arrow *dance-arrows*)
+	  (draw-resource-image (getf images arrow)
+			       x y :destination image)
+	  (incf x *large-arrow-width*)))
+      ;; draw step chart
+      (loop until (>= y height) 
+	    do (setf x 0)
+	       (dolist (arrow (/row-list chart (truncate row)))
+		 (when arrow 
+		   (draw-resource-image (arrow-image arrow)
+					x y :destination image))
+		 (incf x *large-arrow-width*))
+	       (incf row)
+	       (incf y *large-arrow-height*)))))
 
 ;; (defun xiobeat ()
 ;;   (xe2:message "Initializing Xiobeat...")
@@ -790,7 +855,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (xe2:message "Initializing XIOBEAT...")
   (setf xe2:*window-title* "XIOBEAT")
   (clon:initialize)
-  (setf *physics-function* #'do-timestep)
   (setf *ticks* 0)
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
@@ -809,6 +873,9 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     ;;
     (setf *form* form)
     (setf *engine* engine)
+    (setf *physics-function* #'(lambda ()
+				 (when *engine*
+				   (/update-timers *engine*))))
     (setf *prompt* prompt)
     (setf *terminal* terminal)
     (setf *frame* frame)
@@ -915,7 +982,8 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (setf *pager* (clone =pager=))
     (/auto-position *pager*)
     ;;
-    (/add-page *pager* :edit (list engine prompt stack frame terminal status quickhelp))
+    (/add-page *pager* :engine (list engine))
+    (/add-page *pager* :chart (list engine prompt stack frame terminal status quickhelp))
     (/add-page *pager* :help (list help-prompt help))
     (/select *pager* :edit)
     (xe2:reset-joystick)
@@ -928,3 +996,27 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 ))
 
 (xiobeat)
+
+;;; Dance step scrolling display
+
+;; 4 columns, use ABXY keys to select column, you can play a
+;; whole phrase to loop stuff and/or interrupt loops at any time
+;; left side is beat, right side is etc, up to 4 tracks.
+
+ ;; to do the freestyle UI well, after making the step charts, can be
+ ;; 4 sets of ddr-style arrows scrolling up in 4 big columns for the
+ ;; beat for the pads for the bass or whatever the song requires then
+ ;; you can start something looping after you complete dancing the
+ ;; pattern successfully once and switch to another of the 4 tracks
+ ;; using one of the corner buttons.  change relative volumes of each
+ ;; track by holding corner button while pressing up/down left-right
+ ;; could be Pan ok then where do you see the step options as you
+ ;; freestyle? make an onscreen palette.
+
+;; (defvar *commander* nil)
+
+;; (define-prototype commander (:parent xe2:=formatter=)
+;;   (display-current-line :initform t))
+
+;; (define-method insert commander (arrow)
+;;   (/print-formatted-string self (arrow-formatted-string arrow)))

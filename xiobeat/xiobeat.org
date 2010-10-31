@@ -1,8 +1,6 @@
 * Tasks
-* TODO new phrase idea, separate from chart
-*** TODO dance phrases as before, but BEGIN with any corner button
-* TODO [#A] sdl:*ticks*
-** TODO creating/saving a module
+
+
 
 * TODO implement smooth scrolling for dance display
 ** TODO auto adjust pattern zoom to arrow position
@@ -10,15 +8,16 @@
 * TODO [#A] detect jump arrows and arrow accuracy
 * TODO [#B] indicate match progress
 * TODO [#B] modeline displays page variables
-* TODO [#C] indicate measures/rows graphically
 * TODO [#B] background color of arrow gives 8th or 16th etc
-
+* TODO creating/saving a module // adding samples 
 
 * TODO SIDEBAR: page vars go in right form, or pattern browser
 ** TODO links to other pages on page, button /visit
 ** TODO right side pane creates/browses/chooses patterns in module
 ** TODO audio resource browser
 ** TODO MOUSE CLICKS --> select 
+
+* TODO [#C] indicate measures/rows graphically
 
 * Features
 
@@ -40,4 +39,15 @@
 ** usb microphone for making noise
 *** slight mic audio latency will not be a big problem
 ** usb camera for making freestyle videos
+
+
+* Archived Entries
+** DONE [#A] sdl:*ticks*
+CLOSED: [2010-10-30 Sat 19:08]
+:PROPERTIES:
+:ARCHIVE_TIME: 2010-10-30 Sat 19:09
+:ARCHIVE_FILE: ~/xe2/xiobeat/xiobeat.org
+:ARCHIVE_CATEGORY: xiobeat
+:ARCHIVE_TODO: DONE
+:END:
 
