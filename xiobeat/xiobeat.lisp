@@ -300,8 +300,10 @@ right side tool to the left side data."
 		   (sc (or left0 0)))
 	      (/paste-region destination source r0 c0 sr sc height width))))))))
 
-(define-method make-step-chart xiobeat-frame (&rest args)
-  (/create-page (/left-form self) :object (apply #'clone =chart= args)))
+(define-method make-step-chart xiobeat-frame (&rest parameters)
+  (let ((chart (clone =chart=)))
+    (/make-with-parameters chart parameters)
+    (/visit (/left-form self) chart)))
 
 (define-method view xiobeat-frame (chart)
   (/visit (/left-form self) chart))
@@ -580,11 +582,13 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 (define-prototype chart (:parent =page=))  
 
-(define-method make chart (&key (zoom 1) (bars 2))
+(define-method make chart (&key (zoom 1) (bars 2) name)
+  (message "RECEIVED Z~S B~S N~S" zoom bars name)
   (/initialize self 
 	       ;; need rightmost row for actions
 	       :width (1+ (length *dance-arrows*))
-	       :height (* *beats-per-bar* zoom bars)) 
+	       :height (* *beats-per-bar* zoom bars)
+	       :name name)
   (with-field-values (height width grid) self
     (setf (page-variable :zoom) zoom)
     (setf (page-variable :bars) bars)
@@ -605,18 +609,18 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (let ((step (/top-cell row column)))
 	    (when (and step (/is-on step))
 	      (push (/get step) steps))))
-	(return (sort steps #'string<))))))
+	(sort steps #'string<)))))
   
 (define-method row-list chart (row)
   (with-field-values (width height) self
     (when (< row height)
       (let (steps)
 	(dotimes (column (length *dance-arrows*))
-	  (let ((step (/top-cell row column)))
+	  (let ((step (/top-cell self row column)))
 	    (if (/is-on step)
 		(push (/get step) steps)
 		(push nil steps))))
-	(return steps)))))
+	(nreverse steps)))))
 
 (define-method row-command chart (row)
   (with-field-values (width grid) self
@@ -661,8 +665,8 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (defvar *jump-tolerance* 30) ;; milliseconds
 
 (define-prototype tracker (:parent xe2:=prompt=)
-  (beats-per-minute :initform 110) row-remainder voice playing
-   start-position position events chart-name)
+  (beats-per-minute :initform 110) (row-remainder :initform 0.0) voice playing
+   start-position position events chart-name chart-row)
 
 (defun event-time (event) (car event))
 (defun event-arrow (event) (cdr event)) 
@@ -683,19 +687,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (setf <start-time> nil)
   (setf <playing> nil))
 
-(define-method begin-chart tracker (chart-name)
-  (setf <chart-start-time> (get-ticks))
-  (setf <chart-name> chart-name)
-  (setf <chart-row> 0))
-
-(define-method start tracker ()
-  (let ((time (get-ticks)))
-    (setf <start-time> time)
-    (setf <playing> t)
-    (/update-timers self)
-    (/begin-chart self "maniac")
-    (play-music "voxelay" :loop t)))
-
 (define-method left-shift-p tracker ()
   (plusp (poll-joystick-button (get-button-index :y))))
 
@@ -706,17 +697,18 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (or (/left-shift-p self)
       (/right-shift-p self)))
 
-(define-method button-y tracker ())
+(define-method begin-chart tracker (chart-name)
+  (setf <chart-start-time> (get-ticks))
+  (setf <chart-name> chart-name)
+  (setf <chart-row> 0))
 
-(define-method button-x tracker ())
-
-(define-method button-b tracker ())
-
-(define-method button-a tracker ()
-  (let ((form (if (/either-shift-p self)
-		  (/right-form *frame*)
-		  (/left-form *frame*))))
-    (/activate form)))
+(define-method start tracker ()
+  (let ((time (get-ticks)))
+    (setf <start-time> time)
+    (setf <playing> t)
+    (/begin-chart self "maniac2")
+    (/update-timers self)
+    (play-music "voxelay" :loop t)))
 
 (define-method update-timers tracker ()
   (with-fields (beats-per-minute beat-position playing events
@@ -725,20 +717,21 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 				 chart-row) self
     (let ((time (get-ticks))
 	  (minutes-per-tick (/ 1.0 +ticks-per-minute+)))
-      (setf position (- time start-time))
-      (setf beat-position (/ position (ticks-per-beat beats-per-minute)))
-      (let* ((chart (find-resource-object chart-name))
-	     (zoom (/get chart :zoom)))
-	(let ((row (* zoom 
-		      (/ (- time chart-start-time)
-			 (ticks-per-beat beats-per-minute)))))
-	  (setf chart-row (truncate row))
-	  (setf row-remainder (- row chart-row))
-	  ;; expire button presses
-	  (labels ((expired (event)
-		     (< *jump-tolerance* 
-			(abs (- time (event-time event))))))
-	    (setf events (remove-if #'expired events))))))))
+      (when playing
+	(setf position (- time start-time))
+	(setf beat-position (/ position (ticks-per-beat beats-per-minute)))
+	(let* ((chart (find-resource-object chart-name))
+	       (zoom (or (/get chart :zoom) 1)))
+	  (let ((row (* zoom 
+			(/ (- time chart-start-time)
+			   (ticks-per-beat beats-per-minute)))))
+	    (setf chart-row (truncate row))
+	    (setf row-remainder (- row chart-row)))))
+      ;; expire button presses
+      (labels ((expired (event)
+		 (< *jump-tolerance* 
+		    (abs (- time (event-time event))))))
+	(setf events (remove-if #'expired events))))))
       
 (define-method do-arrow-event tracker (arrow)
   (/update-timers self)
@@ -755,25 +748,41 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	  (let ((command (/row-command chart chart-row)))
 	    (when command (/execute command))))))))
 
+(define-method button-y tracker ())
+
+(define-method button-x tracker ())
+
+(define-method button-b tracker ())
+
+(define-method button-a tracker ()
+  (let ((form (if (/either-shift-p self)
+		  (/right-form *frame*)
+		  (/left-form *frame*))))
+    (/activate form)))
+
 (define-method up tracker ()
+  [do-arrow-event self :up]
   (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/move-cursor-up form)))
     
 (define-method down tracker ()
+  [do-arrow-event self :down]
   (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/move-cursor-down form)))
 
 (define-method left tracker ()
+  [do-arrow-event self :left]
   (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
     (/move-cursor-left form)))
 
 (define-method right tracker ()
+  [do-arrow-event self :right]
   (let ((form (if (/either-shift-p self)
 		  (/right-form *frame*)
 		  (/left-form *frame*))))
@@ -784,10 +793,12 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 			     row-remainder) self
     (draw-box 0 0 width height :stroke-color ".black" :color ".black" 
 	      :destination image)
-    (let* ((chart (find-resource-object chart-name))
+    (let* ((chart (when chart-name (find-resource-object chart-name)))
 	   (row chart-row)
 	   (x 0)
-	   (y (- (/ row-remainder *large-arrow-height*))))
+	   (y (if row-remainder 
+		  (truncate (- (/ row-remainder *large-arrow-height*)))
+		  0)))
       ;; draw targets
       (let ((images (if (< row-remainder 0.2)
 			*target-arrow-images*
@@ -797,19 +808,21 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 			       x y :destination image)
 	  (incf x *large-arrow-width*)))
       ;; draw step chart
-      (loop until (>= y height) 
-	    do (setf x 0)
-	       (dolist (arrow (/row-list chart (truncate row)))
-		 (when arrow 
-		   (draw-resource-image (arrow-image arrow)
-					x y :destination image))
-		 (incf x *large-arrow-width*))
-	       (incf row)
-	       (incf y *large-arrow-height*)))))
-
-;; (defun xiobeat ()
-;;   (xe2:message "Initializing Xiobeat...")
-;;   (setf xe2:*window-title* "Xiobeat")
+      (when chart
+	(message "TYPE ~S" (type-of chart))
+	(loop until (>= y height) 
+	      do (setf x 0)
+		 (dolist (arrow (/row-list chart (truncate row)))
+		   (when arrow 
+		     (draw-resource-image (getf *large-arrow-images* arrow)
+					  x y :destination image))
+		   (incf x *large-arrow-width*))
+		 (incf row)
+		 (incf y *large-arrow-height*))))))
+  
+  ;; (defun xiobeat ()
+  ;;   (xe2:message "Initializing Xiobeat...")
+  ;;   (setf xe2:*window-title* "Xiobeat")
 ;;   (setf xe2:*output-chunksize* 128)
 ;;   (xe2:set-screen-height *xiobeat-window-height*)
 ;;   (xe2:set-screen-width *xiobeat-window-width*)
@@ -866,7 +879,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	 (form2 (clone =form= "*scratch*"))
 	 (engine (clone =tracker=))
  	 (status (clone =status=))
- 	 (commander (clone =commander=))
 	 (terminal (clone =narrator=))
 	 (frame (clone =xiobeat-frame=))
 	 (stack (clone =stack=)))
@@ -901,14 +913,10 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	       (/move status :x 0 :y 0)
 	       (/show status)
 	       (setf *status* status)
-	       (/resize engine :height 20 :width 100)
-	       (/move engine :x 200 :y 0)
-	       (/hide engine)
+	       (/resize engine :height 500 :width 500)
+	       (/move engine :x 0 :y 0)
+	       (/show engine)
 	       (/set-receiver engine engine)
-	       (/resize commander :height 550 :width 580)
-	       (/move commander :x 200 :y 25)
-	       (/hide commander)
-	       (setf *commander* commander)
 	       ;;	           [set-receiver prompt engine]
 	       (/resize stack :width *screen-width* :height (- *screen-height* *pager-height* *prompt-height*))
 	       [install-keybindings engine]
@@ -958,6 +966,10 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (let ((text	(find-resource-object "xiobeat-help-message")))
       (/set-buffer help text))
     ;;
+    (/resize engine :height 500 :width 500)
+    (/move engine :x 0 :y 0)
+    (/show engine)
+    ;;
     (/resize quickhelp :height *quickhelp-height* :width *quickhelp-width*)
     (/move quickhelp :y (- *screen-height* *quickhelp-height* *pager-height*) :x (- *screen-width* *quickhelp-width* *quickhelp-spacer*))
     (let ((text	(find-resource-object "xiobeat-quickhelp-message")))
@@ -983,9 +995,9 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (/auto-position *pager*)
     ;;
     (/add-page *pager* :engine (list engine))
-    (/add-page *pager* :chart (list engine prompt stack frame terminal status quickhelp))
+    (/add-page *pager* :chart (list prompt stack frame terminal status quickhelp))
     (/add-page *pager* :help (list help-prompt help))
-    (/select *pager* :edit)
+    (/select *pager* :chart)
     (xe2:reset-joystick)
     (xe2:enable-classic-key-repeat 100 100)
     (/focus-left *frame*)

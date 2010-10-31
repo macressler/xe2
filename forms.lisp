@@ -39,14 +39,15 @@
   (message-queue :initform (make-queue))
   (excluded-fields :initform '(:grid)))
 
-(define-method initialize page (&key height width)
+(define-method initialize page (&key height width name)
     (when height (setf <height> height))
     (when width (setf <width> width))
+    (when name (setf <name> name))
     (setf <variables> (make-hash-table :test 'equal))
     (/create-default-grid self))
   
 (define-method make page (&rest parameters)
-  (/initialize self))
+  (apply #'/initialize self parameters))
 
 (define-method make-with-parameters page (parameters)
   (apply #'send self :make self parameters))
