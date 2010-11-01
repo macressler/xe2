@@ -79,10 +79,6 @@
 
 (defconstant +ticks-per-minute+ 60000 "Each tick is one millisecond.")
 
-(defvar *beats-per-minute* 110)
-
-(defvar *beats-per-bar* 4)
-
 (defvar *position* 0.0 "Song position in ticks. Fractional ticks are allowed.")
 
 (defun position-seconds ()
@@ -376,17 +372,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 ;;; Dance gesture input
 
-;; A dance phrase is a sequence of dance pad button presses. Each
-;; phrase consists of an optional command prefix (one of the corner
-;; buttons, with each one controlling a separate system function)
-;; followed by zero or more dance arrows (up, down, left, or right) or
-;; jumps (:up-left, :up-right, :up-down, :left-right, :down-left,
-;; :down-right) A phrase is terminated by a "period" (represented by a
-;; circle) which can be entered using any of the four corner
-;; buttons. The period immediately executes the command (if any). You
-;; can enter each of the four system menus by double stomping a corner
-;; arrow, i.e. a command phrase with no arrows in it.
-
 (defparameter *dance-arrows* '(:left :down :up :right)) ;; in standard order
 
 (defparameter *corner-buttons* '(:a :b :x :y))
@@ -578,18 +563,21 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (/set self arrow)
   (/off self))
 
-(define-prototype chart (:parent =page=))  
+(define-prototype chart (:parent =page=)
+  (zoom :initform 2)
+  (bars :initform 1)
+  (beats-per-bar :initform 4))
 
-(define-method make chart (&key (zoom 1) (bars 2) name)
+(define-method make chart (&key zoom bars name)
   (message "RECEIVED Z~S B~S N~S" zoom bars name)
   (/initialize self 
 	       ;; need rightmost row for actions
 	       :width (1+ (length *dance-arrows*))
-	       :height (* *beats-per-bar* zoom bars)
+	       :height (* <beats-per-bar> zoom bars)
 	       :name name)
   (with-field-values (height width grid) self
-    (setf (page-variable :zoom) zoom)
-    (setf (page-variable :bars) bars)
+    (setf <zoom> (or <zoom> zoom))
+    (setf <bars> (or <bars> bars))
     (dotimes (row height)
       (vector-push-extend (clone =command-cell=)
       			  (aref grid row (1- width)))
@@ -660,10 +648,11 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 ;;; Tracker mode
 
-(defvar *step-tolerance* 50) ;; milliseconds
+(defvar *step-tolerance* 20) ;; milliseconds
 
 (define-prototype tracker (:parent xe2:=prompt=)
-  (beats-per-minute :initform 110) (row-remainder :initform 0.0) voice playing
+  (beats-per-minute :initform 110) 
+  (row-remainder :initform 0.0) voice playing
    start-position position events chart-name chart-row)
 
 (defun event-time (event) (car event))
@@ -719,7 +708,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	(setf position (- time start-time))
 	(setf beat-position (/ position (ticks-per-beat beats-per-minute)))
 	(let* ((chart (find-resource-object chart-name))
-	       (zoom (or (/get chart :zoom) 1)))
+	       (zoom (field-value :zoom chart) 1))
 	  (let ((row (* zoom
 			(/ (- time chart-start-time)
 			   (ticks-per-beat beats-per-minute)))))

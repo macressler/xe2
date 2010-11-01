@@ -1,5 +1,6 @@
 * Tasks
 
+* TODO Design 32x32 block font that can be doubled to 64x64
 * TODO implement smooth scrolling for dance display
 ** TODO auto adjust pattern zoom to arrow position
 ** TODO not based on formatter, just have it read 
