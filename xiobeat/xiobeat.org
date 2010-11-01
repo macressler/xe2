@@ -1,7 +1,5 @@
 * Tasks
 
-
-
 * TODO implement smooth scrolling for dance display
 ** TODO auto adjust pattern zoom to arrow position
 ** TODO not based on formatter, just have it read 

@@ -36,13 +36,11 @@
 
 ;;; Modes of play 
 
-;; Stomp your feet to create sound in Stomp mode using any Ogg
-;; Vorbis or XM (Extended Module) format song as a backing track, and
-;; load any WAV sample into each of the 8 dance pad buttons to be
-;; triggered by foot stomps. Using XM songs as a backing track allows
-;; you to alter the music by choosing different patterns to loop from
-;; the XM. For more about the Extended Module song standard, see 
-;; http://en.wikipedia.org/wiki/XM_(file_format)
+;; Stomp your feet to create sound in Stomp mode using any Ogg Vorbis
+;; or XM (Extended Module) format song as a backing track, and load
+;; any WAV sample into each of the 8 dance pad buttons to be triggered
+;; by foot stomps. For more about the Extended Module song standard,
+;; see http://en.wikipedia.org/wiki/XM_(file_format)
 
 ;; With the more sophisticated Track mode you can create, improvise,
 ;; or follow dance routines using XIOBEAT's dance gesture input
