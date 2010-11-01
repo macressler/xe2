@@ -74,42 +74,51 @@
 
 (in-package :xiobeat)
 
-(setf xe2:*resizable* t)
-(setf xe2:*dt* 20)
+;;; User interface widgets and layout
 
-(defconstant +ticks-per-minute+ 60000 "Each tick is one millisecond.")
+(defparameter *window-width* 1280 
+  "Initial width of the game window.")
 
-(defvar *position* 0.0 "Song position in ticks. Fractional ticks are allowed.")
+(defparameter *window-height* 720 
+  "Initial height of the game window.")
 
-(defun position-seconds ()
-  (float (/ *position* 1000)))
+(defparameter *prompt-height* 20 
+  "Height in pixels of the interactive command prompt.")
 
-(defvar *ticks* 0)
+(defparameter *quickhelp-height* 140 
+  "Height in pixels of the Quick Help reference display.")
 
-(defun ticks-per-beat (bpm)
-  (float (/ +ticks-per-minute+ bpm)))
+(defparameter *quickhelp-width* 390 
+  "Width in pixels of the Quick Help reference display.")
 
-(defvar *beat* 0)
-
-(defparameter *window-width* 1280)
-(defparameter *window-height* 720)
-(defparameter *prompt-height* 20)
-(defparameter *quickhelp-height* 140)
-(defparameter *quickhelp-width* 390)
 (defparameter *quickhelp-spacer* 0)
-(defparameter *terminal-height* 100)
-(defparameter *pager-height* 20)
-(defparameter *sidebar-width* 200)
-(defparameter *status-height* (* 32 3))
-(defparameter *modes* '(:stomp :track :puzzle))
-(defvar *mode* :stomp)
-(defvar *form*)
-(defvar *terminal*)
-(defvar *prompt*)
-(defvar *pager*)
-(defvar *frame*)
-(defvar *track*)
-(defvar *engine*)
+
+(defparameter *terminal-height* 100
+  "Height in pixels of the message window.")
+
+(defparameter *pager-height* 20 
+  "Height in pixels of the page selection indicator.")
+
+(defparameter *sidebar-width* 200
+  "Width in pixels of the right side form widget.")
+
+(defparameter *status-height* (* 32 3)
+  "Height in pixels of the status bar widget.")
+
+(defvar *terminal* nil "The message window widget.")
+
+(defvar *prompt* nil "The command prompt widget.")
+
+(defvar *pager* nil 
+"A widget for switching among multiple screens of widgets.")
+
+(defvar *frame* nil "The XIOBEAT editor widget with two subwindows.")
+
+(defvar *module* nil "Name of current song module.")
+
+(defvar *engine* nil "Dance engine sound generator.")
+
+(defvar *form* nil "The main spreadsheet widget.")
 
 (defun handle-xiobeat-command (command)
   (assert (stringp command))
@@ -117,6 +126,13 @@
   (/execute *prompt*))
 
 (setf xe2:*form-command-handler-function* #'handle-xiobeat-command)
+
+(defparameter *modes* '(:stomp :track :puzzle))
+
+(defvar *mode* :stomp)
+
+;;; Define the main widgets of the UI. 
+;; Please refer to widgets.lisp and forms.lisp 
 
 (define-prototype xiobeat-frame (:parent xe2:=split=))
 
@@ -327,7 +343,9 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (define-method toggle-right xiobeat-frame ()
   (/toggle (/cell-at self (field-value :cursor-row (/selected-form self)) 3)))
 
-;;; Main command prompt
+;;; Interactive command prompt
+
+;; see also widgets.lisp
 
 (define-prototype xiobeat-prompt (:parent xe2:=prompt=))
 
@@ -347,7 +365,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   [parent>>exit self]
   (/refocus *frame*))
       
-;;; Dance pad layout
+;;; Dance pad support
 
 ;;    The diagram below gives the standard dance pad layout for
 ;;    XIOBEAT. Many generic USB and/or game console compatible dance
@@ -383,13 +401,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 (defparameter *dance-phrase-symbols*
   (append *punctuation* *dance-arrows* *corner-buttons* *function-buttons*))
 
-;; Track-specific phrases have no command prefix. These trigger sounds
-;; or other events.
-
-(defun is-command-phrase (phrase)
-  (member (first phrase) *corner-buttons*))
-
-;; Configure the engine so that it translates dance pad button presses
+;; Configure the XE2 engine so that it translates dance pad button presses
 ;; into standard XE2 joystick events.
 
 (setf xe2:*joystick-button-symbols* *dance-phrase-symbols*)
@@ -422,12 +434,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     ("JOYSTICK" (:start :button-down) "start .")
     ("JOYSTICK" (:select :button-down) "select .")))
 
-;; Other commands must be configured per layout, currently there are
-;; none.
-
-;; (defparameter *qwerty-keybindings*
-;;   (append *basic-keybindings* nil))
-
 ;; Including configurations for common dance pads is a good idea.
 ;; Eventually we need a real configuration menu (for the beta.)
 
@@ -443,12 +449,16 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
     (8 . :select)
     (9 . :start)))
 
+;; TODO (defparameter *hyperkin-adapter-mapping* 
+
+;; TODO (defun auto-detect-pad
+
 (setf xe2:*joystick-mapping* *energy-dance-pad-mapping*)
 
 (defun get-button-index (arrow)
   (first (find arrow *joystick-mapping* :key #'cdr)))
 
-;;; Displaying arrows as icons
+;;; Displaying arrows as images
 
 (defparameter *large-arrow-height* 64)
 (defparameter *large-arrow-width* 64)
@@ -465,6 +475,9 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   '(:up "up-medium" :left "left-medium" :right "right-medium" :down "down-medium"
     :a "a-medium" :x "x-medium" :y "y-medium" :b "b-medium" 
     :period "period-medium" :prompt "prompt-medium" :blank "blank-medium"))
+
+(defparameter *target-arrow-height* 64)
+(defparameter *target-arrow-width* 64)
 
 (defparameter *target-arrow-images*
   '(:up "target-up" :down "target-down" :left "target-left" :right "target-right"))
@@ -569,9 +582,8 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (beats-per-bar :initform 4))
 
 (define-method make chart (&key zoom bars name)
-  (message "RECEIVED Z~S B~S N~S" zoom bars name)
   (/initialize self 
-	       ;; need rightmost row for actions
+	       ;; reserve rightmost column for action buttons
 	       :width (1+ (length *dance-arrows*))
 	       :height (* <beats-per-bar> zoom bars)
 	       :name name)
@@ -648,11 +660,20 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 
 ;;; Tracker mode
 
-(defvar *step-tolerance* 20) ;; milliseconds
+(defvar *step-tolerance* 20 
+  "Maximum time in milliseconds for delay between simultaneous steps.")
 
-(define-prototype tracker (:parent xe2:=prompt=)
+(defconstant +ticks-per-minute+ 60000 "Each tick is one millisecond.")
+
+(defun ticks-per-beat (bpm)
+  (float (/ +ticks-per-minute+ bpm)))
+
+(define-prototype tracker 
+  (:parent xe2:=prompt= 
+   :documentation "A tracker object is the engine for Track mode.")
   (beats-per-minute :initform 110) 
-  (row-remainder :initform 0.0) voice playing
+  (row-remainder :initform 0.0)
+  voice playing
    start-position position events chart-name chart-row)
 
 (defun event-time (event) (car event))
@@ -708,7 +729,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	(setf position (- time start-time))
 	(setf beat-position (/ position (ticks-per-beat beats-per-minute)))
 	(let* ((chart (find-resource-object chart-name))
-	       (zoom (field-value :zoom chart) 1))
+	       (zoom (field-value :zoom chart)))
 	  (let ((row (* zoom
 			(/ (- time chart-start-time)
 			   (ticks-per-beat beats-per-minute)))))
@@ -799,7 +820,7 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 	   (row chart-row)
 	   (x 0)
 	   (y (if row-remainder 
-		  (truncate (- (* row-remainder *large-arrow-height*)))
+		  (round (- (* row-remainder *large-arrow-height*)))
 		  0)))
       ;; draw targets
       (let ((images (if (< row-remainder 0.2)
@@ -821,31 +842,6 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
 		 (incf row)
 		 (incf y *large-arrow-height*))))))
   
-  ;; (defun xiobeat ()
-  ;;   (xe2:message "Initializing Xiobeat...")
-  ;;   (setf xe2:*window-title* "Xiobeat")
-;;   (setf xe2:*output-chunksize* 128)
-;;   (xe2:set-screen-height *xiobeat-window-height*)
-;;   (xe2:set-screen-width *xiobeat-window-width*)
-;;   (let* ((engine (clone =tracker=))
-;; 	 (status (clone =status=))
-;; 	 (commander (clone =commander=)))
-;;     [resize status :height 600 :width 200]
-;;     [move status :x 0 :y 0]
-;;     [resize engine :height 20 :width 100]
-;;     [move engine :x 200 :y 0]
-;;     [show engine]
-;;     [resize commander :height 550 :width 580]
-;;     [move commander :x 200 :y 25]
-;;     [show commander]
-;;     (setf *commander* commander)
-;;     [set-receiver engine engine]
-;;     [install-keybindings engine]
-;;     (xe2:reset-joystick)
-;;     (set-music-volume 255)
-;;     (xe2:install-widgets status engine commander)
-;;     (xe2:enable-classic-key-repeat 100 100)))
-
 (define-prototype help-prompt (:parent =prompt=)
   (default-keybindings :initform '(("N" nil "page-down .")
 				   ("P" nil "page-up ."))))
@@ -869,7 +865,8 @@ CLONE ERASE CREATE-PAGE PASTE QUIT ENTER EXIT"
   (xe2:message "Initializing XIOBEAT...")
   (setf xe2:*window-title* "XIOBEAT")
   (clon:initialize)
-  (setf *ticks* 0)
+  (setf xe2:*dt* 20) ;; 20 millisecond timestep
+  (setf xe2:*resizable* t) ;; We want the game window to be resizable.
   (xe2:set-screen-height *window-height*)
   (xe2:set-screen-width *window-width*)
   (let* ((prompt (clone =xiobeat-prompt=))
