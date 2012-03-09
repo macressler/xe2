@@ -1,7 +1,0 @@
-(
- (:name "floor" :type :image :file "floor.png")
- (:name "frantix" :type :music :file "frantix.ogg" :properties (:volume 20))
- (:name "bip" :type :sample :file "bip.wav" :properties (:volume 10))
- (:name "help-message" :type :text :file "README")
- (:name ".startup" :type :lisp :file "voyager.lisp" :properties (:autoload t))
-)

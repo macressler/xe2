@@ -1,7 +1,0 @@
-((("CONTROLS:                          " :background ".blue" :foreground ".white"))
- (("move: arrows / numpad / hjkl       " :background ".gray20" :foreground ".gray80"))
- (("shoot: SHIFT-Direction             "  :background ".gray14" :foreground ".gray80"))
- (("rotate: Z  get/action: X  drop: C  "  :background ".gray20" :foreground ".gray80"))
- (("help: F1      pause: CONTROL-P     "  :background ".gray14" :foreground ".gray80")))
- 
-		     

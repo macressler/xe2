@@ -1,4 +1,0 @@
-(in-package :void)
-
-(void)
-

@@ -1,9 +1,0 @@
-;; (replace-regexp "\"\\([^.\"]+\.png\"\\)" "\"\\1")
-(
- (:name ".default-font" :type :font :properties (:height 14 :width 7) :data "7x14b")
-
- (:name "electron" :type :music :file "electron.xm" :properties (:volume 100))
- (:name "bip" :type :sample :file "bip.wav" :properties (:volume 3))
-
- (:name ".startup" :type :lisp :file "xiodance.lisp")
-)

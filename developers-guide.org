@@ -1,3 +1,0 @@
-* Page moved
-
-RLX has been renamed XE2. This content has been moved to [[http://dto.github.com/notebook/xe2-reference.html][the XE2 page]].
